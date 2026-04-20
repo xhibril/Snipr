@@ -1,7 +1,6 @@
 package com.xhibril.snipr.dto.auth;
 
 public class SignUpRequest {
-
     private String email;
     private String password;
 
