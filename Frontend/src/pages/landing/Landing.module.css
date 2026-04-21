@@ -1,0 +1,139 @@
+.mainContainer {
+
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: repeat;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg width=%222000%22 height=%221400%22 xmlns=%22http:%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath fill=%22%23fcfeff%22 d=%22M0 0h2000v1400H0z%22%2F%3E%3Cpath d=%22M0 350h0c110.645 6.945 221.29 13.89 334 11 112.71-2.89 227.482-15.618 339-22s219.78-6.42 328-3 216.4 10.298 324 12 214.623-1.773 343-5c128.377-3.227 278.108-6.208 337-5 58.892 1.208 26.946 6.604 35 12%22 fill=%22none%22 stroke=%22%23e8f9fe%22 stroke-width=%225%22 stroke-linecap=%22round%22%2F%3E%3Cpath d=%22M0 700h0c106.781 4.41 213.563 8.822 325 12 111.437 3.178 227.53 5.124 339-2s218.317-23.318 330-26c111.683-2.682 228.204 8.147 337 17 108.796 8.853 209.868 15.73 335 12 125.132-3.73 274.323-18.066 334-22 59.677-3.934 29.838 2.533 40 9%22 fill=%22none%22 stroke=%22%23edfaff%22 stroke-width=%225%22 stroke-linecap=%22round%22%2F%3E%3Cpath d=%22M0 1050h0c109.187-1.481 218.375-2.963 328-1s219.688 7.369 331 10c111.312 2.631 223.874 2.487 335-5s220.817-22.316 331-20c110.183 2.316 220.857 21.777 346 25 125.143 3.223 264.755-9.794 322-14 57.245-4.206 32.122.397 47 5%22 fill=%22none%22 stroke=%22%23e8f9ff%22 stroke-width=%225%22 stroke-linecap=%22round%22%2F%3E%3C%2Fsvg%3E");
+
+  display: grid;
+  grid-template-rows: auto 1fr 1fr;
+}
+
+
+.topRow {
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  width: 100%;
+    margin-top: 1rem;
+
+}
+
+.brand {
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap:.5rem;
+  margin-left:1rem;
+}
+
+.brandLogo {
+  width: 3rem;
+
+}
+
+.brandTitle{
+    font-weight: bold;
+  letter-spacing: -2px;
+  font-family: "Archivo Black", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+  margin:0;
+  padding:0;
+}
+
+.navBar{
+  display: flex;
+  gap:2rem;
+  margin-left: 5rem;
+  
+}
+
+.navBar a{
+  position: relative;
+  cursor: pointer;
+  font-size: .9rem;
+  opacity: .6;
+}
+
+.navBar a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+
+    width: 100%;
+    height: 2px;
+    background-color: black;
+
+    opacity: 0;
+    transform: scaleX(0);
+    transition: all 0.25s ease;
+}
+
+.navBar a:hover::after {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+.authRow{
+  gap:1rem;
+  display: flex;
+  margin-left:auto;
+  margin-right:2rem;
+  
+}
+.signupBtn, .loginBtn {
+  border: none;
+  color:white;
+  padding:1rem 2rem;
+  font-weight: bold;
+  border-radius: .3rem;
+  cursor: pointer;
+    transition: 0.2s all ease;
+}
+
+.signupBtn{
+
+    background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+}
+.loginBtn {
+  background-color:#44444E;
+}
+
+.signupBtn:hover{
+   background: linear-gradient(90deg, #4b6cb7 0%, #182848 00%);
+}
+
+
+.loginBtn:hover{
+   background-color:#84848b;
+
+}
+
+
+
+
+.heroSection{
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.heroText{
+
+  font-family: 'Inter', sans-serif;
+  font-size:3rem;
+
+}
+
+.miniDesc{
+  font-size:.9rem;
+  opacity: .8;
+}
