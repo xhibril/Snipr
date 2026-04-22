@@ -7,4 +7,5 @@ body,
   font-family: 'Open Sans', sans-serif;
   background: #F5F6FA;
   font-size: clamp(14px, 1.1vw, 18px);
+  min-height: 100vh;
 }
