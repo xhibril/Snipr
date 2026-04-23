@@ -138,6 +138,7 @@
   align-items: center;
   flex-direction: column;
   min-height: 60vh;
+  text-align: center;
 }
 .heroText{
 
@@ -313,5 +314,49 @@ gap:1rem;
 .arrowDown,
 .arrowUp {
     margin-left: auto;
+    min-width: 2rem;
 
+}
+
+
+@media (max-width: 1024px) {
+  
+
+
+
+}
+
+
+
+@media (max-width: 768px) {
+
+  .topRowFeatures, .bottomRowFeatures {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .topRow{
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    margin-top: 1rem;
+
+    gap:2rem;
+
+  }
+
+ 
+  .authRow,.navBar, .brand{
+    margin:0;
+  }
+
+ 
+  
+}
+
+
+@media (max-width: 480px) {
+
+  
 }

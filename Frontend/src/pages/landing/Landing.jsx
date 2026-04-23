@@ -7,16 +7,17 @@ import copy from "../../assets/images/copyIcon.svg"
 import pin from "../../assets/images/pin.svg"
 
 import { FiArrowDown, FiArrowUp } from "react-icons/fi";
+import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
 
 export default function Landing() {
+
+  const nav = useNavigate();
 
 
   return <>
 
     <div className={styles.mainContainer}>
-
-
       <div className={styles.topRow}>
 
         <div className={styles.brand}>
@@ -25,16 +26,18 @@ export default function Landing() {
         </div>
 
         <nav className={styles.navBar}>
-          <a>Home</a>
-          <a href = "#features">Features</a>
-          <a>Support</a>
+           <Link to="/">Home</Link>
+          <a href="#features">Features</a>
+           <Link to="/support">Support</Link>
 
         </nav>
 
 
         <div className={styles.authRow}>
-          <button className={styles.signupBtn}>Sign up</button>
-          <button className={styles.loginBtn}>Login</button>
+          <button className={styles.signupBtn}
+          onClick={() => nav("/signup")}>Sign up</button>
+          <button className={styles.loginBtn}
+          onClick={() => nav("/login")}>Login</button>
         </div>
 
       </div>
@@ -47,16 +50,14 @@ export default function Landing() {
 
         <p className={styles.miniDesc}>Stay organized, save snippets quickly, and access them anytime you need.</p>
 
-        <button className={styles.heroSectionBtn}>Try now</button>
+        <button className={styles.heroSectionBtn}
+        onClick={() => nav("/dashboard")}>Try now</button>
       </div>
 
 
 
-
-
-      <div className={styles.features} id = "features">
+      <div className={styles.features} id="features">
         <h1 className={styles.featuresText}>FEATURES</h1>
-
 
         <div className={styles.topRowFeatures}>
 
@@ -67,7 +68,6 @@ export default function Landing() {
 
           </div>
 
-
           <div className={styles.feature}>
             <img src={cloud} className={styles.featureIcon} />
             <h2>Access anywhere</h2>
@@ -75,10 +75,6 @@ export default function Landing() {
           </div>
 
         </div>
-
-
-
-
 
 
         <div className={styles.bottomRowFeatures}>
@@ -106,26 +102,17 @@ export default function Landing() {
           </div>
 
         </div>
-
-
-
-
-
-
-
-
       </div>
 
       <FAQ />
 
+      <div className={styles.footerContainer}>
 
-              <div className={styles.footerContainer}>
-
-                <footer> © 2026 Xhibril </footer>
-                <a href="https://github.com/xhibril" target="_blank">GitHub</a>
-                <a href="https://www.linkedin.com/in/xhibril-lleshi/" target="_blank">LinkedIn </a>
-                <a href="mailto:xhibril.dev@gmail.com" target="_blank">Email</a>
-            </div>
+        <footer> © 2026 Xhibril </footer>
+        <a href="https://github.com/xhibril" target="_blank">GitHub</a>
+        <a href="https://www.linkedin.com/in/xhibril-lleshi/" target="_blank">LinkedIn </a>
+        <a href="mailto:xhibril.dev@gmail.com" target="_blank">Email</a>
+      </div>
     </div>
   </>
 }
@@ -161,27 +148,17 @@ function FAQ() {
   return <>
     <div className={styles.faqs}>
       <h1 className={styles.faqsText}>FAQS</h1>
-
-
-
       <div className={styles.faqWrapper}>
         {faqs.map((faqs, index) =>
-
 
           <div className={styles.question}>
 
             <h2 onClick={() => setActiveIndex(activeIndex === index ? null : index)}> {faqs.question}
-
-
-           
-                        {activeIndex === index ? (
-                            <FiArrowUp className={styles.arrowUp} />
-                        ) :
-                            <FiArrowDown className={styles.arrowDown}
-                            />}
-
-
-              
+              {activeIndex === index ? (
+                <FiArrowUp className={styles.arrowUp} />
+              ) :
+                <FiArrowDown className={styles.arrowDown}
+                />}
             </h2>
 
 
@@ -190,13 +167,10 @@ function FAQ() {
             )
             }
 
-
           </div>
         )}
 
-
       </div>
-
     </div>
 
   </>

@@ -1,0 +1,61 @@
+.remember {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.remember p {
+    font-size: .9rem;
+    white-space: nowrap;
+}
+
+.remember input {
+    width: 1rem;
+    cursor: pointer;
+}
+
+
+.redirect {
+    display: flex;
+    flex-direction: row;
+    gap: .3rem;
+    margin-top: 1rem;
+    font-size: .9rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.redirect a,
+.redirect p {
+    margin: 0;
+    padding: 0;
+}
+
+.redirect a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.redirect a:hover {
+    text-decoration: none;
+}
+
+.forgot {
+    opacity: 1;
+    font-size: .9rem;
+    text-decoration: solid;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    justify-content: center;
+    width: 100%;
+    display: flex;
+    margin-top: .5rem;
+}
+
+.forgot:hover {
+    text-decoration: none;
+}
