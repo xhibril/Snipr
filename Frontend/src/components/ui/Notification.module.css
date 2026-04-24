@@ -1,0 +1,75 @@
+.notification {
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, -30px);
+    opacity: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    margin-top: .5rem;
+    padding: .7rem 1.5rem;
+    border-radius: .5rem;
+    justify-content: center;
+    align-items: center;
+      transition: all 0.25s ease;
+}
+
+.notification.show {
+
+   transform: translate(-50%, 0);
+  opacity: 1;
+  pointer-events: none;
+}
+
+.textWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.notification p {
+    margin: 0;
+    padding: 0;
+}
+
+.notifTypeText {
+    font-weight: bold;
+}
+
+.notifMessage {
+    margin: 0;
+    padding: 0;
+    opacity: .9;
+    font-size: .8rem;
+}
+
+.notifIcon {
+    width: 1.5rem;
+    height: auto;
+    margin: 0;
+}
+
+.notifIcon.success {
+    color: #519A66;
+}
+
+.notifIcon.error {
+    color: red;
+}
+
+.iconBox {
+    padding: .5rem;
+    border-radius: .6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.iconBox.success {
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+.iconBox.error {
+    box-shadow: 0 0 10px rgb(235, 76, 76, 0.5);
+}

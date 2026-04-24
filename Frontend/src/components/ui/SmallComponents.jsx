@@ -48,6 +48,24 @@ export function PasswordField({ password, setPassword, title }) {
     )
 }
 
+export function CodeField({code, setCode, title}){
+    return (
+        <div className = {styles.field}>
+  <label className={styles.fieldLabel}>{title}</label>
+
+      <input className={styles.fieldInput}
+
+                placeholder="123456"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+            >
+            </input>
+            
+
+        </div>
+    )
+}
+
 
 
 export function BrandField() {

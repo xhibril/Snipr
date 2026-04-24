@@ -45,7 +45,7 @@ public class AuthService {
     }
 
 
-    @Async
+
     public ResponseEntity<ApiResponse> registerUser(String email, String password) {
         // check if email is already registered
         Optional<User> userOpt = userRepo.findByEmail(email);

@@ -1,17 +1,95 @@
 import { useNavigate } from "react-router-dom";
 import { BrandField, EmailField, PasswordField } from "../../components/ui/SmallComponents.jsx"
+import ApiFetch from "../utils/Api.jsx";
+import { ValidateEmail, ValidatePassword } from "../utils/Validation.jsx";
 import global from "../../css/Global.module.css"
 import styles from "./Auth.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function Auth({ mode }) {
+export default function Auth({ mode, notify }) {
 
     const [email, setEmail] = useState(null)
     const [password, setPassword] = useState(null)
+    const [remember, setRemember] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+
     const nav = useNavigate();
+    const isLogin = mode === "LOGIN"
 
 
-     const isLogin = mode === "LOGIN"
+    function checkIfVerified() {
+
+        const params = new URLSearchParams(window.location.search);
+        const isVerified = params.get("verified");
+
+        if (isVerified === "true") {
+            notify("Successfully verified", "SUCCESS");
+        }
+
+        if (isVerified === "false") {
+            notify("Verification failed", "ERROR");
+        }
+    }
+
+    useEffect(() => {
+        checkIfVerified();
+    }, [])
+
+
+    async function submitCredentials(path) {
+
+        const emailRes = ValidateEmail(email);
+        if(emailRes !== "VALID"){
+            notify(emailRes, "ERROR");
+            return;
+        }
+
+        const passwordRes = ValidatePassword(password);
+        if(passwordRes !== "VALID"){
+            notify(passwordRes, "ERROR");
+            return;
+        }
+
+        setIsLoading(true);
+
+    
+
+        try {
+
+            const res = await ApiFetch(path, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password, remember })
+            })
+            
+            if (!res) return;
+
+            if (!res.ok) {
+                const data = await res.json();
+                notify(data.message || "Something went wrong, please try again", "ERROR");
+                return;
+            }
+
+
+            if(isLogin){
+                localStorage.removeItem("email")
+                nav("/dashboard")
+
+            } else {
+                localStorage.setItem("email", email);
+                setEmail("");
+                setPassword("");
+                nav("/verify/email")
+            }
+
+        }   catch (err) {
+            notify("Something went wrong. Please try again.", "ERROR");
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+
 
 
 
@@ -21,10 +99,11 @@ export default function Auth({ mode }) {
 
         <div className={global.mainContainer}>
 
-            <div className={`${global.inputContainer} ${global.glassyBackground}`}>
-
-
-
+            <form className={`${global.inputContainer} ${global.glassyBackground}`}
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    submitCredentials(isLogin ? "/api/login" : "/api/signup")
+                }}>
 
                 <BrandField />
 
@@ -43,8 +122,10 @@ export default function Auth({ mode }) {
                 </div>
 
 
-                <button className={global.submit}>
-                    {isLogin ? "Login" : "Sign up"}
+                <button className={global.submit} type="submit"
+                disabled= {isLoading}>
+                    {isLoading ? "Loading..." : (isLogin ? "Login" : "Sign up")}
+                    
                 </button>
 
                 {isLogin && (
@@ -53,23 +134,22 @@ export default function Auth({ mode }) {
 
 
 
-                {isLogin ? ( 
-                    <div className = {styles.redirect}> 
+                {isLogin ? (
+                    <div className={styles.redirect}>
                         <p>Don't have an account? </p>
                         <a
-                        onClick={() => nav("/signup")}>Sign up</a>
-                        </div>
-            
-                ): (
-                         <div className = {styles.redirect}> 
+                            onClick={() => nav("/signup")}>Sign up</a>
+                    </div>
+
+                ) : (
+                    <div className={styles.redirect}>
                         <p>Already have an account? </p>
                         <a
-                        onClick= {() => nav("/login")}>Login</a>
-                        </div>
+                            onClick={() => nav("/login")}>Login</a>
+                    </div>
                 )}
 
-            </div>
-
+            </form>
 
         </div>
     </>

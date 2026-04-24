@@ -34,13 +34,13 @@
 }
 
 .submit{
-    background-color: aliceblue;
+
     border:transparent;
     height:2.2rem;
     border-radius: .5rem;
     width: 100%;
 
-background-color:   #B4D3D9;
+background-color:   #427AB5;
 color:white;
 font-weight: bold;
 cursor: pointer;
@@ -48,5 +48,5 @@ cursor: pointer;
 }
 
 .submit:hover{
-    background-color:  rgb(180, 211, 217, .85)
+    background-color:  rgba(25, 127, 147, 0.85)
 }

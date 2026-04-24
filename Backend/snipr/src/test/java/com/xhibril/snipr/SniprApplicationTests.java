@@ -10,4 +10,5 @@ class SniprApplicationTests {
 	void contextLoads() {
 	}
 
+    
 }

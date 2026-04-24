@@ -1,7 +1,7 @@
 import Auth from "../../../components/auth/Auth";
 
-export default function Login() {
+export default function Login({notify}) {
     return (
-        <Auth mode = {"LOGIN"}/>
+        <Auth mode = {"LOGIN"} notify = {notify}/>
     );
 }

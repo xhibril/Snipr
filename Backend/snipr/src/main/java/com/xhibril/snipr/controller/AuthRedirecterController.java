@@ -18,8 +18,8 @@ public class AuthRedirecterController {
     @GetMapping("/email/verify/{token}")
     public String verifyUser(@PathVariable String token){
         if(authService.verifyUser(token)){
-            return "redirect:http://localhost:8080/login?verified=true";
+            return "redirect:http://localhost:5173/login?verified=true";
 
-        } return "redirect:http://localhost:8080/login?verified=false";
+        } return "redirect:http://localhost:5173/login?verified=false";
     }
 }
