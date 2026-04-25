@@ -6,7 +6,7 @@ import global from "../../css/Global.module.css"
 import styles from "./Auth.module.css";
 import { useState, useEffect } from "react";
 
-export default function Auth({ mode, notify }) {
+export default function Auth({ mode, notify, setIsAuth }) {
 
     const [email, setEmail] = useState(null)
     const [password, setPassword] = useState(null)
@@ -53,14 +53,14 @@ export default function Auth({ mode, notify }) {
         setIsLoading(true);
 
     
-
         try {
-
             const res = await ApiFetch(path, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password, remember })
-            })
+            }, notify, nav)
+
+            console.log(res.status);
             
             if (!res) return;
 
@@ -73,6 +73,7 @@ export default function Auth({ mode, notify }) {
 
             if(isLogin){
                 localStorage.removeItem("email")
+                setIsAuth(true)
                 nav("/dashboard")
 
             } else {
@@ -95,8 +96,6 @@ export default function Auth({ mode, notify }) {
 
 
     return <>
-
-
         <div className={global.mainContainer}>
 
             <form className={`${global.inputContainer} ${global.glassyBackground}`}

@@ -5,6 +5,7 @@ import com.xhibril.snipr.dto.auth.LoginResponse;
 import com.xhibril.snipr.dto.auth.SignUpRequest;
 import com.xhibril.snipr.model.User;
 import com.xhibril.snipr.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.juli.logging.Log;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletResponse res){
         return authService.login(request.getEmail(), request.getPassword(), request.getRememberMe(), res);
+    }
+
+
+    @PostMapping("/auth/status")
+    public Boolean isAuthenticated(HttpServletRequest req){
+        return authService.isAuthenticated(req);
     }
 
 }

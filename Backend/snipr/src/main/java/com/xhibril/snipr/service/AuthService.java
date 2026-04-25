@@ -4,7 +4,9 @@ import com.xhibril.snipr.dto.api.ApiResponse;
 import com.xhibril.snipr.dto.auth.LoginResponse;
 import com.xhibril.snipr.model.User;
 import com.xhibril.snipr.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.hibernate.sql.ast.tree.predicate.BooleanExpressionPredicate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -100,6 +102,11 @@ public class AuthService {
 
             if(email.equals(user.getEmail()) && password.equals(user.getPassword())){
 
+                if(!user.getIsVerified()){
+                    emailService.sendVerificationEmail(email);
+                    return ResponseEntity.status(403).body(new LoginResponse("Not verified", false));
+                }
+
                 Map<String, Object> claims = new HashMap<>();
                 claims.put("id", user.getId());
 
@@ -120,4 +127,21 @@ public class AuthService {
 
         return ResponseEntity.badRequest().body(new LoginResponse("Invalid credentials", false));
     }
+
+
+
+    public Long getAuthenticatedId(HttpServletRequest req){
+        String token = jwtService.extractFromCookie("authToken", req);
+        return jwtService.extractFromToken(token, "id", Long.class);
+    }
+
+    public Boolean isAuthenticated(HttpServletRequest req){
+        Long id = getAuthenticatedId(req);
+        System.out.println(id != null);
+        return id != null;
+    }
+
+
+
+
 }
