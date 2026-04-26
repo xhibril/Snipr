@@ -17,6 +17,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u.verified FROM User u WHERE u.email = :email")
     Optional<Boolean> isVerified(@Param("email") String email);
+
+
+    @Modifying
+    @Query("UPDATE User u SET u.password = :password WHERE u.email = :email")
+    void updatePassword(@Param("password") String password,
+                        @Param("email") String email);
 }
 
 

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { BrandField, EmailField, PasswordField } from "../../components/ui/SmallComponents.jsx"
+import { BrandHeader, EmailField, PasswordField } from "../../components/ui/SmallComponents.jsx"
 import ApiFetch from "../utils/Api.jsx";
 import { ValidateEmail, ValidatePassword } from "../utils/Validation.jsx";
 import global from "../../css/Global.module.css"
@@ -101,16 +101,12 @@ export default function Auth({ mode, notify, setIsAuth }) {
             <form className={`${global.inputContainer} ${global.glassyBackground}`}
                 onSubmit={(e) => {
                     e.preventDefault();
-                    submitCredentials(isLogin ? "/api/login" : "/api/signup")
+                    submitCredentials(isLogin ? "/login" : "api/signup")
                 }}>
 
-                <BrandField />
+                <BrandHeader title = {isLogin ? "Login" : "Sign up"}/>
 
-                {isLogin ? (
-                    <h1>Login</h1>
-                ) : (
-                    <h1>Sign up</h1>
-                )}
+    
                 <EmailField email={email} setEmail={setEmail} title={"Email"} />
                 <PasswordField password={password} setPassword={setPassword} title={"Password"} />
 
@@ -128,7 +124,8 @@ export default function Auth({ mode, notify, setIsAuth }) {
                 </button>
 
                 {isLogin && (
-                    <a className={styles.forgot}>Forgot your password? </a>
+                    <a className={styles.forgot}
+                    onClick={() => nav("/password/reset")}>Forgot your password? </a>
                 )}
 
 

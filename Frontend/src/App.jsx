@@ -10,6 +10,7 @@ import { useRef, useEffect } from 'react'
 import VerifyEmail from './pages/auth/verify/VerifyEmail.jsx'
 import AuthGate from "./components/layout/AuthGate.jsx"
 import Dashboard from './pages/dashboard/Dashboard.jsx'
+import PasswordReset from './pages/auth/password-reset/PasswordReset.jsx'
 
 function App() {
 
@@ -72,6 +73,7 @@ function App() {
 
               <Route path="/login" element={<Login notify={notify} setIsAuth = {setIsAuth} />}></Route>
               <Route path="/signup" element={<Signup notify={notify} />}></Route>
+              <Route path = "/password/reset" element = {<PasswordReset notify = {notify}/>}/>
               <Route path="/verify/email" element={<VerifyEmail notify={notify} />}></Route>
               <Route path = "/dashboard" element={<Dashboard notify = {notify}/>}></Route>
 

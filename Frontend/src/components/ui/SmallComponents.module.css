@@ -6,9 +6,16 @@
     flex-direction: row;
     justify-self: flex-start;
     cursor: pointer;
+ 
+
+    flex-direction: column;
 
     align-items: flex-start;
 
+}
+
+.brandWrapper{
+    display: flex;
 }
 
 .brandLogo {

@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 export default async function ApiFetch(url, options = {}, notify, nav){
 
-    const res = await fetch(`http://localhost:8080${url}`, {
+    const res = await fetch(`http://localhost:8080/api${url}`, {
         credentials: "include",
         ...options
     });

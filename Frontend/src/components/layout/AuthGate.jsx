@@ -5,7 +5,7 @@ export default function AuthGate({ isAuth }) {
     const location = useLocation();
     const path = location.pathname;
 
-    const isAuthPage = path === "/login" || path === "/signup" || path === "/verify/email"; 
+    const isAuthPage = path === "/login" || path === "/signup" || path === "/verify/email" || path === "/password/reset"; 
 
     const isProtectedRoute = path === "/dashboard";
 

@@ -43,16 +43,7 @@ public class EmailService {
                     <a href="%s">Click here to verify</a>
                     """.formatted(link);
 
-            ObjectMapper mapper = new ObjectMapper();
-
-            Map<String, Object> body = new HashMap<>();
-            body.put("api_key", apiKey);
-            body.put("to", new String[]{email});
-            body.put("sender", fromEmail);
-            body.put("subject", "Verify your email");
-            body.put("html_body", html);
-
-            String json = mapper.writeValueAsString(body);
+            String json = createBody(html, email);
 
             sendEmail(json);
         } catch (Exception e) {
@@ -60,6 +51,24 @@ public class EmailService {
         }
 
         return ResponseEntity.ok().body(new ApiResponse("Verification link sent"));
+    }
+
+
+    public ResponseEntity<ApiResponse> sendVerificationCode(String email, String code){
+
+        String html = """
+                <p>Verification code: </p>
+                <p>%s</p>
+                """.formatted(code);
+
+
+     String json = createBody(html, email);
+     sendEmail(json);
+
+
+
+     return ResponseEntity.ok().body(new ApiResponse("Verification code sent"));
+
     }
 
     private void sendEmail(String json) {
@@ -77,5 +86,16 @@ public class EmailService {
         }
     }
 
+    private String createBody(String html, String email){
+        ObjectMapper mapper = new ObjectMapper();
 
+        Map<String, Object> body = new HashMap<>();
+        body.put("api_key", apiKey);
+        body.put("to", new String[]{email});
+        body.put("sender", fromEmail);
+        body.put("subject", "Verify your email");
+        body.put("html_body", html);
+
+        return mapper.writeValueAsString(body);
+    }
 }

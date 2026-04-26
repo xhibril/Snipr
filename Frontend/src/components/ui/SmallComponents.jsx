@@ -68,15 +68,18 @@ export function CodeField({code, setCode, title}){
 
 
 
-export function BrandField() {
+export function BrandHeader({title}) {
     const nav = useNavigate();
 
     return (
 
         <div className={styles.brandContainer}
             onClick={() => nav("/")}>
+                <div className = {styles.brandWrapper}>
             <img src={logo} className={styles.brandLogo} />
             <p className={styles.brandText}>SNIPR</p>
+            </div>
+            <h1>{title}</h1>
         </div>
 
     )
