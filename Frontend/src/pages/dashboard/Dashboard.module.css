@@ -1,0 +1,158 @@
+.mainContainer {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto 1fr;
+    height: 100vh;
+}
+
+p {
+    margin: 0;
+    padding: 0;
+}
+
+.sideBar {
+    grid-row: 1 / 3;
+    gap:3rem;
+}
+
+
+.mainContent {
+    grid-column: 2;
+    grid-row: 2;
+    background-color: #D9E9FF;
+}
+
+
+
+
+.sideBar {
+    background: #F2F4F7;
+    width: 12rem;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.brandHeader {
+    display: flex;
+    justify-content: center; 
+    margin-top:.5rem;
+    gap: 0.5rem; 
+    width: 100%;
+}
+
+.brandHeader img{
+ width: 2rem;
+ height: 2rem;   
+}
+
+.brandHeader h1{
+margin:0;
+padding:0;
+  font-weight: bold;
+  letter-spacing: -2px;
+  font-family: "Archivo Black", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+  font-size:1.5rem;
+}
+
+
+.options {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    width: 100%;
+    align-items: center;
+    gap:1rem;
+
+}
+
+.optionRow {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    width: 80%;
+
+    border: transparent;
+    background-color: transparent;
+align-items: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    padding: 1rem;
+    border-radius: .5rem;
+
+}
+
+.optionRow:hover{
+    background-color: #DDE1E8;
+    color:#306abc;
+
+}
+.optionIcon,
+.optionText {
+    opacity: .8;
+}
+
+.optionIcon {
+    width: 1.2rem;
+    height: auto;
+
+}
+
+.optionText {
+    font-size: .8rem;
+}
+
+.accountContainer {
+    width: 100%;
+    border-top:1px solid rgb(0, 0, 0, 0.1);
+    padding-top:1rem;
+    position: relative;
+}
+
+.accountArrowIcons{
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    font-size: .9rem;
+}
+
+.accountRow {
+    display: flex;
+    flex-direction: row;
+    gap:1rem;
+    width: 95%;
+    justify-content: space-between;
+    margin-left:.3rem;
+}
+
+
+.accountName {
+    font-weight: bold;
+    font-size: .9rem;
+}
+
+
+.accountEmail {
+    font-size: .7rem;
+    opacity: .8;
+}
+
+
+.accountSettings {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  gap:.5rem;
+  margin-bottom: 1rem;
+}
+
+.accountSettings.show {
+  max-height: 20rem; 
+  opacity: 1;
+}
