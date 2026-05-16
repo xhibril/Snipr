@@ -38,6 +38,7 @@ public class SnippetService {
         }
 
         if (userOpt.isPresent()) {
+
             User user = userOpt.get();
 
             Folder folder = new Folder();

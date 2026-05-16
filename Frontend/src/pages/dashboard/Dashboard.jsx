@@ -2,20 +2,65 @@ import styles from "./Dashboard.module.css";
 import { BrandHeader } from "../../components/ui/SmallComponents";
 import logo from "../../assets/images/logo.svg";
 
-import { FiHome, FiFolder, FiShare2, FiStar, FiTrash2, FiChevronUp, FiChevronDown } from "react-icons/fi";
-import { useState } from "react";
+import { FiHome, FiFolder, FiFile, FiX, FiSliders, FiShare2, FiStar, FiTrash2, FiChevronUp, FiChevronDown, FiTrash, FiSearch, FiPlus } from "react-icons/fi";
+import { useState, useRef, useEffect } from "react";
+
+import { RiFile2Fill, RiFolderFill, RiImageFill, RiFolderAddLine, RiFileAddLine } from "react-icons/ri";
+import { isCookie } from "react-router-dom";
 
 export default function Dashboard({ notify }) {
-
-
     const [toggleSettings, setToggleSettings] = useState(false);
+    const [toggleFolder, setToggleFolder] = useState(false);
+    const [isCreatingItem, setIsCreatingItem] = useState(false);
+    const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+    const [isViewingFile, setIsViewingFile] = useState(true);
+    const inputRef = useRef(null);
+    const [isAddingTag, setIsAddingTag] = useState(true);
+
+    const [toggleSearchFilter, setToggleSearchFilter] = useState(false);
+    const [tags, setTags] = useState([])
+
+
+
+
+
+    function setCreatingState(type) {
+
+
+        if (type === "FOLDER") {
+            if (isCreatingFolder && isCreatingItem) {
+
+                setIsCreatingFolder(false);
+                setIsCreatingItem(false);
+            } else {
+                setIsCreatingFolder(true);
+                setIsCreatingItem(true);
+            }
+        } else {
+
+            if (!isCreatingFolder && isCreatingItem) {
+
+                setIsCreatingFolder(false);
+                setIsCreatingItem(false);
+            } else {
+                setIsCreatingFolder(false);
+                setIsCreatingItem(true);
+            }
+
+        }
+    }
+
+
+    useEffect(() => {
+        if (isCreatingItem) {
+            inputRef.current.focus();
+        }
+    }, [isCreatingItem, isCreatingFolder]);
 
 
 
     return (
         <div className={styles.mainContainer}>
-
-
 
             <div className={styles.sideBar}>
 
@@ -44,6 +89,10 @@ export default function Dashboard({ notify }) {
                         <p className={styles.optionText}>Starred</p>
                     </button>
 
+                    <button className={styles.optionRow}>
+                        <FiTrash className={styles.optionIcon} />
+                        <p className={styles.optionText}>Trash</p>
+                    </button>
 
                 </div>
 
@@ -51,44 +100,395 @@ export default function Dashboard({ notify }) {
 
                 <div className={styles.accountContainer}>
 
-
                     <div className={`${styles.accountSettings} ${toggleSettings ? styles.show : " "}`}>
                         <button> Change Password</button>
-                           <button> Change Email</button>
-                              <button> Delete Account</button>
+                        <button> Change Email</button>
+                        <button> Delete Account</button>
                     </div>
 
 
                     <div className={styles.accountRow}>
 
                         <div className={styles.accountDetails}>
-                            <p className = {styles.accountName}>Account name</p>
-                            <p className = {styles.accountEmail}>email@gmail.com</p>
+                            <p className={styles.accountName}>Account name</p>
+                            <p className={styles.accountEmail}>email@gmail.com</p>
                         </div>
 
 
                         <div className={styles.accountArrowIcons}
-                        onClick={() => setToggleSettings(!(toggleSettings))}>
+                            onClick={() => setToggleSettings(!(toggleSettings))}>
                             <FiChevronUp />
                             <FiChevronDown />
                         </div>
                     </div>
-
-
                 </div>
-
             </div>
 
 
 
             <div className={styles.mainContent}>
 
+
+                <div className={styles.snippetMenu}>
+                    <h4 className={styles.snippetMenuTitle}>My snippets</h4>
+
+                    <div className={styles.snippetControls}>
+                        <RiFolderAddLine className={styles.snippetAction}
+                            onClick={() => {
+                                setCreatingState("FOLDER")
+                            }
+
+                            }
+                        />
+                        <RiFileAddLine className={styles.snippetAction}
+                            onClick={() => setCreatingState("FILE")}
+                        />
+                        <FiTrash className={styles.snippetAction} />
+                        <FiStar className={styles.snippetAction} />
+                        <FiShare2 className={styles.snippetAction} />
+
+                    </div>
+
+
+                    {isCreatingItem &&
+                        <form className={styles.addFile}>
+                            <input className={styles.addFileField}
+                                ref={inputRef}
+                                placeholder={isCreatingFolder ? "Folder name" : "File name"} />
+
+                            <FiPlus className={styles.addBtn} />
+                        </form>
+                    }
+
+
+
+
+
+                    <div className={styles.searchContainer}>
+
+                        <div className={styles.search}>
+
+                            <input type="text"
+                                className={styles.searchField}
+                                placeholder="Search" />
+
+                            <FiSearch className={styles.searchIcon} />
+                            <FiSliders className={styles.searchFilter}
+                                onClick={() => setToggleSearchFilter(!toggleSearchFilter)}
+
+
+                            />
+
+                        </div>
+
+
+                        <div className={`${styles.filter}  ${toggleSearchFilter ? styles.show : ""}`}>
+
+
+                            <div className={styles.filterFieldWrapper}>
+                                <input type="text" className={styles.filterField}
+                                    placeholder="Add tags"
+
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            setTags([...tags, e.target.value]);
+                                            e.target.value = "";
+                                        }
+                                    }}
+
+                                />
+                                <FiPlus className={styles.addBtn}
+
+
+
+                                />
+                            </div>
+
+
+                            <div className={styles.filterContainer}>
+
+                                {tags.map((tag, index) => (
+                                    <div className={styles.tag}>
+                                        <p>{tag}</p>
+                                        <FiX className={styles.removeTag}
+                                            onClick={() => setTags(tags.filter((_, i) => i != index))} />
+                                    </div>
+                                ))}
+
+                            </div>
+                        </div>
+
+
+
+
+                    </div>
+
+
+
+
+
+
+                    <div className={styles.snippetFiles}>
+
+                        <div className={styles.folderItem}>
+                            <RiFolderFill className={styles.folderIcon} />
+                            <p className={styles.folderName}>Folder Name</p>
+
+                            {toggleFolder ? (
+                                <FiChevronUp className={styles.toggleFolder} />
+                            ) : (
+                                <FiChevronDown className={styles.toggleFolder} />
+                            )}
+                        </div>
+
+                        <div className={styles.fileItem}>
+                            <RiFile2Fill className={styles.fileIcon} />
+                            <p className={styles.fileName}>File name</p>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div className={styles.fileBody}>
+
+
+                    {isViewingFile ? (
+
+<>
+                        <div className={styles.viewingFile}>
+
+                            <div className={styles.fileInfo}>
+                                <h1>File title</h1>
+
+                                <div className={styles.tagsWrapper}>
+
+                                    <div className={styles.tagsActionWrapper}>
+                                        <div className={styles.tagsAction}>
+                                            <h4>Tags</h4>
+                                            <FiPlus className={styles.addTag} />
+
+                                        </div>
+
+                                             {isAddingTag &&
+
+                                                <div className={styles.addTagFieldWrapper}>
+                                                    <input type="text" className={styles.addTagField} placeholder="Add tag" />
+                                                    <FiPlus className={styles.finalizeAddingTag} />
+                                                </div>
+                                            }
+                                    </div>
+
+
+                                    <div className={styles.tags}>
+                                        <p>Python</p>
+                                        <p>Java</p>
+                                        <p>C++</p>
+                                        <p>C</p>
+                                        <p>SQL</p>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+<pre className = {styles.fileContent}>
+{`
+// ============================================
+// Authentication Service
+// ============================================
+
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import prisma from "../database/client.js";
+
+export async function registerUser(req, res) {
+    try {
+        const { username, email, password } = req.body;
+
+        if (!username || !email || !password) {
+            return res.status(400).json({
+                message: "Missing required fields"
+            });
+        }
+
+        const existingUser = await prisma.user.findUnique({
+            where: {
+                email
+            }
+        });
+
+        if (existingUser) {
+            return res.status(409).json({
+                message: "Email already in use"
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        const createdUser = await prisma.user.create({
+            data: {
+                username,
+                email,
+                password: hashedPassword
+            }
+        });
+
+        const accessToken = jwt.sign(
+            {
+                id: createdUser.id,
+                email: createdUser.email
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "7d"
+            }
+        );
+
+        return res.status(201).json({
+            message: "Account created successfully",
+            token: accessToken,
+            user: {
+                id: createdUser.id,
+                username: createdUser.username,
+                email: createdUser.email
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+}
+
+// ============================================
+// Middleware
+// ============================================
+
+export async function authenticate(req, res, next) {
+    try {
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader) {
+            return res.status(401).json({
+                message: "Missing authorization header"
+            });
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET
+        );
+
+        req.user = decoded;
+
+        next();
+
+    } catch (error) {
+        return res.status(403).json({
+            message: "Invalid token"
+        });
+    }
+}
+
+// ============================================
+// Utilities
+// ============================================
+
+export function generateRandomId(length = 16) {
+    const chars =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    let result = "";
+
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(
+            Math.floor(Math.random() * chars.length)
+        );
+    }
+
+    return result;
+}
+
+export function formatBytes(bytes) {
+    if (bytes === 0) return "0 Bytes";
+
+    const sizes = [
+        "Bytes",
+        "KB",
+        "MB",
+        "GB"
+    ];
+
+    const i = Math.floor(
+        Math.log(bytes) / Math.log(1024)
+    );
+
+    return (
+        parseFloat(
+            (bytes / Math.pow(1024, i)).toFixed(2)
+        ) +
+        " " +
+        sizes[i]
+    );
+}
+
+// ============================================
+// TODO
+// ============================================
+
+// - implement websocket syncing
+// - add collaborative editing
+// - optimize search indexing
+// - improve caching layer
+// - add markdown support
+// - create folder permissions
+// - implement syntax highlighting
+// - improve mobile responsiveness
+// - add drag and drop uploads
+// - create autosave system
+`}
+</pre>
+</>
+
+                    ) : (
+                        <>
+                            <div className={styles.defaultMenu}>
+
+                                <h1>SNIPR.</h1>
+                                <p>Start</p>
+
+
+                                <div className={styles.newFile}
+                                    onClick={() => setCreatingState("FILE")}>
+                                    <RiFileAddLine />   <a>New File</a>
+                                </div>
+
+                                <div className={styles.newFolder}
+
+                                    onClick={() => {
+                                        setCreatingState("FOLDER")
+                                    }
+
+                                    }
+                                >
+                                    <RiFolderAddLine /><a>New Folder</a>
+                                </div>
+
+
+                            </div>
+                        </>
+                    )}
+                </div>
+
             </div>
-
-
         </div>
-
-
-
     )
 }
