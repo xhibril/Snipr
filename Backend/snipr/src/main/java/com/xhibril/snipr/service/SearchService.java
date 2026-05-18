@@ -16,9 +16,9 @@ public class SearchService {
         this.snippetRepo = snippetRepo;
     }
 
-    public List<SnippetResponse> searchSnippets(Long userId, String query, List<String> tags, List<String> languages ){
+    public List<SnippetResponse> searchSnippets(Long userId, String query, List<String> tags){
         List<Snippet> snippetList = snippetRepo.findAllByUserId(userId);
-        List<Snippet> firstFilteredSnippets = firstFilter(snippetList, tags, languages);
+        List<Snippet> firstFilteredSnippets = firstFilter(snippetList, tags);
 
         if(query == null){
             List<SnippetResponse> snippetResponses = new ArrayList<>();
@@ -38,30 +38,16 @@ public class SearchService {
     }
 
 
-    public List<Snippet> firstFilter(List<Snippet> snippetList, List<String> tags, List<String> languages){
+    public List<Snippet> firstFilter(List<Snippet> snippetList, List<String> tags){
         List<Snippet> firstFilteredSnippets = new ArrayList<>();
 
         if(snippetList != null){
             for(Snippet snippet : snippetList){
 
-                // both lang n tags included
-                if(tags != null && languages != null){
-
-                    if(snippet.getLanguages().containsAll(languages) &&
-                            snippet.getTags().containsAll(tags)){
-
-                        firstFilteredSnippets.add(snippet);
-                    }
-                    // only tags included
-                } else if (tags != null){
-
+                // tags included
+                if(tags != null){
                     if(snippet.getTags().containsAll(tags)){
-                        firstFilteredSnippets.add(snippet);
-                    }
 
-                    // only langs included
-                } else if (languages != null){
-                    if(snippet.getLanguages().containsAll(languages)){
                         firstFilteredSnippets.add(snippet);
                     }
                 } else {

@@ -55,7 +55,7 @@ public class SnippetService {
 
     public ResponseEntity<ApiResponse> addSnippet(Long userId, String title,
                                                       String code, String description,
-                                                      List<String> tags, List<String> languages) {
+                                                      List<String> tags) {
 
         Optional<User> userOpt = userRepo.findById(userId);
 
@@ -68,7 +68,6 @@ public class SnippetService {
             snippet.setCode(code);
             snippet.setDescription(description);
             snippet.setTags(tags);
-            snippet.setLanguages(languages);
 
             snippetRepo.save(snippet);
             return ResponseEntity.ok().body(new ApiResponse("Snippet successfully saved"));
@@ -155,29 +154,6 @@ public class SnippetService {
         }
     }
 
-    public ResponseEntity<ApiResponse> addLanguage(Long userId, Long snippetId, String language){
-        Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, snippetId);
-
-        if(snippetOpt.isPresent()){
-            Snippet snippet = snippetOpt.get();
-
-            if(language == null){
-                return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
-            }
-
-            if(snippet.getLanguages().contains(language)){
-                return ResponseEntity.badRequest().body(new ApiResponse("Language already exists"));
-            }
-
-            snippet.getLanguages().add(language);
-            snippetRepo.save(snippet);
-            return ResponseEntity.ok().body(new ApiResponse("Language added"));
-        }
-        return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
-    }
-
-
-
     public ResponseEntity<ApiResponse> deleteTag(Long userId, Long snippetId, String tag){
         Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, snippetId);
 
@@ -192,21 +168,14 @@ public class SnippetService {
         }
     }
 
-
-    public ResponseEntity<ApiResponse> deleteLanguage(Long userId, Long snippetId, String language){
-        Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, snippetId);
-
-        if(snippetOpt.isPresent()){
-            Snippet snippet = snippetOpt.get();
-
-            snippet.getLanguages().remove(language);
-            snippetRepo.save(snippet);
-
-            return ResponseEntity.ok().body(new ApiResponse("Language deleted"));
-        } else {
-            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
-        }
+    public List<Folder> getFolders(Long userId){
+        return folderRepo.findByUserId(userId);
     }
+
+    public List<Snippet> getSnippets(Long userId){
+        return snippetRepo.findByUserId(userId);
+    }
+
 
 
 

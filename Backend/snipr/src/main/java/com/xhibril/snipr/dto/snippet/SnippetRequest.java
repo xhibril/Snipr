@@ -7,7 +7,6 @@ public class SnippetRequest {
     private String code;
     private String description;
     private List<String> tags;
-    private List<String> languages;
     private String query;
 
     public String getTitle() {
@@ -40,14 +39,6 @@ public class SnippetRequest {
 
     public void setTags(List<String> tags){
         this.tags = tags;
-    }
-
-    public List<String> getLanguages(){
-        return languages;
-    }
-
-    public void setLanguages(List<String> languages){
-        this.languages = languages;
     }
 
     public void setQuery(String query){

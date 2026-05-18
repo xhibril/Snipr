@@ -1,9 +1,13 @@
 package com.xhibril.snipr.controller;
 import com.xhibril.snipr.dto.api.ApiResponse;
 import com.xhibril.snipr.dto.snippet.*;
+import com.xhibril.snipr.model.Folder;
+import com.xhibril.snipr.model.Snippet;
 import com.xhibril.snipr.service.SnippetService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -28,7 +32,7 @@ public class SnippetController {
         Long userId = 1L; // placeholder
 
         return snippetService.addSnippet(userId, request.getTitle(), request.getCode(),
-                request.getDescription(), request.getTags(), request.getLanguages());
+                request.getDescription(), request.getTags());
     }
 
 
@@ -67,17 +71,19 @@ public class SnippetController {
         return snippetService.deleteTag(userId, snippetId, request.getTag());
     }
 
-    @PostMapping("/snippets/{snippetId}/language")
-    public ResponseEntity<ApiResponse> addLanguage(@PathVariable Long snippetId, @RequestBody LanguageRequest request){
-        Long userId = 1L; // place holder
 
-        return snippetService.addLanguage(userId, snippetId, request.getLanguage());
+    @GetMapping("/folders")
+    public List<Folder> getFolders(){
+        Long userId = 14L; // place holder;
+
+        return snippetService.getFolders(userId);
     }
 
-    @DeleteMapping("/snippets/{snippetId}/language")
-    public ResponseEntity<ApiResponse> deleteLanguage(@PathVariable Long snippetId, @RequestBody LanguageRequest request){
-        Long userId = 1L;
+    @GetMapping("/snippets")
+    public List<Snippet> getSnippets(){
+        Long userId = 14L; // place holder;
 
-        return snippetService.deleteLanguage(userId, snippetId, request.getLanguage());
+        return snippetService.getSnippets(userId);
     }
+
 }

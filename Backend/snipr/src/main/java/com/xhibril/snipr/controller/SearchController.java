@@ -20,7 +20,7 @@ public class SearchController {
     public List<SnippetResponse> searchSnippet(@RequestBody SnippetRequest request){
         Long userId = 1L;
 
-        return searchService.searchSnippets(userId, request.getQuery(), request.getTags(), request.getLanguages());
+        return searchService.searchSnippets(userId, request.getQuery(), request.getTags());
     }
 
 

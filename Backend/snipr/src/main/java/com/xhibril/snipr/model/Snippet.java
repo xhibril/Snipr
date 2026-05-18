@@ -25,8 +25,6 @@ public class Snippet {
     @ElementCollection
     private List<String> tags = new ArrayList<>();
 
-    @ElementCollection
-    private List<String> languages = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -82,13 +80,5 @@ public class Snippet {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
-    }
-
-    public List<String> getLanguages() {
-        return languages;
-    }
-
-    public void setLanguages(List<String> languages) {
-        this.languages = languages;
     }
 }

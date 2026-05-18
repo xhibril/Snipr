@@ -22,4 +22,6 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
     void deleteByUserIdAndFolderId(Long userId, Long folderId);
 
     List<Snippet> findAllByUserId(Long userId);
+
+    List<Snippet> findByUserId(Long userId);
 }

@@ -2,60 +2,64 @@ import styles from "./Dashboard.module.css";
 import { BrandHeader } from "../../components/ui/SmallComponents";
 import logo from "../../assets/images/logo.svg";
 
+import ApiFetch from "../../components/utils/Api.jsx";
+
+import FileExplorer from "../../components/dashboard/file-explorer/FileExplorer.jsx";
+
 import { FiHome, FiFolder, FiFile, FiX, FiSliders, FiShare2, FiStar, FiTrash2, FiChevronUp, FiChevronDown, FiTrash, FiSearch, FiPlus } from "react-icons/fi";
 import { useState, useRef, useEffect } from "react";
 
 import { RiFile2Fill, RiFolderFill, RiImageFill, RiFolderAddLine, RiFileAddLine } from "react-icons/ri";
-import { isCookie } from "react-router-dom";
+import { isCookie, useNavigate } from "react-router-dom";
 
 export default function Dashboard({ notify }) {
+ 
+    const [isViewingFile, setIsViewingFile] = useState(true);
+    const [isAddingTag, setIsAddingTag] = useState(true);
     const [toggleSettings, setToggleSettings] = useState(false);
     const [toggleFolder, setToggleFolder] = useState(false);
-    const [isCreatingItem, setIsCreatingItem] = useState(false);
-    const [isCreatingFolder, setIsCreatingFolder] = useState(false);
-    const [isViewingFile, setIsViewingFile] = useState(true);
-    const inputRef = useRef(null);
-    const [isAddingTag, setIsAddingTag] = useState(true);
+    const [folders, setFolders] = useState([])
+    const [files, setFiles ] = useState([])
 
-    const [toggleSearchFilter, setToggleSearchFilter] = useState(false);
-    const [tags, setTags] = useState([])
+    const nav = useNavigate();
 
 
 
+    useEffect(()=> {
+        fetchFolders();
+        fetchFiles();
+    },[])
 
 
-    function setCreatingState(type) {
+    async function fetchFolders(){
+        const res = await ApiFetch("/folders", {method:"GET"},notify, nav)
 
+        if(!res) return;
 
-        if (type === "FOLDER") {
-            if (isCreatingFolder && isCreatingItem) {
-
-                setIsCreatingFolder(false);
-                setIsCreatingItem(false);
-            } else {
-                setIsCreatingFolder(true);
-                setIsCreatingItem(true);
-            }
-        } else {
-
-            if (!isCreatingFolder && isCreatingItem) {
-
-                setIsCreatingFolder(false);
-                setIsCreatingItem(false);
-            } else {
-                setIsCreatingFolder(false);
-                setIsCreatingItem(true);
-            }
-
+        if(!res.ok){
+            notify("Could not fetch folders, please try again", "ERROR");
+            return;
         }
+
+        const data = await res.json();
+         console.log("FOLDERS: ", data)
+        setFolders(data);
     }
 
+    async function fetchFiles(){
+        const res = await ApiFetch("/snippets", {METHOD: "GET"}, notify, nav)
 
-    useEffect(() => {
-        if (isCreatingItem) {
-            inputRef.current.focus();
+        if(!res) return;
+
+        if(!res.ok){
+            notify("Could not fetch snippets, please try again", "ERROR");
+            return;
         }
-    }, [isCreatingItem, isCreatingFolder]);
+
+        const data = await res.json();
+        console.log("FILES: ", data)
+        setFiles(data);
+    }
 
 
 
@@ -128,125 +132,17 @@ export default function Dashboard({ notify }) {
 
             <div className={styles.mainContent}>
 
-
-                <div className={styles.snippetMenu}>
-                    <h4 className={styles.snippetMenuTitle}>My snippets</h4>
-
-                    <div className={styles.snippetControls}>
-                        <RiFolderAddLine className={styles.snippetAction}
-                            onClick={() => {
-                                setCreatingState("FOLDER")
-                            }
-
-                            }
-                        />
-                        <RiFileAddLine className={styles.snippetAction}
-                            onClick={() => setCreatingState("FILE")}
-                        />
-                        <FiTrash className={styles.snippetAction} />
-                        <FiStar className={styles.snippetAction} />
-                        <FiShare2 className={styles.snippetAction} />
-
-                    </div>
-
-
-                    {isCreatingItem &&
-                        <form className={styles.addFile}>
-                            <input className={styles.addFileField}
-                                ref={inputRef}
-                                placeholder={isCreatingFolder ? "Folder name" : "File name"} />
-
-                            <FiPlus className={styles.addBtn} />
-                        </form>
-                    }
-
-
-
-
-
-                    <div className={styles.searchContainer}>
-
-                        <div className={styles.search}>
-
-                            <input type="text"
-                                className={styles.searchField}
-                                placeholder="Search" />
-
-                            <FiSearch className={styles.searchIcon} />
-                            <FiSliders className={styles.searchFilter}
-                                onClick={() => setToggleSearchFilter(!toggleSearchFilter)}
-
-
-                            />
-
-                        </div>
-
-
-                        <div className={`${styles.filter}  ${toggleSearchFilter ? styles.show : ""}`}>
-
-
-                            <div className={styles.filterFieldWrapper}>
-                                <input type="text" className={styles.filterField}
-                                    placeholder="Add tags"
-
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                            setTags([...tags, e.target.value]);
-                                            e.target.value = "";
-                                        }
-                                    }}
-
-                                />
-                                <FiPlus className={styles.addBtn}
-
-
-
-                                />
-                            </div>
-
-
-                            <div className={styles.filterContainer}>
-
-                                {tags.map((tag, index) => (
-                                    <div className={styles.tag}>
-                                        <p>{tag}</p>
-                                        <FiX className={styles.removeTag}
-                                            onClick={() => setTags(tags.filter((_, i) => i != index))} />
-                                    </div>
-                                ))}
-
-                            </div>
-                        </div>
-
-
-
-
-                    </div>
+                <FileExplorer toggleSettings={toggleSettings} setToggleSettings={setToggleSettings}
+                              toggleFolder = {toggleFolder} setToggleFolder={setToggleFolder}
+                              folders = {folders} setFolders={setFolders}
+                              files = {files} setFiles = {setFiles}/>
 
 
 
 
 
 
-                    <div className={styles.snippetFiles}>
 
-                        <div className={styles.folderItem}>
-                            <RiFolderFill className={styles.folderIcon} />
-                            <p className={styles.folderName}>Folder Name</p>
-
-                            {toggleFolder ? (
-                                <FiChevronUp className={styles.toggleFolder} />
-                            ) : (
-                                <FiChevronDown className={styles.toggleFolder} />
-                            )}
-                        </div>
-
-                        <div className={styles.fileItem}>
-                            <RiFile2Fill className={styles.fileIcon} />
-                            <p className={styles.fileName}>File name</p>
-                        </div>
-                    </div>
-                </div>
 
 
 
@@ -489,6 +385,6 @@ export function formatBytes(bytes) {
                 </div>
 
             </div>
-        </div>
+            </div>
     )
 }
