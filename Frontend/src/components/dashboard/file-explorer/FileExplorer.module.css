@@ -65,19 +65,45 @@ background-color: #0D1117;
 
 .fileItem, .folderItem {
 display: flex;
-flex-direction:  row;
-gap:.5rem;
-max-width:100%;
-
-
-cursor: pointer;
-transition: all 0.25s ease;
+flex-direction: column;
 margin:.0 .5rem 0 .5rem;
 border-radius: .2rem;
 padding: .2rem;
 }
 
-.fileItem:hover, .folderItem:hover{
+.folderHeader, .fileHeader {
+cursor: pointer;
+transition: all 0.25s ease;
+
+border-radius: .2rem;
+padding: .2rem;  
+}
+
+.folderItem {
+    flex-direction: column;
+}
+
+
+.folderHeader, .fileHeader {
+    display: flex;
+    flex-direction: row;
+    gap:.5rem;
+}
+
+
+.folderFiles {
+    display: none;
+}
+
+.folderFiles.show {
+    display: block;
+}
+
+
+
+
+
+.folderHeader:hover, .fileHeader:hover{
 background-color: rgba(196, 206, 216, 0.2);
 }
 

@@ -1,5 +1,7 @@
 package com.xhibril.snipr.service;
 import com.xhibril.snipr.dto.api.ApiResponse;
+import com.xhibril.snipr.dto.snippet.FolderResponse;
+import com.xhibril.snipr.dto.snippet.SnippetResponse;
 import com.xhibril.snipr.model.Folder;
 import com.xhibril.snipr.model.Snippet;
 import com.xhibril.snipr.model.User;
@@ -10,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,31 +32,35 @@ public class SnippetService {
     }
 
 
-    public ResponseEntity<ApiResponse> addFolder(Long userId, String folderName) {
+    public ResponseEntity<FolderResponse> addFolder(Long userId, String folderName) {
         Optional<User> userOpt = userRepo.findById(userId);
         Optional<Folder> folderOpt = folderRepo.findByUserIdAndName(userId, folderName);
 
         if (folderOpt.isPresent()) {
-            return ResponseEntity.badRequest().body(new ApiResponse("Folder already exists"));
+            return ResponseEntity.badRequest().body(new FolderResponse("Folder already exists"));
         }
 
         if (userOpt.isPresent()) {
-
             User user = userOpt.get();
 
             Folder folder = new Folder();
             folder.setUser(user);
             folder.setName(folderName);
 
-            folderRepo.save(folder);
-            return ResponseEntity.ok().body(new ApiResponse("Folder successfully created"));
+            Folder folderSaved = folderRepo.save(folder);
+
+            FolderResponse folderResponse = new FolderResponse();
+            folderResponse.setId(folderSaved.getId());
+            folderResponse.setMessage("Folder successfully created");
+
+            return ResponseEntity.ok().body(folderResponse);
         } else {
-            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
+            return ResponseEntity.badRequest().body(new FolderResponse("Invalid request"));
         }
     }
 
 
-    public ResponseEntity<ApiResponse> addSnippet(Long userId, String title,
+    public ResponseEntity<SnippetResponse> addSnippet(Long userId, String title,
                                                       String code, String description,
                                                       List<String> tags) {
 
@@ -69,10 +76,15 @@ public class SnippetService {
             snippet.setDescription(description);
             snippet.setTags(tags);
 
-            snippetRepo.save(snippet);
-            return ResponseEntity.ok().body(new ApiResponse("Snippet successfully saved"));
+            Snippet savedSnippet = snippetRepo.save(snippet);
+
+            SnippetResponse snippetResponse = new SnippetResponse();
+            snippetResponse.setMessage("Snippet successfully saved");
+            snippetResponse.setId(savedSnippet.getId());
+
+            return ResponseEntity.ok().body(snippetResponse);
         } else {
-            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
+            return ResponseEntity.badRequest().body(new SnippetResponse("Invalid request"));
         }
     }
 
@@ -168,15 +180,40 @@ public class SnippetService {
         }
     }
 
-    public List<Folder> getFolders(Long userId){
-        return folderRepo.findByUserId(userId);
+    public List<FolderResponse> getFolders(Long userId){
+        List<Folder> folders = folderRepo.findByUserId(userId);
+        List<FolderResponse> foldersToReturn = new ArrayList<>();
+
+
+        for(Folder folder : folders){
+            FolderResponse folderRequest = new FolderResponse();
+            folderRequest.setId(folder.getId());
+            folderRequest.setName(folder.getName());
+            foldersToReturn.add(folderRequest);
+        }
+
+        return foldersToReturn;
     }
 
-    public List<Snippet> getSnippets(Long userId){
-        return snippetRepo.findByUserId(userId);
+    public List<SnippetResponse> getSnippets(Long userId){
+        List<Snippet> snippets =  snippetRepo.findByUserId(userId);
+        List<SnippetResponse> snippetsToReturn = new ArrayList<>();
+
+        for(Snippet snippet : snippets){
+            SnippetResponse snippetResponse = new SnippetResponse();
+
+            if(snippet.getFolder()!= null){
+                Folder folder = snippet.getFolder();
+                snippetResponse.setFolderId(folder.getId());
+            }
+
+            snippetResponse.setId(snippet.getId());
+            snippetResponse.setTitle(snippet.getTitle());
+            snippetResponse.setCode(snippet.getCode());
+            snippetResponse.setDescription(snippet.getDescription());
+            snippetsToReturn.add(snippetResponse);
+        }
+
+        return snippetsToReturn;
     }
-
-
-
-
 }

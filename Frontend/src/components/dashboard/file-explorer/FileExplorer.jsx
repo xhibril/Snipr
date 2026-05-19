@@ -15,7 +15,10 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
 
     const [toggleSearchFilter, setToggleSearchFilter] = useState(false);
     const inputRef = useRef(null);
+    const [foldersToggled, setFoldersToggle] = useState([])
 
+    const [prevFolderState, setPrevFolderState] = useState([])
+    const [prevFileState, setPrevFileState] = useState([])
 
     const [tags, setTags] = useState([])
 
@@ -52,6 +55,30 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
     }, [isCreatingItem, isCreatingFolder]);
 
 
+    async function addFile(){
+
+
+
+    }
+
+
+  async function handleCreateItem(path, itemName){
+    
+    if(isCreatingFolder){
+        setPrevFolderState(folders)
+        setFolders([...folders, {name: itemName}])
+    } else {
+        setPrevFileState(files)
+        setFiles([...files, {title: itemName,
+                             folderId: null}])
+    }
+
+
+
+
+  }
+
+
     return (
         <>
             <div className={styles.fileExplorer}>
@@ -81,7 +108,12 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
                 </div>
 
                 {isCreatingItem && (
-                    <form className={styles.addFile}>
+                    <form className={styles.addFile}
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleCreateItem(isCreatingFolder ? "/folders" : "/snippets", inputRef.current.value)
+                        inputRef.current.value = ""
+                    }}>
 
                         <input
                             className={styles.addFileField}
@@ -93,7 +125,9 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
                             }
                         />
 
-                        <FiPlus className={styles.addBtn} />
+                       <button type="submit">
+    <FiPlus className = {styles.addBtn}/>
+</button>
 
                     </form>
                 )}
@@ -179,42 +213,78 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
 
                 <div className={styles.snippetFiles}>
 
-
-                    {folders.map(folder => {
+                    {folders.map((folder, index) => (
 
                         <div className={styles.folderItem}>
-                            <RiFolderFill className={styles.folderIcon} />
-                            <p className={styles.folderName}>{folder.name}</p>
 
 
-                            {files.filter(file => file.folderId === folder.id)
-                                .map(file => {
-                                    <div className={styles.fileItem}>
-                                        <RiFile2Fill className={styles.fileIcon} />
-                                        <p className={styles.fileName}>{file.name}</p>
-                                    </div>
-                                })
+                            <div className={styles.folderHeader}
+
+                            onClick={() => {
+
+                            
+
+                                if(foldersToggled.includes(index)){
+                                    setFoldersToggle(
+                                        foldersToggled.filter(folder => folder !== index)
+                                    )
+                                } else {
+                                         setFoldersToggle([...foldersToggled, index])
+
+                                }
+                            
+                            
+                       
+                            
+                            
+                            
                             }
+                            }>
 
-                            {toggleFolder ? (
-                                <FiChevronUp className={styles.toggleFolder} />
-                            ) : (
-                                <FiChevronDown className={styles.toggleFolder} />
-                            )}
+                                <RiFolderFill className={styles.folderIcon} />
+                                <p className={styles.folderName}>{folder.name}</p>
+                                {toggleFolder ? (
+                                    <FiChevronUp className={styles.toggleFolder} />
+                                ) : (
+                                    <FiChevronDown className={styles.toggleFolder} />
+                                )}
+                            </div>
+
+
+
+                            <div className={`${styles.folderFiles} ${foldersToggled.includes(index) ? styles.show : ""}`}>
+                                {files.filter(file => file.folderId === folder.id)
+                                    .map(file => (
+                                        <div className={styles.fileItem}>
+                                            <div className = {styles.fileHeader}>
+                                                 <RiFile2Fill className={styles.fileIcon} />
+                                            <p className={styles.fileName}>{file.title}</p>
+                                            </div>
+                                           
+                                        </div>
+                                    ))
+                                }
+                            </div>
+
+
+
                         </div>
 
 
-                    })}
+                    ))}
 
 
-                                {files.filter(file => file.folderId === null)
-                                .map(file => {
-                                    <div className={styles.fileItem}>
-                                        <RiFile2Fill className={styles.fileIcon} />
-                                        <p className={styles.fileName}>{file.name}</p>
-                                    </div>
-                                })
-                            }
+                    {files.filter(file => file.folderId === null)
+                        .map(file => (
+                             <div className={styles.fileItem}>
+                                            <div className = {styles.fileHeader}>
+                                                 <RiFile2Fill className={styles.fileIcon} />
+                                            <p className={styles.fileName}>{file.title}</p>
+                                            </div>
+                                           
+                                        </div>
+                        ))
+                    }
 
                 </div>
             </div>

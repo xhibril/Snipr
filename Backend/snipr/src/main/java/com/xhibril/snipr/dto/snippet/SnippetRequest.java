@@ -9,6 +9,7 @@ public class SnippetRequest {
     private List<String> tags;
     private String query;
 
+
     public String getTitle() {
         return title;
     }

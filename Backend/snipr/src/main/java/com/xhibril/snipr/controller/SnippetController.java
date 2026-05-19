@@ -20,7 +20,7 @@ public class SnippetController {
     }
 
     @PostMapping("/folders")
-    public ResponseEntity<ApiResponse> addFolder(@RequestParam String name){
+    public ResponseEntity<FolderResponse> addFolder(@RequestParam String name){
         Long userId = 1L; // placeholder
 
         return snippetService.addFolder(userId, name);
@@ -28,7 +28,7 @@ public class SnippetController {
 
 
     @PostMapping("/snippets")
-    public ResponseEntity<ApiResponse> addSnippet(@RequestBody SnippetRequest request){
+    public ResponseEntity<SnippetResponse> addSnippet(@RequestBody SnippetRequest request){
         Long userId = 1L; // placeholder
 
         return snippetService.addSnippet(userId, request.getTitle(), request.getCode(),
@@ -73,14 +73,14 @@ public class SnippetController {
 
 
     @GetMapping("/folders")
-    public List<Folder> getFolders(){
+    public List<FolderResponse> getFolders(){
         Long userId = 14L; // place holder;
 
         return snippetService.getFolders(userId);
     }
 
     @GetMapping("/snippets")
-    public List<Snippet> getSnippets(){
+    public List<SnippetResponse> getSnippets(){
         Long userId = 14L; // place holder;
 
         return snippetService.getSnippets(userId);
