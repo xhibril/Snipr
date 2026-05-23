@@ -1,4 +1,5 @@
 package com.xhibril.snipr.model;
+
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -6,6 +7,7 @@ import java.util.List;
 
 @Entity
 public class Snippet {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,13 +20,12 @@ public class Snippet {
     @JoinColumn(name = "folder_id", nullable = true)
     private Folder folder;
 
+    private String fileName;
+    private String body;
     private String title;
-    private String code;
-    private String description;
 
     @ElementCollection
     private List<String> tags = new ArrayList<>();
-
 
     public Long getId() {
         return id;
@@ -50,28 +51,28 @@ public class Snippet {
         this.folder = folder;
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public List<String> getTags() {

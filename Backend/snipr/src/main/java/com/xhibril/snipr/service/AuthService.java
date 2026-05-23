@@ -137,7 +137,6 @@ public class AuthService {
 
     public Boolean isAuthenticated(HttpServletRequest req){
         Long id = getAuthenticatedId(req);
-        System.out.println(id != null);
         return id != null;
     }
 

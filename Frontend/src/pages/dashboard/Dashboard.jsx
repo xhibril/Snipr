@@ -47,7 +47,7 @@ export default function Dashboard({ notify }) {
     }
 
     async function fetchFiles(){
-        const res = await ApiFetch("/snippets", {METHOD: "GET"}, notify, nav)
+        const res = await ApiFetch("/snippets", {method: "GET"}, notify, nav)
 
         if(!res) return;
 
@@ -135,7 +135,8 @@ export default function Dashboard({ notify }) {
                 <FileExplorer toggleSettings={toggleSettings} setToggleSettings={setToggleSettings}
                               toggleFolder = {toggleFolder} setToggleFolder={setToggleFolder}
                               folders = {folders} setFolders={setFolders}
-                              files = {files} setFiles = {setFiles}/>
+                              files = {files} setFiles = {setFiles}
+                                notify = {notify}/>
 
 
 

@@ -24,7 +24,7 @@ public class SearchService {
             List<SnippetResponse> snippetResponses = new ArrayList<>();
 
             for(Snippet snippet : firstFilteredSnippets){
-                SnippetResponse res = new SnippetResponse(snippet.getTitle(), snippet.getCode(), snippet.getDescription());
+                SnippetResponse res = new SnippetResponse(snippet.getTitle(), snippet.getBody(), snippet.getTitle());
                 snippetResponses.add(res);
             }
             return snippetResponses;
@@ -81,8 +81,8 @@ public class SearchService {
             if(score > 0){
                 SnippetResponse snippetResponse = new SnippetResponse(
                         snippet.getTitle(),
-                        snippet.getCode(),
-                        snippet.getDescription()
+                        snippet.getBody(),
+                        snippet.getTitle()
                 );
 
                 filteredList.add(snippetResponse);

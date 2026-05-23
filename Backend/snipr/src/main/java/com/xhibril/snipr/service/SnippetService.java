@@ -50,6 +50,7 @@ public class SnippetService {
             Folder folderSaved = folderRepo.save(folder);
 
             FolderResponse folderResponse = new FolderResponse();
+            folderResponse.setName(folderSaved.getName());
             folderResponse.setId(folderSaved.getId());
             folderResponse.setMessage("Folder successfully created");
 
@@ -60,9 +61,7 @@ public class SnippetService {
     }
 
 
-    public ResponseEntity<SnippetResponse> addSnippet(Long userId, String title,
-                                                      String code, String description,
-                                                      List<String> tags) {
+    public ResponseEntity<SnippetResponse> addSnippet(Long userId, String fileName, Long folderId) {
 
         Optional<User> userOpt = userRepo.findById(userId);
 
@@ -71,16 +70,27 @@ public class SnippetService {
             Snippet snippet = new Snippet();
 
             snippet.setUser(user);
-            snippet.setTitle(title);
-            snippet.setCode(code);
-            snippet.setDescription(description);
-            snippet.setTags(tags);
+            snippet.setFileName(fileName);
+
+            if(folderId != null){
+                Optional<Folder> folderOpt = folderRepo.findById(folderId);
+
+                if(folderOpt.isPresent()){
+                    Folder folder = folderOpt.get();
+                    snippet.setFolder(folder);
+                }
+            }
 
             Snippet savedSnippet = snippetRepo.save(snippet);
 
             SnippetResponse snippetResponse = new SnippetResponse();
             snippetResponse.setMessage("Snippet successfully saved");
+            snippetResponse.setFileName(savedSnippet.getFileName());
             snippetResponse.setId(savedSnippet.getId());
+
+            if(snippet.getFolder() != null){
+                snippetResponse.setFolderId(snippet.getFolder().getId());
+            }
 
             return ResponseEntity.ok().body(snippetResponse);
         } else {
@@ -208,9 +218,9 @@ public class SnippetService {
             }
 
             snippetResponse.setId(snippet.getId());
+            snippetResponse.setFileName(snippet.getFileName());
+            snippetResponse.setBody(snippet.getBody());
             snippetResponse.setTitle(snippet.getTitle());
-            snippetResponse.setCode(snippet.getCode());
-            snippetResponse.setDescription(snippet.getDescription());
             snippetsToReturn.add(snippetResponse);
         }
 

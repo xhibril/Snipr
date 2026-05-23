@@ -59,8 +59,6 @@ export default function Auth({ mode, notify, setIsAuth }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password, remember })
             }, notify, nav)
-
-            console.log(res.status);
             
             if (!res) return;
 
@@ -101,7 +99,7 @@ export default function Auth({ mode, notify, setIsAuth }) {
             <form className={`${global.inputContainer} ${global.glassyBackground}`}
                 onSubmit={(e) => {
                     e.preventDefault();
-                    submitCredentials(isLogin ? "/login" : "api/signup")
+                    submitCredentials(isLogin ? "/login" : "/signup")
                 }}>
 
                 <BrandHeader title = {isLogin ? "Login" : "Sign up"}/>

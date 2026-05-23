@@ -4,11 +4,13 @@ import { FiHome, FiFolder, FiFile, FiX, FiSliders, FiShare2, FiStar, FiTrash2, F
 import { useState, useRef, useEffect } from "react";
 
 import { RiFile2Fill, RiFolderFill, RiImageFill, RiFolderAddLine, RiFileAddLine } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
+import ApiFetch from "../../utils/Api.jsx";
 
 export default function FileExplorer({ toggleSettings, setToggleSettings,
     toggleFolder, setToggleFolder,
     folders, setFolders,
-    files, setFiles }) {
+    files, setFiles, notify}) {
 
     const [isCreatingItem, setIsCreatingItem] = useState(false);
     const [isCreatingFolder, setIsCreatingFolder] = useState(false);
@@ -17,10 +19,18 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
     const inputRef = useRef(null);
     const [foldersToggled, setFoldersToggle] = useState([])
 
-    const [prevFolderState, setPrevFolderState] = useState([])
-    const [prevFileState, setPrevFileState] = useState([])
+    const [prevExplorerState, setPrevExplorerState] = useState([])
 
     const [tags, setTags] = useState([])
+
+    const [snippetDesc, setSnippetDesc] = useState("")
+    const [snippetCode, setSnippetCode] = useState("")
+    const [snippetTags, setSnippetTags] = useState([])
+
+
+    const nav = useNavigate();
+
+
 
     function setCreatingState(type) {
 
@@ -55,28 +65,91 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
     }, [isCreatingItem, isCreatingFolder]);
 
 
-    async function addFile(){
+    async function addFile() {
 
 
 
     }
 
 
-  async function handleCreateItem(path, itemName){
-    
-    if(isCreatingFolder){
-        setPrevFolderState(folders)
-        setFolders([...folders, {name: itemName}])
-    } else {
-        setPrevFileState(files)
-        setFiles([...files, {title: itemName,
-                             folderId: null}])
+    async function handleCreateItem(path, itemName) {
+        let methods = {};
+        let newFolder;
+        let newFile;
+        
+        if (isCreatingFolder) {
+            setPrevExplorerState(folders)
+
+            newFolder = { name: itemName }
+
+            setFolders([...folders, newFolder])
+
+            methods =  {
+                method: "POST",
+                headers: {"Content-Type" : "application/json"},
+                body: JSON.stringify({name: itemName, })
+            }
+            
+        } else {
+            setPrevExplorerState(files)
+
+            newFile = {
+                title: itemName,
+                folderId: null
+            }
+
+            setFiles([...files, newFile])
+
+                methods =  {
+                method: "POST",
+                headers: {"Content-Type" : "application/json"},
+                body: JSON.stringify({fileName: itemName, title: snippetDesc, body: snippetCode, tags: snippetTags})
+            }
+
+        }
+               const res = await ApiFetch(path, methods, notify, nav)
+
+               if(!res) return;
+
+               const data = await res.json();
+
+               if(!res.ok){
+                notify(data.message || isCreatingFolder ? "Something went wrong while creating folder" : 
+                                                           "Something went wrong while creating file", "ERROR")
+
+
+                isCreatingFolder ? setFolders(prevExplorerState) : setFiles(prevExplorerState)
+                return;
+               }
+
+
+               console.log("FINISHED RES")
+        
+               if(isCreatingFolder){
+
+
+               
+                setFolders(prev => 
+                    prev.map(folder => (
+                        folder === newFolder ?  data : folder
+                    ))
+                )
+
+
+               } else {
+
+                setFiles(prev => 
+                    prev.map(file => (
+                        file === newFile ?data : file
+                    ))
+                )
+               }
+
+
+               
+            
+
     }
-
-
-
-
-  }
 
 
     return (
@@ -109,11 +182,11 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
 
                 {isCreatingItem && (
                     <form className={styles.addFile}
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        handleCreateItem(isCreatingFolder ? "/folders" : "/snippets", inputRef.current.value)
-                        inputRef.current.value = ""
-                    }}>
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            handleCreateItem(isCreatingFolder ? "/folders" : "/snippets", inputRef.current.value)
+                            inputRef.current.value = ""
+                        }}>
 
                         <input
                             className={styles.addFileField}
@@ -125,9 +198,9 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
                             }
                         />
 
-                       <button type="submit">
-    <FiPlus className = {styles.addBtn}/>
-</button>
+                        <button type="submit">
+                            <FiPlus className={styles.addBtn} />
+                        </button>
 
                     </form>
                 )}
@@ -220,26 +293,28 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
 
                             <div className={styles.folderHeader}
 
-                            onClick={() => {
+                                onClick={() => {
 
-                            
 
-                                if(foldersToggled.includes(index)){
-                                    setFoldersToggle(
-                                        foldersToggled.filter(folder => folder !== index)
-                                    )
-                                } else {
-                                         setFoldersToggle([...foldersToggled, index])
+
+                                    if (foldersToggled.includes(index)) {
+                                        setFoldersToggle(
+                                            foldersToggled.filter(folder => folder !== index)
+                                        )
+                                    } else {
+                                        setFoldersToggle([...foldersToggled, index])
+
+                                    }
+
+
+                                 
+
+
+
+
 
                                 }
-                            
-                            
-                       
-                            
-                            
-                            
-                            }
-                            }>
+                                }>
 
                                 <RiFolderFill className={styles.folderIcon} />
                                 <p className={styles.folderName}>{folder.name}</p>
@@ -256,11 +331,11 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
                                 {files.filter(file => file.folderId === folder.id)
                                     .map(file => (
                                         <div className={styles.fileItem}>
-                                            <div className = {styles.fileHeader}>
-                                                 <RiFile2Fill className={styles.fileIcon} />
-                                            <p className={styles.fileName}>{file.title}</p>
+                                            <div className={styles.fileHeader}>
+                                                <RiFile2Fill className={styles.fileIcon} />
+                                                <p className={styles.fileName}>{file.title}</p>
                                             </div>
-                                           
+
                                         </div>
                                     ))
                                 }
@@ -276,13 +351,13 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
 
                     {files.filter(file => file.folderId === null)
                         .map(file => (
-                             <div className={styles.fileItem}>
-                                            <div className = {styles.fileHeader}>
-                                                 <RiFile2Fill className={styles.fileIcon} />
-                                            <p className={styles.fileName}>{file.title}</p>
-                                            </div>
-                                           
-                                        </div>
+                            <div className={styles.fileItem}>
+                                <div className={styles.fileHeader}>
+                                    <RiFile2Fill className={styles.fileIcon} />
+                                    <p className={styles.fileName}>{file.fileName}</p>
+                                </div>
+
+                            </div>
                         ))
                     }
 
