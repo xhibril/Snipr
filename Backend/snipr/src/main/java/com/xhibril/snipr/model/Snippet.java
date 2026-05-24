@@ -23,6 +23,7 @@ public class Snippet {
     private String fileName;
     private String body;
     private String title;
+    private Boolean isPinned;
 
     @ElementCollection
     private List<String> tags = new ArrayList<>();
@@ -82,4 +83,13 @@ public class Snippet {
     public void setTags(List<String> tags) {
         this.tags = tags;
     }
+
+    public void setIsPinned(Boolean isPinned){
+        this.isPinned = isPinned;
+    }
+
+    public Boolean getIsPinned(){
+        return isPinned;
+    }
 }
+

@@ -23,5 +23,16 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
 
     List<Snippet> findAllByUserId(Long userId);
 
+
+
+    @Modifying
+    @Query("UPDATE Snippet s SET s.isPinned = :isPinned  WHERE s.id = :snippetId")
+    void updatePinStatus(@Param("isPinned") Boolean isPinned,
+                         @Param("snippetId") Long snippetId);
+
+
+
+
+
     List<Snippet> findByUserId(Long userId);
 }

@@ -8,6 +8,7 @@ import com.xhibril.snipr.model.User;
 import com.xhibril.snipr.repository.FolderRepository;
 import com.xhibril.snipr.repository.SnippetRepository;
 import com.xhibril.snipr.repository.UserRepository;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -196,10 +197,11 @@ public class SnippetService {
 
 
         for(Folder folder : folders){
-            FolderResponse folderRequest = new FolderResponse();
-            folderRequest.setId(folder.getId());
-            folderRequest.setName(folder.getName());
-            foldersToReturn.add(folderRequest);
+            FolderResponse folderResponse = new FolderResponse();
+            folderResponse.setId(folder.getId());
+            folderResponse.setName(folder.getName());
+            folderResponse.setIsPinned(folder.getIsPinned());
+            foldersToReturn.add(folderResponse);
         }
 
         return foldersToReturn;
@@ -221,9 +223,47 @@ public class SnippetService {
             snippetResponse.setFileName(snippet.getFileName());
             snippetResponse.setBody(snippet.getBody());
             snippetResponse.setTitle(snippet.getTitle());
+            snippetResponse.setIsPinned(snippet.getIsPinned());
             snippetsToReturn.add(snippetResponse);
         }
 
         return snippetsToReturn;
+    }
+
+
+    @Transactional
+    public ResponseEntity<ApiResponse> updateSnippetPinStatus(Long userId, Long snippetId){
+        Optional<Snippet> snippetOpt = snippetRepo.findById(snippetId);
+
+        if(snippetOpt.isPresent()){
+            Snippet snippet = snippetOpt.get();
+            User user = snippet.getUser();
+
+            if(user.getId() == userId){
+                Boolean pinStatus = !Boolean.TRUE.equals(snippet.getIsPinned());
+                snippetRepo.updatePinStatus(pinStatus, snippetId);
+                return ResponseEntity.ok().body(new ApiResponse("Snippet successfully updated"));
+            }
+        }
+        return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
+    }
+
+
+    @Transactional
+    public ResponseEntity<ApiResponse> updateFolderPinStatus(Long userId, Long folderId){
+        Optional<Folder> folderOpt = folderRepo.findById(folderId);
+
+
+        if(folderOpt.isPresent()){
+            Folder folder = folderOpt.get();
+            User user = folder.getUser();
+
+            if(user.getId() == userId){
+                Boolean pinStatus = !Boolean.TRUE.equals(folder.getIsPinned());
+                folderRepo.updatePinStatus(pinStatus, folderId);
+                return ResponseEntity.ok().body(new ApiResponse("Snippet successfully updated"));
+            }
+        }
+        return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
     }
 }

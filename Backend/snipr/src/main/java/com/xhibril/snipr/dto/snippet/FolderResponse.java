@@ -3,7 +3,9 @@ package com.xhibril.snipr.dto.snippet;
 public class FolderResponse {
     private String name;
     private Long id;
-    public String message;
+    private String message;
+    private Boolean isPinned;
+
 
 
     public FolderResponse(){}
@@ -34,5 +36,13 @@ public class FolderResponse {
 
     public Long getId(){
         return id;
+    }
+
+    public void setIsPinned(Boolean isPinned){
+        this.isPinned = isPinned;
+    }
+
+    public Boolean getIsPinned(){
+        return isPinned;
     }
 }

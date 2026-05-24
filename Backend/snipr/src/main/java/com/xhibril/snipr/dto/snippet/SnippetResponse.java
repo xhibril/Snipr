@@ -8,6 +8,7 @@ public class SnippetResponse {
     private String title;
     private Long folderId;
     private String message;
+    private Boolean isPinned;
 
     public SnippetResponse(String title, String body, String fileName) {
         this.title = title;
@@ -67,5 +68,13 @@ public class SnippetResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public void setIsPinned(Boolean isPinned){
+        this.isPinned = isPinned;
+    }
+
+    public Boolean getIsPinned(){
+        return isPinned;
     }
 }

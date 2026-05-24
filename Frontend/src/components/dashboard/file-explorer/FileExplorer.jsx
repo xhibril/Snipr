@@ -3,14 +3,14 @@ import styles from "./FileExplorer.module.css"
 import { FiHome, FiFolder, FiFile, FiX, FiSliders, FiShare2, FiStar, FiTrash2, FiChevronUp, FiChevronDown, FiTrash, FiSearch, FiPlus } from "react-icons/fi";
 import { useState, useRef, useEffect } from "react";
 
-import { RiFile2Fill, RiFolderFill, RiImageFill, RiFolderAddLine, RiFileAddLine } from "react-icons/ri";
+import { RiFile2Fill, RiFolderFill, RiImageFill, RiFolderAddLine, RiFileAddLine, RiPushpinFill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import ApiFetch from "../../utils/Api.jsx";
 
 export default function FileExplorer({ toggleSettings, setToggleSettings,
     toggleFolder, setToggleFolder,
     folders, setFolders,
-    files, setFiles, notify}) {
+    files, setFiles, notify }) {
 
     const [isCreatingItem, setIsCreatingItem] = useState(false);
     const [isCreatingFolder, setIsCreatingFolder] = useState(false);
@@ -26,6 +26,15 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
     const [snippetDesc, setSnippetDesc] = useState("")
     const [snippetCode, setSnippetCode] = useState("")
     const [snippetTags, setSnippetTags] = useState([])
+
+
+    const [selectedItem, setSelectedItem] = useState(null)
+    const [allItems, setAllItems] = useState({})
+
+
+
+    const [sortedFolders, setSortedFolders] = useState([])
+    const [sortedFiles, setSortedFiles] = useState([])
 
 
     const nav = useNavigate();
@@ -76,7 +85,7 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
         let methods = {};
         let newFolder;
         let newFile;
-        
+
         if (isCreatingFolder) {
             setPrevExplorerState(folders)
 
@@ -84,12 +93,12 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
 
             setFolders([...folders, newFolder])
 
-            methods =  {
+            methods = {
                 method: "POST",
-                headers: {"Content-Type" : "application/json"},
-                body: JSON.stringify({name: itemName, })
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: itemName, })
             }
-            
+
         } else {
             setPrevExplorerState(files)
 
@@ -100,56 +109,121 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
 
             setFiles([...files, newFile])
 
-                methods =  {
+            methods = {
                 method: "POST",
-                headers: {"Content-Type" : "application/json"},
-                body: JSON.stringify({fileName: itemName, title: snippetDesc, body: snippetCode, tags: snippetTags})
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ fileName: itemName, title: snippetDesc, body: snippetCode, tags: snippetTags })
             }
 
         }
-               const res = await ApiFetch(path, methods, notify, nav)
+        const res = await ApiFetch(path, methods, notify, nav)
 
-               if(!res) return;
+        if (!res) return;
 
-               const data = await res.json();
+        const data = await res.json();
 
-               if(!res.ok){
-                notify(data.message || isCreatingFolder ? "Something went wrong while creating folder" : 
-                                                           "Something went wrong while creating file", "ERROR")
-
-
-                isCreatingFolder ? setFolders(prevExplorerState) : setFiles(prevExplorerState)
-                return;
-               }
+        if (!res.ok) {
+            notify(data.message || isCreatingFolder ? "Something went wrong while creating folder" :
+                "Something went wrong while creating file", "ERROR")
 
 
-               console.log("FINISHED RES")
-        
-               if(isCreatingFolder){
+            isCreatingFolder ? setFolders(prevExplorerState) : setFiles(prevExplorerState)
+            return;
+        }
 
 
-               
-                setFolders(prev => 
-                    prev.map(folder => (
-                        folder === newFolder ?  data : folder
-                    ))
-                )
+        console.log("FINISHED RES")
+
+        if (isCreatingFolder) {
 
 
-               } else {
 
-                setFiles(prev => 
-                    prev.map(file => (
-                        file === newFile ?data : file
-                    ))
-                )
-               }
+            setFolders(prev =>
+                prev.map(folder => (
+                    folder === newFolder ? data : folder
+                ))
+            )
 
 
-               
-            
+        } else {
 
+            setFiles(prev =>
+                prev.map(file => (
+                    file === newFile ? data : file
+                ))
+            )
+        }
     }
+
+
+    // compare two folders at a time
+    // pinned = 1 gets placed before unpinned = 0
+    useEffect(() => {
+        const finalizedFolders = [...folders].sort((a, b) => b.isPinned - b.isPinned);
+        setSortedFolders(finalizedFolders);
+        console.log("FINALIZED FOLDERS: " + finalizedFolders);
+
+    }, [folders])
+
+    useEffect(() => {
+        const finalizedFiles = [...files].sort((a, b) => b.isPinned - a.isPinned)
+        setSortedFiles(finalizedFiles);
+        console.log("FINALIZED FILES: " + finalizedFiles);
+    }, [files])
+
+
+
+
+    async function updateItemPinStatus() {
+
+        let status = false;
+        selectedItem.data.isPinned === true ? status = false : status = true;
+
+        let path;
+
+        if (selectedItem.type === "FOLDER") {
+            path = "/folders/" + selectedItem.data.id + "/pin"
+        } else {
+            path = "/snippets/" + selectedItem.data.id + "/pin"
+        }
+
+        const res = await ApiFetch(path, { method: "PATCH" }, notify, nav)
+
+        if (!res) return;
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            notify(data.message || "Could not pin, please try again", "ERROR")
+            return;
+        }
+
+        if (selectedItem.type === "FOLDER") {
+            setFolders(
+                folders.map(
+                    folder => folder.id === selectedItem.data.id ?
+                        {
+                            ...folder,
+                            isPinned: status
+                        } : folder
+                )
+            )
+        } else {
+            setFiles(
+                files.map(
+                    file => file.id === selectedItem.data.id ? {
+                        ...file,
+                        isPinned: status
+                    } : file
+                )
+            )
+        }
+    }
+
+
+
+
+
 
 
     return (
@@ -175,7 +249,16 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
                     />
 
                     <FiTrash className={styles.snippetAction} />
-                    <FiStar className={styles.snippetAction} />
+                    <FiStar className={styles.snippetAction}
+
+
+                        onClick={() => updateItemPinStatus()}
+
+
+
+
+
+                    />
                     <FiShare2 className={styles.snippetAction} />
 
                 </div>
@@ -284,9 +367,12 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
                 </div>
 
 
+
+
+
                 <div className={styles.snippetFiles}>
 
-                    {folders.map((folder, index) => (
+                    {sortedFolders.map((folder, index) => (
 
                         <div className={styles.folderItem}>
 
@@ -294,6 +380,12 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
                             <div className={styles.folderHeader}
 
                                 onClick={() => {
+
+
+                                    setSelectedItem({
+                                        type: "FOLDER",
+                                        data: folder
+                                    })
 
 
 
@@ -305,20 +397,15 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
                                         setFoldersToggle([...foldersToggled, index])
 
                                     }
-
-
-                                 
-
-
-
-
-
                                 }
                                 }>
 
                                 <RiFolderFill className={styles.folderIcon} />
+
+                                {folder.isPinned && <RiPushpinFill />}
+
                                 <p className={styles.folderName}>{folder.name}</p>
-                                {toggleFolder ? (
+                                {foldersToggled.includes(index) ? (
                                     <FiChevronUp className={styles.toggleFolder} />
                                 ) : (
                                     <FiChevronDown className={styles.toggleFolder} />
@@ -328,11 +415,24 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
 
 
                             <div className={`${styles.folderFiles} ${foldersToggled.includes(index) ? styles.show : ""}`}>
-                                {files.filter(file => file.folderId === folder.id)
+
+                                {/*add files belonging to folders */}
+                                {sortedFiles.filter(file => file.folderId === folder.id)
                                     .map(file => (
                                         <div className={styles.fileItem}>
-                                            <div className={styles.fileHeader}>
+                                            <div className={styles.fileHeader}
+
+                                                onClick={() => {
+                                                    setSelectedItem({
+                                                        type: "FILE",
+                                                        data: file
+                                                    })
+
+                                                }}
+
+                                            >
                                                 <RiFile2Fill className={styles.fileIcon} />
+                                                {file.isPinned && <RiPushpinFill />}
                                                 <p className={styles.fileName}>{file.title}</p>
                                             </div>
 
@@ -340,20 +440,28 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
                                     ))
                                 }
                             </div>
-
-
-
                         </div>
-
-
                     ))}
 
 
-                    {files.filter(file => file.folderId === null)
+                    {sortedFiles.filter(file => file.folderId === null)
                         .map(file => (
                             <div className={styles.fileItem}>
-                                <div className={styles.fileHeader}>
+                                <div className={styles.fileHeader}
+
+                                    onClick={() => {
+                                        setSelectedItem({
+                                            type: "FILE",
+                                            data: file
+                                        })
+
+                                    }}
+
+
+
+                                >
                                     <RiFile2Fill className={styles.fileIcon} />
+                                    {file.isPinned && <RiPushpinFill />}
                                     <p className={styles.fileName}>{file.fileName}</p>
                                 </div>
 

@@ -42,6 +42,19 @@ public class SnippetController {
         return snippetService.moveSnippet(userId, snippetId, request.getFolderId());
     }
 
+    @PatchMapping("/snippets/{snippetId}/pin")
+    public ResponseEntity<ApiResponse> pinSnippet(@PathVariable Long snippetId){
+        Long userId = 1L; // placeholder
+
+        return snippetService.updateSnippetPinStatus(userId, snippetId);
+    }
+
+    @PatchMapping("/folders/{folderId}/pin")
+    public ResponseEntity<ApiResponse> pinFolder(@PathVariable Long folderId){
+        Long userId = 1L;
+
+                return snippetService.updateFolderPinStatus(userId, folderId);
+    }
 
     @DeleteMapping("/snippets/{snippetId}")
     public ResponseEntity<ApiResponse> deleteSnippet(@PathVariable Long snippetId){
