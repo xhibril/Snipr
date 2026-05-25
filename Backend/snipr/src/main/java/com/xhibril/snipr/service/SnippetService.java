@@ -86,7 +86,7 @@ public class SnippetService {
 
             SnippetResponse snippetResponse = new SnippetResponse();
             snippetResponse.setMessage("Snippet successfully saved");
-            snippetResponse.setFileName(savedSnippet.getFileName());
+            snippetResponse.setName(savedSnippet.getFileName());
             snippetResponse.setId(savedSnippet.getId());
 
             if(snippet.getFolder() != null){
@@ -220,7 +220,7 @@ public class SnippetService {
             }
 
             snippetResponse.setId(snippet.getId());
-            snippetResponse.setFileName(snippet.getFileName());
+            snippetResponse.setName(snippet.getFileName());
             snippetResponse.setBody(snippet.getBody());
             snippetResponse.setTitle(snippet.getTitle());
             snippetResponse.setIsPinned(snippet.getIsPinned());

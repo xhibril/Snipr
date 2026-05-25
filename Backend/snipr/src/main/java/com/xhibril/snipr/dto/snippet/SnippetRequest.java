@@ -4,19 +4,19 @@ import java.util.List;
 
 public class SnippetRequest {
 
-    private String fileName;
+    private String name;
     private Long folderId;
     private String body;
     private String title;
     private List<String> tags;
     private String query;
 
-    public String getFileName() {
-        return fileName;
+    public String getName() {
+        return name;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void folderId(Long folderId){

@@ -61,11 +61,8 @@ public class EmailService {
                 <p>%s</p>
                 """.formatted(code);
 
-
      String json = createBody(html, email);
      sendEmail(json);
-
-
 
      return ResponseEntity.ok().body(new ApiResponse("Verification code sent"));
 

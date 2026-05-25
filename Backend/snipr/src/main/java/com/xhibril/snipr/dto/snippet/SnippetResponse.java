@@ -3,17 +3,17 @@ package com.xhibril.snipr.dto.snippet;
 public class SnippetResponse {
 
     private Long id;
-    private String fileName;
+    private String name;
     private String body;
     private String title;
     private Long folderId;
     private String message;
     private Boolean isPinned;
 
-    public SnippetResponse(String title, String body, String fileName) {
+    public SnippetResponse(String title, String body, String name) {
         this.title = title;
         this.body = body;
-        this.fileName = fileName;
+        this.name = name;
     }
 
     public SnippetResponse(String message) {
@@ -30,12 +30,12 @@ public class SnippetResponse {
         this.id = id;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getName() {
+        return name;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getBody() {

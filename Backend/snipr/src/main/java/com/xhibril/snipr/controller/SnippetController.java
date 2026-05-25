@@ -31,7 +31,7 @@ public class SnippetController {
     public ResponseEntity<SnippetResponse> addSnippet(@RequestBody SnippetRequest request){
         Long userId = 1L; // placeholder
 
-        return snippetService.addSnippet(userId, request.getFileName(), request.getFolderId());
+        return snippetService.addSnippet(userId, request.getName(), request.getFolderId());
     }
 
 
