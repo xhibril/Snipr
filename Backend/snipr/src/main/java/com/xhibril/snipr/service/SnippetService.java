@@ -280,11 +280,16 @@ public class SnippetService {
             snippet.setBody(request.getBody());
             snippet.setTitle(request.getTitle());
 
-            Optional<Folder> folderOpt = folderRepo.findById(request.getFolderId());
+            if(request.getFolderId() != null){
+                Optional<Folder> folderOpt = folderRepo.findById(request.getFolderId());
 
-            if(folderOpt.isPresent()) {
-                snippet.setFolder(folderOpt.get());
+                if(folderOpt.isPresent()) {
+                    snippet.setFolder(folderOpt.get());
+                }
             }
+
+
+
 
             snippet.setTags(request.getTags());
             snippetRepo.save(snippet);

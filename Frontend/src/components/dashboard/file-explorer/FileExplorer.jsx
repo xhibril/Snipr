@@ -7,10 +7,11 @@ import { RiFile2Fill, RiFolderFill, RiImageFill, RiFolderAddLine, RiFileAddLine,
 import { useNavigate } from "react-router-dom";
 import ApiFetch from "../../utils/Api.jsx";
 
-export default function FileExplorer({ toggleSettings, setToggleSettings,
+export default function FileExplorer({
+    toggleSettings, setToggleSettings,
     toggleFolder, setToggleFolder,
     folders, setFolders,
-    files, setFiles, notify }) {
+    files, setFiles, notify, selectedItem, setSelectedItem }) {
 
     const [isCreatingItem, setIsCreatingItem] = useState(false);
     const [isCreatingFolder, setIsCreatingFolder] = useState(false);
@@ -27,7 +28,6 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
     const [snippetTags, setSnippetTags] = useState([])
 
 
-    const [selectedItem, setSelectedItem] = useState(null)
     const [allItems, setAllItems] = useState({})
 
 
@@ -257,7 +257,7 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
         // opt update
 
         setFiles(
-            files.map(file=> file.id === snippet.id ? snippet: file
+            files.map(file => file.id === snippet.id ? snippet : file
             )
         )
 
@@ -275,11 +275,11 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
             })
         })
 
-        if(!res) return;
+        if (!res) return;
 
         const data = await res.json();
 
-        if(!res.ok){
+        if (!res.ok) {
             notify(data.message || "Could not update snippet", "ERROR");
             setFiles(previousFiles);
             return;
@@ -433,18 +433,41 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
 
 
 
-                <div className={styles.snippetFiles}>
+                <div className={styles.snippetFiles}
+                    onDragOver={(e) => e.preventDefault()
+                    }
+
+
+                    onDrop={(e) => {
+                        const file = JSON.parse(
+                            e.dataTransfer.getData("file"))
+
+                                const snippet = {
+                        ...file,
+                        folderId: null
+                    }
+
+                    updateSnippet(snippet)
+                
+                    }}
+
+                
+
+
+                >
 
                     {sortedFolders.map((folder, index) => (
 
                         <div className={styles.folderItem}
+                     
 
                             onDragOver={(e) => e.preventDefault()}
 
                             onDrop={(e) => {
-                           const file = JSON.parse(
-   e.dataTransfer.getData("file")
-)
+                                e.stopPropagation(); 
+                                const file = JSON.parse(
+                                    e.dataTransfer.getData("file")
+                                )
 
 
                                 const snippet = {
@@ -453,10 +476,10 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
                                 }
 
 
-                                if(file.folderId !== folder.id){
-    updateSnippet(snippet)
+                                if (file.folderId !== folder.id) {
+                                    updateSnippet(snippet)
                                 }
-                            
+
 
 
                             }}
@@ -472,10 +495,16 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
                                 onClick={() => {
 
 
-                                    setSelectedItem({
-                                        type: "FOLDER",
-                                        data: folder
-                                    })
+                                    if (selectedItem?.data?.id === folder?.id) {
+                                        setSelectedItem(null)
+                                    } else {
+                                        setSelectedItem({
+                                            type: "FOLDER",
+                                            data: folder
+                                        })
+
+                                    }
+
 
 
 
@@ -528,21 +557,30 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
                                     .map(file => (
                                         <div className={styles.fileItem}
                                             draggable={true}
-                                            onDragStart={(e) => { e.dataTransfer.setData(
-   "file",
-   JSON.stringify(file)
-) }}
+                                            onDragStart={(e) => {
+                                                e.dataTransfer.setData(
+                                                    "file",
+                                                    JSON.stringify(file)
+                                                )
+                                            }}
                                         >
                                             <div className={`${styles.fileHeader} ${selectedItem?.type === "FILE" &&
                                                 selectedItem?.data?.id === file?.id ? styles.selected : ""}`}
 
                                                 onClick={() => {
-                                                    setSelectedItem({
-                                                        type: "FILE",
-                                                        data: file
-                                                    })
+
+                                                    if (selectedItem?.data?.id === file?.id) {
+                                                        setSelectedItem(null)
+                                                    } else {
+                                                        setSelectedItem({
+                                                            type: "FILE",
+                                                            data: file
+                                                        })
+
+                                                    }
 
                                                 }}
+
 
                                             >
                                                 <RiFile2Fill className={styles.fileIcon} />
@@ -573,18 +611,27 @@ export default function FileExplorer({ toggleSettings, setToggleSettings,
                             <div className={styles.fileItem}
 
                                 draggable={true}
-                                onDragStart={(e) => { e.dataTransfer.setData(
-   "file",
-   JSON.stringify(file)
-) }}
+                                onDragStart={(e) => {
+                                    e.dataTransfer.setData(
+                                        "file",
+                                        JSON.stringify(file)
+                                    )
+                                }}
                             >
                                 <div className={`${styles.fileHeader} ${selectedItem?.type === "FILE" && selectedItem?.data?.id === file?.id ? styles.selected : ""}`}
 
+
                                     onClick={() => {
-                                        setSelectedItem({
-                                            type: "FILE",
-                                            data: file
-                                        })
+
+                                        if (selectedItem?.data?.id === file?.id) {
+                                            setSelectedItem(null)
+                                        } else {
+                                            setSelectedItem({
+                                                type: "FILE",
+                                                data: file
+                                            })
+
+                                        }
 
                                     }}
 

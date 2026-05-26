@@ -299,3 +299,11 @@ align-items: center;
     min-height: 0;
  
 }
+
+pre:focus {
+    outline: none;
+}
+
+h1:focus {
+    outline: none;
+}
