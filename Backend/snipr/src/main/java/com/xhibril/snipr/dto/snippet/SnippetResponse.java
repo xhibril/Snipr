@@ -1,5 +1,7 @@
 package com.xhibril.snipr.dto.snippet;
 
+import java.util.List;
+
 public class SnippetResponse {
 
     private Long id;
@@ -9,6 +11,7 @@ public class SnippetResponse {
     private Long folderId;
     private String message;
     private Boolean isPinned;
+    private List<String> tags;
 
     public SnippetResponse(String title, String body, String name) {
         this.title = title;
@@ -76,5 +79,13 @@ public class SnippetResponse {
 
     public Boolean getIsPinned(){
         return isPinned;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 }

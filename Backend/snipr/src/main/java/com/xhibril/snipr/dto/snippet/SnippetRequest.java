@@ -4,12 +4,14 @@ import java.util.List;
 
 public class SnippetRequest {
 
+    private Long id;
     private String name;
     private Long folderId;
     private String body;
     private String title;
     private List<String> tags;
     private String query;
+    private Boolean isPinned;
 
     public String getName() {
         return name;
@@ -57,5 +59,20 @@ public class SnippetRequest {
 
     public void setQuery(String query) {
         this.query = query;
+    }
+
+
+    public void setId(Long id){ this.id = id;}
+    public Long getId(){
+        return id;
+    }
+
+
+    public void setIsPinned(Boolean isPinned){
+        this.isPinned = isPinned;
+    }
+
+    public Boolean getIsPinned(){
+        return isPinned;
     }
 }

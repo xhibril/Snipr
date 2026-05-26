@@ -1,6 +1,7 @@
 package com.xhibril.snipr.service;
 import com.xhibril.snipr.dto.api.ApiResponse;
 import com.xhibril.snipr.dto.snippet.FolderResponse;
+import com.xhibril.snipr.dto.snippet.SnippetRequest;
 import com.xhibril.snipr.dto.snippet.SnippetResponse;
 import com.xhibril.snipr.model.Folder;
 import com.xhibril.snipr.model.Snippet;
@@ -265,5 +266,32 @@ public class SnippetService {
             }
         }
         return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
+    }
+
+
+
+
+    public ResponseEntity<ApiResponse> updateSnippet(Long userId, SnippetRequest request){
+        Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, request.getId());
+
+        if(snippetOpt.isPresent()){
+            Snippet snippet = snippetOpt.get();
+            snippet.setFileName(request.getName());
+            snippet.setBody(request.getBody());
+            snippet.setTitle(request.getTitle());
+
+            Optional<Folder> folderOpt = folderRepo.findById(request.getFolderId());
+
+            if(folderOpt.isPresent()) {
+                snippet.setFolder(folderOpt.get());
+            }
+
+            snippet.setTags(request.getTags());
+            snippetRepo.save(snippet);
+
+            return ResponseEntity.ok().body(new ApiResponse("Snippet updated"));
+        } else {
+            return ResponseEntity.badRequest().body(new ApiResponse("Could not update snippet"));
+        }
     }
 }

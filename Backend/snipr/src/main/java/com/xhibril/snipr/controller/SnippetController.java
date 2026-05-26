@@ -4,6 +4,7 @@ import com.xhibril.snipr.dto.snippet.*;
 import com.xhibril.snipr.model.Folder;
 import com.xhibril.snipr.model.Snippet;
 import com.xhibril.snipr.service.SnippetService;
+import jakarta.persistence.PreUpdate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -99,9 +100,9 @@ public class SnippetController {
     }
 
 
-
-
-
-
-
+    @PatchMapping("/snippets")
+    public ResponseEntity<ApiResponse> updateSnippet(@RequestBody SnippetRequest request){
+        Long userId = 1L;
+        return snippetService.updateSnippet(userId, request);
+    }
 }
