@@ -14,15 +14,29 @@ import { isCookie, useNavigate } from "react-router-dom";
 
 export default function Dashboard({ notify }) {
 
-    const [isViewingFile, setIsViewingFile] = useState(true);
-    const [isAddingTag, setIsAddingTag] = useState(true);
+    const [isViewingFile, setIsViewingFile] = useState(false);
+    const [isAddingTag, setIsAddingTag] = useState(false);
     const [toggleSettings, setToggleSettings] = useState(false);
     const [toggleFolder, setToggleFolder] = useState(false);
     const [folders, setFolders] = useState([])
     const [files, setFiles] = useState([])
     const [selectedItem, setSelectedItem] = useState(null)
 
+    const [creatingState, setCreatingState] = useState({
+    type: null,
+    tick: 0
+});
+
+
     const nav = useNavigate();
+
+
+    const [draftTitle, setDrafTitle] = useState("")
+    const [draftBody, setDraftBody] = useState("")
+
+
+    const [originalTitle, setOriginalTitle] = useState("")
+    const [originalBody, setOriginalBody] = useState("")
 
 
 
@@ -30,6 +44,16 @@ export default function Dashboard({ notify }) {
         fetchFolders();
         fetchFiles();
     }, [])
+
+
+    useEffect(() => {
+        selectedItem?.type === "FILE" ? setIsViewingFile(true) : setIsViewingFile(null);
+
+        if(selectedItem?.type === "FILE"){
+            setOriginalTitle(selectedItem.data.title);
+            setOriginalBody(selectedItem.data.body);
+        }
+    }, [selectedItem])
 
 
     async function fetchFolders() {
@@ -137,7 +161,9 @@ export default function Dashboard({ notify }) {
                     toggleFolder={toggleFolder} setToggleFolder={setToggleFolder}
                     folders={folders} setFolders={setFolders}
                     files={files} setFiles={setFiles}
-                    notify={notify} setSelectedItem={setSelectedItem} selectedItem={selectedItem} />
+                    notify={notify} setSelectedItem={setSelectedItem} selectedItem={selectedItem}
+             
+             creatingState={creatingState} setCreatingState={setCreatingState}/>
 
 
 
@@ -154,47 +180,50 @@ export default function Dashboard({ notify }) {
                     {isViewingFile ? (
 
                         <>
-                            <div className={styles.viewingFile}>
 
-                                <div className={styles.fileInfo}>
-                                    <h1 contentEditable = {true}>Untitled</h1>
 
-                                    <div className={styles.tagsWrapper}>
+                            <div className={styles.fileInfo}>
 
-                                        <div className={styles.tagsActionWrapper}>
-                                            <div className={styles.tagsAction}>
-                                                <h4>Tags</h4>
-                                                <FiPlus className={styles.addTag} />
 
+                                <input type="text" className={styles.fileTitle} value = {draftTitle}
+                                    onChange={(e) => setDrafTitle(e.target.value)}/>  
+
+
+                                <div className={styles.tagsWrapper}>
+
+                                    <div className={styles.tagsActionWrapper}>
+                                        <div className={styles.tagsAction}>
+                                            <h4>Tags</h4>
+                                            <FiPlus className={styles.addTag} onClick={() => setIsAddingTag(!isAddingTag)} />
+
+                                        </div>
+
+                                        {isAddingTag &&
+
+                                            <div className={styles.addTagFieldWrapper}>
+                                                <input type="text" className={styles.addTagField} placeholder="Add tag" />
+                                                <FiPlus className={styles.finalizeAddingTag} />
                                             </div>
-
-                                            {isAddingTag &&
-
-                                                <div className={styles.addTagFieldWrapper}>
-                                                    <input type="text" className={styles.addTagField} placeholder="Add tag" />
-                                                    <FiPlus className={styles.finalizeAddingTag} />
-                                                </div>
-                                            }
-                                        </div>
+                                        }
+                                    </div>
 
 
-                                        <div className={styles.tags}>
-                                            <p>Python</p>
-                                            <p>Java</p>
-                                            <p>C++</p>
-                                            <p>C</p>
-                                            <p>SQL</p>
+                                    <div className={styles.tags}>
+                                        <p>Python</p>
+                                        <p>Java</p>
+                                        <p>C++</p>
+                                        <p>C</p>
+                                        <p>SQL</p>
 
-                                        </div>
                                     </div>
                                 </div>
-
                             </div>
 
 
-                            <pre className={styles.fileContent} contentEditable={true}>
-                                {selectedItem?.data?.body}
-                            </pre>
+
+<textarea className={styles.fileContent} value={draftBody} onChange={(e) => setDraftBody(e.target.value)}>
+    {selectedItem?.data?.body}
+</textarea>
                         </>
 
                     ) : (
@@ -206,14 +235,25 @@ export default function Dashboard({ notify }) {
 
 
                                 <div className={styles.newFile}
-                                    onClick={() => setCreatingState("FILE")}>
+                                    onClick={() => {
+                                   setCreatingState({
+    type: "FILE",
+    tick: Date.now()
+});
+                                     
+                                    }
+                                        }>
                                     <RiFileAddLine />   <a>New File</a>
                                 </div>
 
                                 <div className={styles.newFolder}
 
                                     onClick={() => {
-                                        setCreatingState("FOLDER")
+                                       setCreatingState({
+    type: "FOLDER",
+    tick: Date.now()
+});
+                                   
                                     }
 
                                     }

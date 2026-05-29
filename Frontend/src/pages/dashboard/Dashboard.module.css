@@ -147,6 +147,8 @@ align-items: center;
 }
 
 
+
+
 .accountEmail {
     font-size: .7rem;
     opacity: .8;
@@ -289,6 +291,7 @@ align-items: center;
 }
 
 
+
 .fileContent {
     margin-left:2rem;
 
@@ -306,4 +309,36 @@ pre:focus {
 
 h1:focus {
     outline: none;
+}
+
+
+.fileContent {
+    height:100%;
+    margin-top:1rem;
+    background:none;
+    border:none;
+    color:white;
+    padding-right:2rem;
+}
+
+.fileContent:focus {
+    outline:none;
+}
+
+
+
+.fileTitle {
+    background:none;
+    border:none;
+    color:white;
+    font-size: 2rem;
+    margin-left:2rem;
+    padding-right:2rem;
+
+    flex:1;
+}
+
+
+.fileTitle:focus {
+    outline:none;
 }

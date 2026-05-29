@@ -11,14 +11,15 @@ export default function FileExplorer({
     toggleSettings, setToggleSettings,
     toggleFolder, setToggleFolder,
     folders, setFolders,
-    files, setFiles, notify, selectedItem, setSelectedItem }) {
+    files, setFiles, notify, selectedItem, setSelectedItem, setCreatingState, creatingState}) {
 
-    const [isCreatingItem, setIsCreatingItem] = useState(false);
-    const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+
 
     const [toggleSearchFilter, setToggleSearchFilter] = useState(false);
     const inputRef = useRef(null);
     const [foldersToggled, setFoldersToggle] = useState([])
+       const [isCreatingItem, setIsCreatingItem] = useState(false);
+    const [isCreatingFolder, setIsCreatingFolder] = useState(false);
 
 
     const [tags, setTags] = useState([])
@@ -29,6 +30,10 @@ export default function FileExplorer({
 
 
     const [allItems, setAllItems] = useState({})
+
+    
+    const [originalTitle, setOriginalTitle] = useState("")
+    const [originalBody, setOriginalBody] = useState("")
 
 
 
@@ -41,8 +46,8 @@ export default function FileExplorer({
 
 
     // updating input field for creating folder or file
-    function setCreatingState(type) {
-        if (type === "FOLDER") {
+    useEffect(() => {
+          if (creatingState?.type === "FOLDER") {
             if (isCreatingFolder && isCreatingItem) {
 
                 setIsCreatingFolder(false);
@@ -63,7 +68,11 @@ export default function FileExplorer({
             }
 
         }
-    }
+
+    }, [creatingState])
+  
+      
+
 
 
     // focus on field 
@@ -301,13 +310,27 @@ export default function FileExplorer({
                     <RiFolderAddLine
                         className={styles.snippetAction}
                         onClick={() => {
-                            setCreatingState("FOLDER")
+                            setCreatingState({
+    type: "FOLDER",
+    tick: Date.now()
+});
                         }}
                     />
 
                     <RiFileAddLine
                         className={styles.snippetAction}
-                        onClick={() => setCreatingState("FILE")}
+                        onClick={() =>
+{
+                            setCreatingState({
+    type: "FILE",
+    tick: Date.now()
+});
+
+}
+
+
+
+                        }
                     />
 
                     <FiTrash className={styles.snippetAction}
@@ -464,7 +487,7 @@ export default function FileExplorer({
                             onDragOver={(e) => e.preventDefault()}
 
                             onDrop={(e) => {
-                                e.stopPropagation(); 
+                                e.stopPropagation();  // prevent outer container from firing
                                 const file = JSON.parse(
                                     e.dataTransfer.getData("file")
                                 )
@@ -495,7 +518,7 @@ export default function FileExplorer({
                                 onClick={() => {
 
 
-                                    if (selectedItem?.data?.id === folder?.id) {
+                                    if (selectedItem?.type === "FOLDER" && selectedItem?.data?.id === folder?.id) {
                                         setSelectedItem(null)
                                     } else {
                                         setSelectedItem({
@@ -569,7 +592,7 @@ export default function FileExplorer({
 
                                                 onClick={() => {
 
-                                                    if (selectedItem?.data?.id === file?.id) {
+                                                    if (selectedItem?.type === "FILE" && selectedItem?.data?.id === file?.id) {
                                                         setSelectedItem(null)
                                                     } else {
                                                         setSelectedItem({
