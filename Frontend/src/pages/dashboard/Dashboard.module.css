@@ -318,7 +318,26 @@ h1:focus {
     background:none;
     border:none;
     color:white;
+   resize: none;
     padding-right:2rem;
+}
+
+
+.fileContent::-webkit-scrollbar {
+    width: 10px;
+}
+
+.fileContent::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.fileContent::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,.15);
+    border-radius: 999px;
+}
+
+.fileContent::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,.25);
 }
 
 .fileContent:focus {
@@ -341,4 +360,11 @@ h1:focus {
 
 .fileTitle:focus {
     outline:none;
+}
+
+
+.saveContainer {
+
+    display: flex;
+    justify-content: flex-end;
 }

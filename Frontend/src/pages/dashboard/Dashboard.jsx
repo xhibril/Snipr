@@ -23,21 +23,33 @@ export default function Dashboard({ notify }) {
     const [selectedItem, setSelectedItem] = useState(null)
 
     const [creatingState, setCreatingState] = useState({
-    type: null,
-    tick: 0
-});
-
-
-    const nav = useNavigate();
-
-
-    const [draftTitle, setDrafTitle] = useState("")
-    const [draftBody, setDraftBody] = useState("")
+        type: null,
+        tick: 0
+    });
 
 
     const [originalTitle, setOriginalTitle] = useState("")
     const [originalBody, setOriginalBody] = useState("")
 
+
+    const nav = useNavigate();
+
+
+    const [draftTitle, setDraftTitle] = useState("")
+    const [draftBody, setDraftBody] = useState("")
+
+
+    const [unsavedChanges, setUnsavedChanges] = useState(false)
+
+useEffect(() => {
+
+
+    if (draftBody !== originalBody || draftTitle !== originalTitle) {
+        setUnsavedChanges(true);
+    } else {
+        setUnsavedChanges(false);
+    }
+}, [draftBody, draftTitle, originalBody, originalTitle]);
 
 
     useEffect(() => {
@@ -49,7 +61,7 @@ export default function Dashboard({ notify }) {
     useEffect(() => {
         selectedItem?.type === "FILE" ? setIsViewingFile(true) : setIsViewingFile(null);
 
-        if(selectedItem?.type === "FILE"){
+        if (selectedItem?.type === "FILE") {
             setOriginalTitle(selectedItem.data.title);
             setOriginalBody(selectedItem.data.body);
         }
@@ -85,6 +97,54 @@ export default function Dashboard({ notify }) {
         console.log("FILES: ", data)
         setFiles(data);
     }
+
+    async function updateSnippet(snippet) {
+
+        const previousFiles = files;
+
+        // opt update
+
+        setFiles(
+            files.map(file => file.id === snippet.id ? snippet : file
+            )
+        )
+
+        const res = await ApiFetch("/snippets", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                id: snippet.id,
+                name: snippet.name,
+                body: snippet.body,
+                title: snippet.title,
+                isPinned: snippet.isPinned,
+                tags: snippet.tags,
+                folderId: snippet.folderId
+            })
+        })
+
+        if (!res) return;
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            notify(data.message || "Could not update snippet", "ERROR");
+            setFiles(previousFiles);
+            return;
+        }
+
+
+        console.log("updated snippet")
+    }
+
+
+    useEffect(() => {
+    console.log("draftBody changed:", draftBody);
+}, [draftBody]);
+
+
+
+
 
 
 
@@ -162,8 +222,12 @@ export default function Dashboard({ notify }) {
                     folders={folders} setFolders={setFolders}
                     files={files} setFiles={setFiles}
                     notify={notify} setSelectedItem={setSelectedItem} selectedItem={selectedItem}
-             
-             creatingState={creatingState} setCreatingState={setCreatingState}/>
+
+                    creatingState={creatingState} setCreatingState={setCreatingState}
+                    setDraftTitle={setDraftTitle} draftTitle={draftTitle}
+                    setDraftBody={setDraftBody} draftBody={draftBody}
+                    setOriginalBody={setOriginalBody} originalBody={originalBody}
+                    setOriginalTitle={setOriginalTitle} originalTitle={originalTitle} updateSnippet={updateSnippet} />
 
 
 
@@ -185,8 +249,8 @@ export default function Dashboard({ notify }) {
                             <div className={styles.fileInfo}>
 
 
-                                <input type="text" className={styles.fileTitle} value = {draftTitle}
-                                    onChange={(e) => setDrafTitle(e.target.value)}/>  
+                                <input type="text" className={styles.fileTitle} value={draftTitle}
+                                    onChange={(e) => setDraftTitle(e.target.value)} />
 
 
                                 <div className={styles.tagsWrapper}>
@@ -221,9 +285,9 @@ export default function Dashboard({ notify }) {
 
 
 
-<textarea className={styles.fileContent} value={draftBody} onChange={(e) => setDraftBody(e.target.value)}>
-    {selectedItem?.data?.body}
-</textarea>
+                            <textarea className={styles.fileContent} value={draftBody} onChange={(e) => setDraftBody(e.target.value)}>
+                                {selectedItem?.data?.body}
+                            </textarea>
                         </>
 
                     ) : (
@@ -236,24 +300,24 @@ export default function Dashboard({ notify }) {
 
                                 <div className={styles.newFile}
                                     onClick={() => {
-                                   setCreatingState({
-    type: "FILE",
-    tick: Date.now()
-});
-                                     
+                                        setCreatingState({
+                                            type: "FILE",
+                                            tick: Date.now()
+                                        });
+
                                     }
-                                        }>
+                                    }>
                                     <RiFileAddLine />   <a>New File</a>
                                 </div>
 
                                 <div className={styles.newFolder}
 
                                     onClick={() => {
-                                       setCreatingState({
-    type: "FOLDER",
-    tick: Date.now()
-});
-                                   
+                                        setCreatingState({
+                                            type: "FOLDER",
+                                            tick: Date.now()
+                                        });
+
                                     }
 
                                     }
@@ -265,8 +329,36 @@ export default function Dashboard({ notify }) {
                             </div>
                         </>
                     )}
-                </div>
 
+
+{isViewingFile && unsavedChanges &&
+                     <div className={styles.saveContainer}>
+
+                    <p className={styles.saveStatus}> {unsavedChanges ? "Unsaved changes" : ""}</p>
+                    <button className={styles.saveBtn}  onClick= {() => {
+
+const snippet = {
+    id: selectedItem.data.id,
+                name: selectedItem.data.name,
+                body: draftBody,
+                title: draftTitle,
+                isPinned: selectedItem.data.isPinned,
+                tags: selectedItem.data.tags,
+                folderId: selectedItem.data.folderId
+}
+
+
+updateSnippet(snippet);
+
+
+
+
+
+                    }}>Save</button>
+                </div>
+                }
+
+                </div>
             </div>
         </div>
     )

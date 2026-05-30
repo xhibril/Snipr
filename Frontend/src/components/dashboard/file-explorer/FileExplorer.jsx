@@ -11,7 +11,8 @@ export default function FileExplorer({
     toggleSettings, setToggleSettings,
     toggleFolder, setToggleFolder,
     folders, setFolders,
-    files, setFiles, notify, selectedItem, setSelectedItem, setCreatingState, creatingState}) {
+    files, setFiles, notify, selectedItem, setSelectedItem, setCreatingState, creatingState,
+setDraftBody, draftBody, setDraftTitle, draftTitle, originalTitle, originalBody,setOriginalBody, setOriginalTitle, updateSnippet}) {
 
 
 
@@ -32,8 +33,6 @@ export default function FileExplorer({
     const [allItems, setAllItems] = useState({})
 
     
-    const [originalTitle, setOriginalTitle] = useState("")
-    const [originalBody, setOriginalBody] = useState("")
 
 
 
@@ -257,43 +256,6 @@ export default function FileExplorer({
         notify(data.message, "SUCCESS");
     }
 
-
-
-    async function updateSnippet(snippet) {
-
-        const previousFiles = files;
-
-        // opt update
-
-        setFiles(
-            files.map(file => file.id === snippet.id ? snippet : file
-            )
-        )
-
-        const res = await ApiFetch("/snippets", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                id: snippet.id,
-                name: snippet.name,
-                body: snippet.body,
-                title: snippet.title,
-                isPinned: snippet.isPinned,
-                tags: snippet.tags,
-                folderId: snippet.folderId
-            })
-        })
-
-        if (!res) return;
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            notify(data.message || "Could not update snippet", "ERROR");
-            setFiles(previousFiles);
-            return;
-        }
-    }
 
 
 
@@ -578,6 +540,8 @@ export default function FileExplorer({
                                 {/*add files belonging to folders */}
                                 {sortedFiles.filter(file => file.folderId === folder.id)
                                     .map(file => (
+                                
+
                                         <div className={styles.fileItem}
                                             draggable={true}
                                             onDragStart={(e) => {
@@ -585,7 +549,14 @@ export default function FileExplorer({
                                                     "file",
                                                     JSON.stringify(file)
                                                 )
-                                            }}
+                                            }
+                                        
+                                        
+                                        
+                                        }
+
+
+                                         
                                         >
                                             <div className={`${styles.fileHeader} ${selectedItem?.type === "FILE" &&
                                                 selectedItem?.data?.id === file?.id ? styles.selected : ""}`}
@@ -600,8 +571,13 @@ export default function FileExplorer({
                                                             data: file
                                                         })
 
-                                                    }
 
+                                                       setDraftBody(file.body || "")
+setDraftTitle(file.title || "")
+
+setOriginalBody(file.body || "")
+setOriginalTitle(file.title || "")
+                                                    }
                                                 }}
 
 
@@ -654,6 +630,12 @@ export default function FileExplorer({
                                                 data: file
                                             })
 
+                                            
+                                             setDraftBody(file.body || "")
+setDraftTitle(file.title || "")
+
+setOriginalBody(file.body || "")
+setOriginalTitle(file.title || "")
                                         }
 
                                     }}
