@@ -73,6 +73,7 @@ public class SnippetService {
 
             snippet.setUser(user);
             snippet.setFileName(fileName);
+            snippet.setTitle("Untitled");
 
             if(folderId != null){
                 Optional<Folder> folderOpt = folderRepo.findById(folderId);
@@ -89,6 +90,7 @@ public class SnippetService {
             snippetResponse.setMessage("Snippet successfully saved");
             snippetResponse.setName(savedSnippet.getFileName());
             snippetResponse.setId(savedSnippet.getId());
+            snippetResponse.setTitle(snippet.getTitle());
 
             if(snippet.getFolder() != null){
                 snippetResponse.setFolderId(snippet.getFolder().getId());

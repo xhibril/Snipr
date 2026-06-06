@@ -11,6 +11,7 @@ import { useState, useRef, useEffect } from "react";
 
 import { RiFile2Fill, RiFolderFill, RiImageFill, RiFolderAddLine, RiFileAddLine } from "react-icons/ri";
 import { isCookie, useNavigate } from "react-router-dom";
+import { MdSendTimeExtension } from "react-icons/md";
 
 export default function Dashboard({ notify }) {
 
@@ -39,18 +40,18 @@ export default function Dashboard({ notify }) {
     const [draftBody, setDraftBody] = useState("")
 
 
-    const [unsavedChanges, setUnsavedChanges] = useState(false)
+    const [unsavedChanges, setUnsavedChanges] = useState("")
 
-useEffect(() => {
 
+
+  useEffect(() => {
 
     if (draftBody !== originalBody || draftTitle !== originalTitle) {
-        setUnsavedChanges(true);
+        setUnsavedChanges("Unsaved Changes");
     } else {
-        setUnsavedChanges(false);
+        setUnsavedChanges("");
     }
 }, [draftBody, draftTitle, originalBody, originalTitle]);
-
 
     useEffect(() => {
         fetchFolders();
@@ -59,11 +60,11 @@ useEffect(() => {
 
 
     useEffect(() => {
-        selectedItem?.type === "FILE" ? setIsViewingFile(true) : setIsViewingFile(null);
+        selectedItem?.type === "FILE" ? setIsViewingFile(true) : "";
 
         if (selectedItem?.type === "FILE") {
-            setOriginalTitle(selectedItem.data.title);
-            setOriginalBody(selectedItem.data.body);
+            setOriginalTitle(selectedItem.data.title || "");
+            setOriginalBody(selectedItem.data.body || "");
         }
     }, [selectedItem])
 
@@ -98,9 +99,22 @@ useEffect(() => {
         setFiles(data);
     }
 
-    async function updateSnippet(snippet) {
+    async function updateSnippet() {
+
+               const snippet = {
+                                    id: selectedItem.data.id,
+                                    name: selectedItem.data.name,
+                                    body: draftBody,
+                                    title: draftTitle,
+                                    isPinned: selectedItem.data.isPinned,
+                                    tags: selectedItem.data.tags,
+                                    folderId: selectedItem.data.folderId
+                                }
+
+
 
         const previousFiles = files;
+        setUnsavedChanges("Saving...")
 
         // opt update
 
@@ -134,13 +148,21 @@ useEffect(() => {
         }
 
 
-        console.log("updated snippet")
+
+                
+                            setDraftBody(snippet.body || "")
+            setDraftTitle(snippet.title || "")
+
+            setOriginalBody(snippet.body || "")
+            setOriginalTitle(snippet.title || "")
+
+   
+
+        
+
     }
 
 
-    useEffect(() => {
-    console.log("draftBody changed:", draftBody);
-}, [draftBody]);
 
 
 
@@ -215,7 +237,15 @@ useEffect(() => {
 
 
 
-            <div className={styles.mainContent}>
+            <div className={styles.mainContent}
+            
+            
+            onKeyDown={(e) => {
+                if(e.ctrlKey && e.key === "s" && unsavedChanges){
+                    e.preventDefault();
+                    updateSnippet();
+                }
+            }}>
 
                 <FileExplorer toggleSettings={toggleSettings} setToggleSettings={setToggleSettings}
                     toggleFolder={toggleFolder} setToggleFolder={setToggleFolder}
@@ -331,32 +361,20 @@ useEffect(() => {
                     )}
 
 
-{isViewingFile && unsavedChanges &&
-                     <div className={styles.saveContainer}>
+                    {isViewingFile && unsavedChanges &&
+                        <div className={styles.saveContainer}>
 
-                    <p className={styles.saveStatus}> {unsavedChanges ? "Unsaved changes" : ""}</p>
-                    <button className={styles.saveBtn}  onClick= {() => {
-
-const snippet = {
-    id: selectedItem.data.id,
-                name: selectedItem.data.name,
-                body: draftBody,
-                title: draftTitle,
-                isPinned: selectedItem.data.isPinned,
-                tags: selectedItem.data.tags,
-                folderId: selectedItem.data.folderId
-}
-
-
-updateSnippet(snippet);
+                            <p className={styles.saveStatus}>{unsavedChanges}</p>
+                            <button className={styles.saveBtn} onClick={() => {
+                                updateSnippet();
 
 
 
 
 
-                    }}>Save</button>
-                </div>
-                }
+                            }}>Save</button>
+                        </div>
+                    }
 
                 </div>
             </div>

@@ -12,14 +12,14 @@ export default function FileExplorer({
     toggleFolder, setToggleFolder,
     folders, setFolders,
     files, setFiles, notify, selectedItem, setSelectedItem, setCreatingState, creatingState,
-setDraftBody, draftBody, setDraftTitle, draftTitle, originalTitle, originalBody,setOriginalBody, setOriginalTitle, updateSnippet}) {
+    setDraftBody, draftBody, setDraftTitle, draftTitle, originalTitle, originalBody, setOriginalBody, setOriginalTitle, updateSnippet }) {
 
 
 
     const [toggleSearchFilter, setToggleSearchFilter] = useState(false);
     const inputRef = useRef(null);
     const [foldersToggled, setFoldersToggle] = useState([])
-       const [isCreatingItem, setIsCreatingItem] = useState(false);
+    const [isCreatingItem, setIsCreatingItem] = useState(false);
     const [isCreatingFolder, setIsCreatingFolder] = useState(false);
 
 
@@ -32,7 +32,7 @@ setDraftBody, draftBody, setDraftTitle, draftTitle, originalTitle, originalBody,
 
     const [allItems, setAllItems] = useState({})
 
-    
+
 
 
 
@@ -46,7 +46,7 @@ setDraftBody, draftBody, setDraftTitle, draftTitle, originalTitle, originalBody,
 
     // updating input field for creating folder or file
     useEffect(() => {
-          if (creatingState?.type === "FOLDER") {
+        if (creatingState?.type === "FOLDER") {
             if (isCreatingFolder && isCreatingItem) {
 
                 setIsCreatingFolder(false);
@@ -69,8 +69,8 @@ setDraftBody, draftBody, setDraftTitle, draftTitle, originalTitle, originalBody,
         }
 
     }, [creatingState])
-  
-      
+
+
 
 
 
@@ -273,22 +273,21 @@ setDraftBody, draftBody, setDraftTitle, draftTitle, originalTitle, originalBody,
                         className={styles.snippetAction}
                         onClick={() => {
                             setCreatingState({
-    type: "FOLDER",
-    tick: Date.now()
-});
+                                type: "FOLDER",
+                                tick: Date.now()
+                            });
                         }}
                     />
 
                     <RiFileAddLine
                         className={styles.snippetAction}
-                        onClick={() =>
-{
+                        onClick={() => {
                             setCreatingState({
-    type: "FILE",
-    tick: Date.now()
-});
+                                type: "FILE",
+                                tick: Date.now()
+                            });
 
-}
+                        }
 
 
 
@@ -427,16 +426,16 @@ setDraftBody, draftBody, setDraftTitle, draftTitle, originalTitle, originalBody,
                         const file = JSON.parse(
                             e.dataTransfer.getData("file"))
 
-                                const snippet = {
-                        ...file,
-                        folderId: null
-                    }
+                        const snippet = {
+                            ...file,
+                            folderId: null
+                        }
 
-                    updateSnippet(snippet)
-                
+                        updateSnippet(snippet)
+
                     }}
 
-                
+
 
 
                 >
@@ -444,7 +443,7 @@ setDraftBody, draftBody, setDraftTitle, draftTitle, originalTitle, originalBody,
                     {sortedFolders.map((folder, index) => (
 
                         <div className={styles.folderItem}
-                     
+
 
                             onDragOver={(e) => e.preventDefault()}
 
@@ -540,7 +539,7 @@ setDraftBody, draftBody, setDraftTitle, draftTitle, originalTitle, originalBody,
                                 {/*add files belonging to folders */}
                                 {sortedFiles.filter(file => file.folderId === folder.id)
                                     .map(file => (
-                                
+
 
                                         <div className={styles.fileItem}
                                             draggable={true}
@@ -550,13 +549,13 @@ setDraftBody, draftBody, setDraftTitle, draftTitle, originalTitle, originalBody,
                                                     JSON.stringify(file)
                                                 )
                                             }
-                                        
-                                        
-                                        
-                                        }
 
 
-                                         
+
+                                            }
+
+
+
                                         >
                                             <div className={`${styles.fileHeader} ${selectedItem?.type === "FILE" &&
                                                 selectedItem?.data?.id === file?.id ? styles.selected : ""}`}
@@ -572,11 +571,11 @@ setDraftBody, draftBody, setDraftTitle, draftTitle, originalTitle, originalBody,
                                                         })
 
 
-                                                       setDraftBody(file.body || "")
-setDraftTitle(file.title || "")
+                                                        setDraftBody(file.body || "")
+                                                        setDraftTitle(file.title || "")
 
-setOriginalBody(file.body || "")
-setOriginalTitle(file.title || "")
+                                                        setOriginalBody(file.body || "")
+                                                        setOriginalTitle(file.title || "")
                                                     }
                                                 }}
 
@@ -630,12 +629,12 @@ setOriginalTitle(file.title || "")
                                                 data: file
                                             })
 
-                                            
-                                             setDraftBody(file.body || "")
-setDraftTitle(file.title || "")
 
-setOriginalBody(file.body || "")
-setOriginalTitle(file.title || "")
+                                            setDraftBody(file.body || "")
+                                            setDraftTitle(file.title || "")
+
+                                            setOriginalBody(file.body || "")
+                                            setOriginalTitle(file.title || "")
                                         }
 
                                     }}
