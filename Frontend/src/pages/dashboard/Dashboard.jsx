@@ -46,6 +46,14 @@ export default function Dashboard({ notify }) {
 
   useEffect(() => {
 
+    console.log({
+    draftBody,
+    originalBody,
+    draftTitle,
+    originalTitle
+});
+    
+
     if (draftBody !== originalBody || draftTitle !== originalTitle) {
         setUnsavedChanges("Unsaved Changes");
     } else {
@@ -99,19 +107,9 @@ export default function Dashboard({ notify }) {
         setFiles(data);
     }
 
-    async function updateSnippet() {
+    async function updateSnippet(snippet) {
 
-               const snippet = {
-                                    id: selectedItem.data.id,
-                                    name: selectedItem.data.name,
-                                    body: draftBody,
-                                    title: draftTitle,
-                                    isPinned: selectedItem.data.isPinned,
-                                    tags: selectedItem.data.tags,
-                                    folderId: selectedItem.data.folderId
-                                }
-
-
+        console.log(snippet);
 
         const previousFiles = files;
         setUnsavedChanges("Saving...")
@@ -243,7 +241,13 @@ export default function Dashboard({ notify }) {
             onKeyDown={(e) => {
                 if(e.ctrlKey && e.key === "s" && unsavedChanges){
                     e.preventDefault();
-                    updateSnippet();
+
+                    const snippet = {
+                        ...selectedItem.data,
+                        body: draftBody,
+                        title: draftTitle
+                    }
+                    updateSnippet( snippet);
                 }
             }}>
 

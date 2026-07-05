@@ -6,6 +6,6 @@ body,
   margin: 0;
   font-family: 'Open Sans', sans-serif;
   background: #F2F4F7;
-  font-size: clamp(14px, 1.1vw, 18px);
+  font-size: clamp(16px, 1.1vw, 18px);
   min-height: 100vh;
 }

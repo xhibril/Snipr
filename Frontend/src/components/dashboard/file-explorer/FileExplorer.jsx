@@ -461,6 +461,7 @@ export default function FileExplorer({
 
 
                                 if (file.folderId !== folder.id) {
+                                    console.log(snippet)
                                     updateSnippet(snippet)
                                 }
 
