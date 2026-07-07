@@ -43,23 +43,21 @@ export default function Dashboard({ notify }) {
     const [unsavedChanges, setUnsavedChanges] = useState("")
 
 
+    const [draftTags, setDraftTags] = useState([])
+
+    const [newTag, setNewTag] = useState("")
+
+
 
   useEffect(() => {
-
-    console.log({
-    draftBody,
-    originalBody,
-    draftTitle,
-    originalTitle
-});
-    
-
-    if (draftBody !== originalBody || draftTitle !== originalTitle) {
+    if (draftBody !== originalBody || draftTitle !== originalTitle 
+    || selectedItem?.data.tags != draftTags
+    ) {
         setUnsavedChanges("Unsaved Changes");
     } else {
         setUnsavedChanges("");
     }
-}, [draftBody, draftTitle, originalBody, originalTitle]);
+}, [draftBody, draftTitle, originalBody, originalTitle, draftTags]);
 
     useEffect(() => {
         fetchFolders();
@@ -68,6 +66,10 @@ export default function Dashboard({ notify }) {
 
 
     useEffect(() => {
+
+console.log(selectedItem?.data.tags)
+
+
         selectedItem?.type === "FILE" ? setIsViewingFile(true) : "";
 
         if (selectedItem?.type === "FILE") {
@@ -109,8 +111,6 @@ export default function Dashboard({ notify }) {
 
     async function updateSnippet(snippet) {
 
-        console.log(snippet);
-
         const previousFiles = files;
         setUnsavedChanges("Saving...")
 
@@ -148,12 +148,14 @@ export default function Dashboard({ notify }) {
 
 
                 
-                            setDraftBody(snippet.body || "")
+            setDraftBody(snippet.body || "")
             setDraftTitle(snippet.title || "")
 
             setOriginalBody(snippet.body || "")
             setOriginalTitle(snippet.title || "")
 
+    
+            setDraftTags(snippet.tags || [])
    
 
         
@@ -298,20 +300,48 @@ export default function Dashboard({ notify }) {
 
                                         {isAddingTag &&
 
-                                            <div className={styles.addTagFieldWrapper}>
-                                                <input type="text" className={styles.addTagField} placeholder="Add tag" />
+                                            <form className={styles.addTagFieldWrapper}
+                                             onSubmit={(e) => {
+                                                    e.preventDefault()
+
+                                                    const snippet = {
+                                                        ...selectedItem.data,
+                                                        tags: [ ...(selectedItem.data.tags ?? []), newTag]
+
+                                                    }
+
+                                                    setSelectedItem({
+                                                        ...selectedItem,
+                                                        data: snippet
+                                
+                                                    })
+
+                                                    updateSnippet(selectedItem.data)
+
+
+                                                }
+
+
+
+
+                                                }>
+                                                <input type="text" className={styles.addTagField} placeholder="Add tag" 
+                                                onChange={(e) => setNewTag(e.target.value)}
+                                            />
                                                 <FiPlus className={styles.finalizeAddingTag} />
-                                            </div>
+                                            </form>
                                         }
                                     </div>
 
 
                                     <div className={styles.tags}>
-                                        <p>Python</p>
-                                        <p>Java</p>
-                                        <p>C++</p>
-                                        <p>C</p>
-                                        <p>SQL</p>
+                                       {selectedItem?.data?.tags?.map((tag, index) => (
+                                    
+
+                                            <p key = {index}>{tag}</p>
+
+                                       ))
+                                       }
 
                                     </div>
                                 </div>

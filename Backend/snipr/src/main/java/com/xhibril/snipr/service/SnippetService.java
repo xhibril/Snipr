@@ -227,6 +227,7 @@ public class SnippetService {
             snippetResponse.setBody(snippet.getBody());
             snippetResponse.setTitle(snippet.getTitle());
             snippetResponse.setIsPinned(snippet.getIsPinned());
+            snippetResponse.setTags(snippet.getTags());
             snippetsToReturn.add(snippetResponse);
         }
 
