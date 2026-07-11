@@ -12,6 +12,7 @@ public class SnippetRequest {
     private List<String> tags;
     private String query;
     private Boolean isPinned;
+    private Integer tagAmount;
 
     public String getName() {
         return name;
@@ -74,5 +75,13 @@ public class SnippetRequest {
 
     public Boolean getIsPinned(){
         return isPinned;
+    }
+
+    public void setTagAmount(Integer tagAmount){
+        this.tagAmount = tagAmount;
+    }
+
+    public Integer getTagAmount(){
+        return tagAmount;
     }
 }

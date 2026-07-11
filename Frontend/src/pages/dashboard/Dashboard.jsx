@@ -48,6 +48,9 @@ export default function Dashboard({ notify }) {
     const [newTag, setNewTag] = useState("")
 
 
+    const [tagAmount, setTagAmount] = useState("")
+
+
 
   useEffect(() => {
     if (draftBody !== originalBody || draftTitle !== originalTitle 
@@ -75,6 +78,7 @@ console.log(selectedItem?.data.tags)
         if (selectedItem?.type === "FILE") {
             setOriginalTitle(selectedItem.data.title || "");
             setOriginalBody(selectedItem.data.body || "");
+            setDraftTags(selectedItem.data.tags || [])
         }
     }, [selectedItem])
 
@@ -121,6 +125,7 @@ console.log(selectedItem?.data.tags)
             )
         )
 
+
         const res = await ApiFetch("/snippets", {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
@@ -146,6 +151,12 @@ console.log(selectedItem?.data.tags)
         }
 
 
+                    setSelectedItem({
+                                                        ...selectedItem,
+                                                        data: data
+                                
+                                                    })
+
 
                 
             setDraftBody(snippet.body || "")
@@ -156,7 +167,10 @@ console.log(selectedItem?.data.tags)
 
     
             setDraftTags(snippet.tags || [])
+
+    
    
+
 
         
 
@@ -291,6 +305,14 @@ console.log(selectedItem?.data.tags)
 
                                 <div className={styles.tagsWrapper}>
 
+                                <div className = {styles.tagCounter}>
+                                    <p>{selectedItem.data.tagAmount}</p>
+                                    <p>/5</p>
+
+
+
+                                </div>
+
                                     <div className={styles.tagsActionWrapper}>
                                         <div className={styles.tagsAction}>
                                             <h4>Tags</h4>
@@ -310,13 +332,10 @@ console.log(selectedItem?.data.tags)
 
                                                     }
 
-                                                    setSelectedItem({
-                                                        ...selectedItem,
-                                                        data: snippet
-                                
-                                                    })
 
-                                                    updateSnippet(selectedItem.data)
+
+                                                    updateSnippet(snippet)
+                                                    setNewTag("")
 
 
                                                 }
@@ -327,6 +346,8 @@ console.log(selectedItem?.data.tags)
                                                 }>
                                                 <input type="text" className={styles.addTagField} placeholder="Add tag" 
                                                 onChange={(e) => setNewTag(e.target.value)}
+                                                       value={newTag}
+                                                
                                             />
                                                 <FiPlus className={styles.finalizeAddingTag} />
                                             </form>

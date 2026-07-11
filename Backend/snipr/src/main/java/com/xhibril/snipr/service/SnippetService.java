@@ -74,6 +74,7 @@ public class SnippetService {
             snippet.setUser(user);
             snippet.setFileName(fileName);
             snippet.setTitle("Untitled");
+            snippet.setTagAmount(0);
 
             if(folderId != null){
                 Optional<Folder> folderOpt = folderRepo.findById(folderId);
@@ -228,6 +229,7 @@ public class SnippetService {
             snippetResponse.setTitle(snippet.getTitle());
             snippetResponse.setIsPinned(snippet.getIsPinned());
             snippetResponse.setTags(snippet.getTags());
+            snippetResponse.setTagAmount(snippet.getTagAmount());
             snippetsToReturn.add(snippetResponse);
         }
 
@@ -274,7 +276,7 @@ public class SnippetService {
 
 
 
-    public ResponseEntity<ApiResponse> updateSnippet(Long userId, SnippetRequest request){
+    public ResponseEntity<SnippetResponse> updateSnippet(Long userId, SnippetRequest request){
         Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, request.getId());
 
         if(snippetOpt.isPresent()){
@@ -293,13 +295,36 @@ public class SnippetService {
 
 
 
+            if(snippet.getTags().size() < 5){
+                snippet.setTags(request.getTags());
 
-            snippet.setTags(request.getTags());
+                if(snippet.getTags().size() != snippet.getTagAmount()){
+                    snippet.setTagAmount(snippet.getTags().size());
+                }
+            } else {
+                return ResponseEntity.badRequest().body(new SnippetResponse("Tag limit exceeded"));
+            }
+
             snippetRepo.save(snippet);
 
-            return ResponseEntity.ok().body(new ApiResponse("Snippet updated"));
+            SnippetResponse snippetRes = new SnippetResponse();
+            snippetRes.setId(snippet.getId());
+
+            if (snippet.getFolder() != null) {
+                snippetRes.setFolderId(snippet.getFolder().getId());
+            }
+
+            snippetRes.setTitle(snippet.getTitle());
+            snippetRes.setBody(snippet.getBody());
+            snippetRes.setTags(snippet.getTags());
+            snippetRes.setTagAmount(snippet.getTagAmount());
+            snippetRes.setMessage("Snippet updated");
+
+            System.out.println("TAG AMOUNT: " + snippet.getTagAmount());
+
+            return ResponseEntity.ok().body(snippetRes);
         } else {
-            return ResponseEntity.badRequest().body(new ApiResponse("Could not update snippet"));
+            return ResponseEntity.badRequest().body(new SnippetResponse("Could not update snippet"));
         }
     }
 }

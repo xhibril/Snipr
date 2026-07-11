@@ -12,6 +12,7 @@ public class SnippetResponse {
     private String message;
     private Boolean isPinned;
     private List<String> tags;
+    private Integer tagAmount;
 
     public SnippetResponse(String title, String body, String name) {
         this.title = title;
@@ -87,5 +88,14 @@ public class SnippetResponse {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+
+    public void setTagAmount(Integer tagAmount){
+        this.tagAmount = tagAmount;
+    }
+
+    public Integer getTagAmount(){
+        return tagAmount;
     }
 }

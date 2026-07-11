@@ -101,7 +101,7 @@ public class SnippetController {
 
 
     @PatchMapping("/snippets")
-    public ResponseEntity<ApiResponse> updateSnippet(@RequestBody SnippetRequest request){
+    public ResponseEntity<SnippetResponse> updateSnippet(@RequestBody SnippetRequest request){
         Long userId = 1L;
         return snippetService.updateSnippet(userId, request);
     }

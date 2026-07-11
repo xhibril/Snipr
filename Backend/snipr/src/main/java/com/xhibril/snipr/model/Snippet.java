@@ -25,6 +25,12 @@ public class Snippet {
     private String title;
     private Boolean isPinned;
 
+    @Column(name = "tag_amount")
+    private Integer tagAmount;
+
+
+
+
     @ElementCollection
     private List<String> tags = new ArrayList<>();
 
@@ -90,6 +96,15 @@ public class Snippet {
 
     public Boolean getIsPinned(){
         return isPinned;
+    }
+
+
+    public void setTagAmount(Integer tagAmount){
+        this.tagAmount = tagAmount;
+    }
+
+    public Integer getTagAmount(){
+        return tagAmount;
     }
 }
 
