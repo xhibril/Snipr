@@ -11,7 +11,6 @@ import { useState, useRef, useEffect } from "react";
 
 import { RiFile2Fill, RiFolderFill, RiImageFill, RiFolderAddLine, RiFileAddLine } from "react-icons/ri";
 import { isCookie, useNavigate } from "react-router-dom";
-import { MdSendTimeExtension } from "react-icons/md";
 
 export default function Dashboard({ notify }) {
 
@@ -306,7 +305,7 @@ console.log(selectedItem?.data.tags)
                                 <div className={styles.tagsWrapper}>
 
                                 <div className = {styles.tagCounter}>
-                                    <p>{selectedItem.data.tagAmount}</p>
+                                    <p>{draftTags?.length ?? 0}</p>
                                     <p>/5</p>
 
 
@@ -356,10 +355,27 @@ console.log(selectedItem?.data.tags)
 
 
                                     <div className={styles.tags}>
-                                       {selectedItem?.data?.tags?.map((tag, index) => (
+                                       {draftTags.map((tag, index) => (
                                     
 
+                                    <>
                                             <p key = {index}>{tag}</p>
+                                            <FiX onClick={(e) => {
+
+                                                const newTags = draftTags.filter((_, i) => i !== index)
+
+
+
+
+                                                const snippet = {
+                                                    ...selectedItem.data,
+                                                    tags: (newTags ?? [])
+                                                }
+
+                                                updateSnippet(snippet)
+                                            }}/>
+                                            </>
+                                            
 
                                        ))
                                        }
