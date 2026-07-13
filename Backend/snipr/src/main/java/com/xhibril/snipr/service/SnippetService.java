@@ -294,15 +294,14 @@ public class SnippetService {
             }
 
 
-
-            if(snippet.getTags().size() < 5){
-                snippet.setTags(request.getTags());
-
-                if(snippet.getTags().size() != snippet.getTagAmount()){
-                    snippet.setTagAmount(snippet.getTags().size());
-                }
-            } else {
+            if (request.getTags().size() > 5) {
                 return ResponseEntity.badRequest().body(new SnippetResponse("Tag limit exceeded"));
+            }
+
+            snippet.setTags(request.getTags());
+
+            if (snippet.getTags().size() != snippet.getTagAmount()) {
+                snippet.setTagAmount(snippet.getTags().size());
             }
 
             snippetRepo.save(snippet);
@@ -314,6 +313,7 @@ public class SnippetService {
                 snippetRes.setFolderId(snippet.getFolder().getId());
             }
 
+            snippetRes.setName(snippet.getFileName());
             snippetRes.setTitle(snippet.getTitle());
             snippetRes.setBody(snippet.getBody());
             snippetRes.setTags(snippet.getTags());

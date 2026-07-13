@@ -41,10 +41,10 @@ export default function Dashboard({ notify }) {
 
     const [unsavedChanges, setUnsavedChanges] = useState("")
 
-
     const [draftTags, setDraftTags] = useState([])
-
     const [newTag, setNewTag] = useState("")
+    const [previousSnippet, setPreviousSnippet] = useState([])
+
 
 
     const [tagAmount, setTagAmount] = useState("")
@@ -108,17 +108,16 @@ console.log(selectedItem?.data.tags)
         }
 
         const data = await res.json();
-        console.log("FILES: ", data)
         setFiles(data);
     }
 
     async function updateSnippet(snippet) {
 
-        const previousFiles = files;
+        const previousSnippet = structuredClone(selectedItem?.data);
+const previousFiles = structuredClone(files);
         setUnsavedChanges("Saving...")
 
         // opt update
-
         setFiles(
             files.map(file => file.id === snippet.id ? snippet : file
             )
@@ -143,9 +142,17 @@ console.log(selectedItem?.data.tags)
 
         const data = await res.json();
 
+        console.log("BACKEND RESPONSE:", data);
+
         if (!res.ok) {
             notify(data.message || "Could not update snippet", "ERROR");
             setFiles(previousFiles);
+            setSelectedItem({
+                type:"FILE",
+                data: previousSnippet
+            })
+
+            setPreviousSnippet([])
             return;
         }
 
@@ -166,12 +173,6 @@ console.log(selectedItem?.data.tags)
 
     
             setDraftTags(snippet.tags || [])
-
-    
-   
-
-
-        
 
     }
 
@@ -258,7 +259,7 @@ console.log(selectedItem?.data.tags)
                     e.preventDefault();
 
                     const snippet = {
-                        ...selectedItem.data,
+                        ...selectedItem?.data,
                         body: draftBody,
                         title: draftTitle
                     }
@@ -325,8 +326,11 @@ console.log(selectedItem?.data.tags)
                                              onSubmit={(e) => {
                                                     e.preventDefault()
 
+
+                                        
+
                                                     const snippet = {
-                                                        ...selectedItem.data,
+                                                        ...selectedItem?.data,
                                                         tags: [ ...(selectedItem.data.tags ?? []), newTag]
 
                                                     }
