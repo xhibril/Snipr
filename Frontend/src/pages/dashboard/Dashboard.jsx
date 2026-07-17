@@ -12,6 +12,8 @@ import { useState, useRef, useEffect } from "react";
 import { RiFile2Fill, RiFolderFill, RiImageFill, RiFolderAddLine, RiFileAddLine } from "react-icons/ri";
 import { isCookie, useNavigate } from "react-router-dom";
 
+import FileEditor from "../../components/dashboard/file-editor/FileEditor.jsx";
+
 export default function Dashboard({ notify }) {
 
     const [isViewingFile, setIsViewingFile] = useState(false);
@@ -67,19 +69,19 @@ export default function Dashboard({ notify }) {
     }, [])
 
 
-    useEffect(() => {
+ useEffect(() => {
+    if (selectedItem?.type === "FILE") {
+        setIsViewingFile(true);
 
-console.log(selectedItem?.data.tags)
+        setOriginalTitle(selectedItem.data.title || "");
+        setOriginalBody(selectedItem.data.body || "");
 
+        setDraftTitle(selectedItem.data.title || "");
+        setDraftBody(selectedItem.data.body || "");
 
-        selectedItem?.type === "FILE" ? setIsViewingFile(true) : "";
-
-        if (selectedItem?.type === "FILE") {
-            setOriginalTitle(selectedItem.data.title || "");
-            setOriginalBody(selectedItem.data.body || "");
-            setDraftTags(selectedItem.data.tags || [])
-        }
-    }, [selectedItem])
+        setDraftTags(selectedItem.data.tags || []);
+    }
+}, [selectedItem]);
 
 
     async function fetchFolders() {
@@ -142,7 +144,6 @@ const previousFiles = structuredClone(files);
 
         const data = await res.json();
 
-        console.log("BACKEND RESPONSE:", data);
 
         if (!res.ok) {
             notify(data.message || "Could not update snippet", "ERROR");
@@ -281,6 +282,14 @@ const previousFiles = structuredClone(files);
 
 
 
+<FileEditor setIsViewingFile={setIsViewingFile}
+draftTags={draftTags} setDraftTags={setDraftTags}
+isViewingFile={isViewingFile} setDraftTitle={setDraftTitle} draftTitle={draftTitle}
+draftBody = {draftBody} setDraftBody={setDraftBody} isAddingTag={ isAddingTag} setIsAddingTag={setIsAddingTag}
+setSelectedItem={setSelectedItem} selectedItem={selectedItem}
+setUnsavedChanges={setUnsavedChanges} unsavedChanges={unsavedChanges} setNewTag={setNewTag} newTag={newTag}
+updateSnippet={updateSnippet}
+/>
 
 
 
@@ -288,170 +297,9 @@ const previousFiles = structuredClone(files);
 
 
 
-                <div className={styles.fileBody}>
 
 
-                    {isViewingFile ? (
-
-                        <>
-
-
-                            <div className={styles.fileInfo}>
-
-
-                                <input type="text" className={styles.fileTitle} value={draftTitle}
-                                    onChange={(e) => setDraftTitle(e.target.value)} />
-
-
-                                <div className={styles.tagsWrapper}>
-
-                                <div className = {styles.tagCounter}>
-                                    <p>{draftTags?.length ?? 0}</p>
-                                    <p>/5</p>
-
-
-
-                                </div>
-
-                                    <div className={styles.tagsActionWrapper}>
-                                        <div className={styles.tagsAction}>
-                                            <h4>Tags</h4>
-                                            <FiPlus className={styles.addTag} onClick={() => setIsAddingTag(!isAddingTag)} />
-
-                                        </div>
-
-                                        {isAddingTag &&
-
-                                            <form className={styles.addTagFieldWrapper}
-                                             onSubmit={(e) => {
-                                                    e.preventDefault()
-
-
-                                        
-
-                                                    const snippet = {
-                                                        ...selectedItem?.data,
-                                                        tags: [ ...(selectedItem.data.tags ?? []), newTag]
-
-                                                    }
-
-
-
-                                                    updateSnippet(snippet)
-                                                    setNewTag("")
-
-
-                                                }
-
-
-
-
-                                                }>
-                                                <input type="text" className={styles.addTagField} placeholder="Add tag" 
-                                                onChange={(e) => setNewTag(e.target.value)}
-                                                       value={newTag}
-                                                
-                                            />
-                                                <FiPlus className={styles.finalizeAddingTag} />
-                                            </form>
-                                        }
-                                    </div>
-
-
-                                    <div className={styles.tags}>
-                                       {draftTags.map((tag, index) => (
-                                    
-
-                                    <>
-                                            <p key = {index}>{tag}</p>
-                                            <FiX onClick={(e) => {
-
-                                                const newTags = draftTags.filter((_, i) => i !== index)
-
-
-
-
-                                                const snippet = {
-                                                    ...selectedItem.data,
-                                                    tags: (newTags ?? [])
-                                                }
-
-                                                updateSnippet(snippet)
-                                            }}/>
-                                            </>
-                                            
-
-                                       ))
-                                       }
-
-                                    </div>
-                                </div>
-                            </div>
-
-
-
-                            <textarea className={styles.fileContent} value={draftBody} onChange={(e) => setDraftBody(e.target.value)}>
-                                {selectedItem?.data?.body}
-                            </textarea>
-                        </>
-
-                    ) : (
-                        <>
-                            <div className={styles.defaultMenu}>
-
-                                <h1>SNIPR.</h1>
-                                <p>Start</p>
-
-
-                                <div className={styles.newFile}
-                                    onClick={() => {
-                                        setCreatingState({
-                                            type: "FILE",
-                                            tick: Date.now()
-                                        });
-
-                                    }
-                                    }>
-                                    <RiFileAddLine />   <a>New File</a>
-                                </div>
-
-                                <div className={styles.newFolder}
-
-                                    onClick={() => {
-                                        setCreatingState({
-                                            type: "FOLDER",
-                                            tick: Date.now()
-                                        });
-
-                                    }
-
-                                    }
-                                >
-                                    <RiFolderAddLine /><a>New Folder</a>
-                                </div>
-
-
-                            </div>
-                        </>
-                    )}
-
-
-                    {isViewingFile && unsavedChanges &&
-                        <div className={styles.saveContainer}>
-
-                            <p className={styles.saveStatus}>{unsavedChanges}</p>
-                            <button className={styles.saveBtn} onClick={() => {
-                                updateSnippet();
-
-
-
-
-
-                            }}>Save</button>
-                        </div>
-                    }
-
-                </div>
+               
             </div>
         </div>
     )
