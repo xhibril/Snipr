@@ -294,11 +294,17 @@ public class SnippetService {
             }
 
 
-            if (request.getTags().size() > 5) {
+            List<String> tags = request.getTags();
+
+            if (tags == null) {
+                tags = new ArrayList<>();
+            }
+
+            if (tags.size() > 5) {
                 return ResponseEntity.badRequest().body(new SnippetResponse("Tag limit exceeded"));
             }
 
-            snippet.setTags(request.getTags());
+            snippet.setTags(tags);
 
             if (snippet.getTags().size() != snippet.getTagAmount()) {
                 snippet.setTagAmount(snippet.getTags().size());

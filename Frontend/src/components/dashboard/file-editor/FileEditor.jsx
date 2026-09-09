@@ -144,7 +144,12 @@ export default function FileEditor({isViewingFile, setIsViewingFile, selectedIte
               <button
                 className={styles.saveBtn}
                 onClick={() => {
-                  updateSnippet();
+                    const snippet = {
+                        ...selectedItem?.data,
+                        body: draftBody,
+                        title: draftTitle
+                    }
+                    updateSnippet( snippet);
                 }}
               >
                 Save
