@@ -46,14 +46,6 @@ export default function FileExplorer({
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [tags, setTags] = useState([]);
 
-  const [snippetDesc, setSnippetDesc] = useState("");
-  const [snippetCode, setSnippetCode] = useState("");
-  const [snippetTags, setSnippetTags] = useState([]);
-
-  const [allItems, setAllItems] = useState({});
-
-  const [sortedFolders, setSortedFolders] = useState([]);
-  const [sortedFiles, setSortedFiles] = useState([]);
 
   const nav = useNavigate();
 
@@ -95,8 +87,8 @@ export default function FileExplorer({
       folderId = selectedItem.data.id;
     }
 
-    const previousFolders = folders;
-    const previousFiles = files;
+    const previousFolders = structuredClone(folders);
+    const previousFiles = structuredClone(files);
 
     // opt update
     if (isCreatingFolder) {
@@ -151,35 +143,16 @@ export default function FileExplorer({
     }
   }
 
-  // compare two folders at a time
-  // pinned = 1 gets placed before unpinned = 0
-  useEffect(() => {
-    const finalizedFolders = [...folders].sort(
-      (a, b) => b.isPinned - a.isPinned,
-    );
-    setSortedFolders(finalizedFolders);
-  }, [folders]);
-
-  useEffect(() => {
-    const finalizedFiles = [...files].sort((a, b) => b.isPinned - a.isPinned);
-    setSortedFiles(finalizedFiles);
-  }, [files]);
-
-
-
   async function updateItemPinStatus(selectedItem) {
     const isFolder = selectedItem.type === "FOLDER";
     const status = !selectedItem.data.isPinned;
 
-    const path = isFolder
-      ? `/folders/${selectedItem.data.id}/pin`
-      : `/snippets/${selectedItem.data.id}/pin`;
-
-    const previousFolders = folders;
-    const previousFiles = files;
+    const path = `/${isFolder ? "folders" : "snippets"}/${selectedItem.data.id}/pin`;
+    const previousFolders = structuredClone(folders);
+    const previousFiles = structuredClone(files);
 
     // opt update
-    if (selectedItem.type === "FOLDER") {
+    if (isFolder) {
       setFolders(
         folders.map((folder) =>
           folder.id === selectedItem.data.id
@@ -212,24 +185,19 @@ export default function FileExplorer({
     if (!res.ok) {
       notify(data.message || "Could not pin, please try again", "ERROR");
       selectedItem.type === "FOLDER"
-        ? setFolders(previousFolder)
+        ? setFolders(previousFolders)
         : setFiles(previousFiles);
       return;
     }
   }
 
-
   async function deleteItem() {
-    let path;
 
-    if (selectedItem.type === "FOLDER") {
-      path = "/folders/" + selectedItem.data.id;
-    } else {
-      path = "/snippets/" + selectedItem.data.id;
-    }
+    const isFolder = selectedItem.type === "FOLDER";
+    const path = `/${isFolder ? "folders" : "snippets"}/${selectedItem.data.id}`;
 
-    const previousFolders = folders;
-    const previousFiles = files;
+    const previousFolders = structuredClone(folders);
+    const previousFiles = structuredClone(files);
 
     // opt update
     if (selectedItem.type === "FOLDER") {
@@ -255,50 +223,71 @@ export default function FileExplorer({
     }
 
     notify(data.message, "SUCCESS");
-
     setIsViewingFile(false);
   }
 
-
-  async function moveSnippet(snippet){
-    const path = `/snippets/${snippet.id}`
+  async function moveSnippet(snippet) {
+    const path = `/snippets/${snippet.id}`;
 
     const previousFiles = structuredClone(files);
-
-
 
     // opt update
     setFiles((prev) =>
       prev.map((file) =>
-        file.id === snippet.id ? 
-        {...file, folderId : snippet.folderId} : file
-      )
-
+        file.id === snippet.id ? { ...file, folderId: snippet.folderId } : file,
+      ),
     );
 
-
-    const res = ApiFetch(path, {
-      method: "PATCH",
+    const res = await ApiFetch(
+      path,
+      {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ folderId: snippet.folderId }),
-    }, notify, nav)
-
+      },
+      notify,
+      nav,
+    );
 
     if (!res) return;
 
     const data = await res.json();
 
-    if(!res.ok){
-      notify(data.message || "Could not move snippet, pleasey try again", "ERROR");
-      setPreviousFiles(files);
+    if (!res.ok) {
+      notify(
+        data.message || "Could not move snippet, pleasey try again",
+        "ERROR",
+      );
+      setFiiles(previousFiles);
       return;
     }
-
-
   }
 
-  return (
+  function selectFile(file) {
+    setSelectedItem({
+      type: "FILE",
+      data: file,
+    });
+
+    const data = {
+      title: file.title || "",
+      body: file.body || "",
+      tags: file.tags || [],
+    };
+
+    setDraft(data);
+    setOriginal(data);
+  }
+
+  // compare two folders at a time
+  // pinned = 1 gets placed before unpinned = 0
+    const sortedFolders = [...folders.sort((a,b) => b.isPinned - a.isPinned)]
+    const sortedFiles = [...files.sort((a,b) => b.isPinned - a.isPinned)]
+  
+  return ( 
     <>
+
+
       <div className={styles.fileExplorer}>
         <div className={styles.snippetControls}>
           <RiFolderAddLine
@@ -516,25 +505,7 @@ export default function FileExplorer({
                             ? styles.selected
                             : ""
                         }`}
-                        onClick={() => {
-                          if (
-                            selectedItem?.type === "FILE" &&
-                            selectedItem?.data?.id === file?.id
-                          ) {
-                            setSelectedItem(null);
-                          } else {
-                            setSelectedItem({
-                              type: "FILE",
-                              data: file,
-                            });
-
-                            setDraftBody(file.body || "");
-                            setDraftTitle(file.title || "");
-
-                            setOriginalBody(file.body || "");
-                            setOriginalTitle(file.title || "");
-                          }
-                        }}
+                        onClick={() => {selectFile(file)}}
                       >
                         <RiFile2Fill className={styles.fileIcon} />
                         {file.isPinned && (
@@ -569,22 +540,8 @@ export default function FileExplorer({
               >
                 <div
                   className={`${styles.fileHeader} ${selectedItem?.type === "FILE" && selectedItem?.data?.id === file?.id ? styles.selected : ""}`}
-                  onClick={() => {
-                    if (selectedItem?.data?.id === file?.id) {
-                      setSelectedItem(null);
-                    } else {
-                      setSelectedItem({
-                        type: "FILE",
-                        data: file,
-                      });
 
-                      setDraftBody(file.body || "");
-                      setDraftTitle(file.title || "");
-
-                      setOriginalBody(file.body || "");
-                      setOriginalTitle(file.title || "");
-                    }
-                  }}
+                  onClick={() => { selectFile(file)}}
                 >
                   <RiFile2Fill className={styles.fileIcon} />
                   {file.isPinned && (

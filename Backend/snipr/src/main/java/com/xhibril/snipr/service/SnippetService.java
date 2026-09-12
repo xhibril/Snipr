@@ -159,42 +159,6 @@ public class SnippetService {
         }
     }
 
-
-    public ResponseEntity<ApiResponse> addTag(Long userId, Long snippetId, String tag) {
-        Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, snippetId);
-
-        if (snippetOpt.isPresent()) {
-            Snippet snippet = snippetOpt.get();
-            if (tag == null) {
-                return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
-            }
-
-            if(snippet.getTags().contains(tag)){
-                return ResponseEntity.badRequest().body(new ApiResponse("Tag already exists"));
-            }
-
-            snippet.getTags().add(tag);
-            snippetRepo.save(snippet);
-            return ResponseEntity.ok().body(new ApiResponse("Tag added"));
-        } else {
-            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
-        }
-    }
-
-    public ResponseEntity<ApiResponse> deleteTag(Long userId, Long snippetId, String tag){
-        Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, snippetId);
-
-        if(snippetOpt.isPresent()){
-            Snippet snippet = snippetOpt.get();
-
-            snippet.getTags().remove(tag);
-            snippetRepo.save(snippet);
-            return ResponseEntity.ok().body(new ApiResponse("Tag deleted"));
-        } else {
-            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
-        }
-    }
-
     public List<FolderResponse> getFolders(Long userId){
         List<Folder> folders = folderRepo.findByUserId(userId);
         List<FolderResponse> foldersToReturn = new ArrayList<>();

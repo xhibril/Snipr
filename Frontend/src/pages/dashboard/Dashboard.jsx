@@ -121,11 +121,13 @@ export default function Dashboard({ notify }) {
       return;
     }
 
-    syncSelected();
+    syncSelected(data);
     syncDraft();
   }
 
   function syncDraft() {
+    if (!selectedItem?.data) return;
+
     const { title, body, tags } = selectedItem.data;
     const data = { title, body, tags };
 
@@ -181,6 +183,7 @@ export default function Dashboard({ notify }) {
           setDraft={setDraft}
           updateSnippet={updateSnippet}
           setIsViewingFile={setIsViewingFile}
+          updateSnippet = {updateSnippet}
         />
 
         <FileEditor
