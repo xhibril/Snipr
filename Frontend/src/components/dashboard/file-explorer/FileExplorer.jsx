@@ -44,8 +44,7 @@ export default function FileExplorer({
   const [foldersToggled, setFoldersToggle] = useState([]);
   const [isCreatingItem, setIsCreatingItem] = useState(false);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
-  const [tags, setTags] = useState([]);
-
+  const [filterTags, setFilterTags] = useState([]);
 
   const nav = useNavigate();
 
@@ -83,12 +82,9 @@ export default function FileExplorer({
     let newFile;
     let folderId = null;
 
-    if (selectedItem?.type === "FOLDER" && selectedItem?.data.id !== null) {
-      folderId = selectedItem.data.id;
-    }
+    if (selectedItem?.type === "FOLDER") folderId = selectedItem?.data.id;
 
-    const previousFolders = structuredClone(folders);
-    const previousFiles = structuredClone(files);
+    const previous = isCreatingFolder ? structuredClone(folders) : structuredClone(files);
 
     // opt update
     if (isCreatingFolder) {
@@ -116,7 +112,10 @@ export default function FileExplorer({
     }
     const res = await ApiFetch(path, methods, notify, nav);
 
-    if (!res) return;
+    if (!res) {
+      rollBack(isCreatingFolder, previous);
+      return;
+    }
 
     const data = await res.json();
 
@@ -129,7 +128,7 @@ export default function FileExplorer({
         "ERROR",
       );
 
-      isCreatingFolder ? setFolders(previousFolders) : setFiles(previousFiles);
+      rollBack(isCreatingFolder, previous);
       return;
     }
 
@@ -148,8 +147,9 @@ export default function FileExplorer({
     const status = !selectedItem.data.isPinned;
 
     const path = `/${isFolder ? "folders" : "snippets"}/${selectedItem.data.id}/pin`;
-    const previousFolders = structuredClone(folders);
-    const previousFiles = structuredClone(files);
+    const previous = isFolder
+      ? structuredClone(folders)
+      : structuredClone(files);
 
     // opt update
     if (isFolder) {
@@ -178,29 +178,29 @@ export default function FileExplorer({
 
     const res = await ApiFetch(path, { method: "PATCH" }, notify, nav);
 
-    if (!res) return;
-
-    const data = await res.json();
+    if (!res) {
+      rollBack(isFolder, previous);
+      return;
+    }
 
     if (!res.ok) {
+      const data = await res.json();
       notify(data.message || "Could not pin, please try again", "ERROR");
-      selectedItem.type === "FOLDER"
-        ? setFolders(previousFolders)
-        : setFiles(previousFiles);
+      rollBack(isFolder, previous);
       return;
     }
   }
 
   async function deleteItem() {
-
     const isFolder = selectedItem.type === "FOLDER";
     const path = `/${isFolder ? "folders" : "snippets"}/${selectedItem.data.id}`;
 
-    const previousFolders = structuredClone(folders);
-    const previousFiles = structuredClone(files);
+    const previous = isFolder
+      ? structuredClone(folders)
+      : structuredClone(files);
 
     // opt update
-    if (selectedItem.type === "FOLDER") {
+    if (isFolder) {
       setFolders(
         folders.filter((folder) => folder.id !== selectedItem.data.id),
       );
@@ -210,15 +210,15 @@ export default function FileExplorer({
 
     const res = await ApiFetch(path, { method: "DELETE" }, notify, nav);
 
-    if (!res) return;
-
-    const data = await res.json();
+    if (!res) {
+      rollBack(isFolder, previous);
+      return;
+    }
 
     if (!res.ok) {
+      const data = await res.json();
       notify(data.message || "Could not delete, please try again", "ERROR");
-      selectedItem.type === "FOLDER"
-        ? setFolders(previousFolders)
-        : setFiles(previousFiles);
+      rollBack(isFolder, previous);
       return;
     }
 
@@ -249,7 +249,10 @@ export default function FileExplorer({
       nav,
     );
 
-    if (!res) return;
+    if (!res) {
+      setFiles(previousFiles);
+      return;
+    }
 
     const data = await res.json();
 
@@ -258,7 +261,7 @@ export default function FileExplorer({
         data.message || "Could not move snippet, pleasey try again",
         "ERROR",
       );
-      setFiiles(previousFiles);
+      setFiles(previousFiles);
       return;
     }
   }
@@ -279,15 +282,17 @@ export default function FileExplorer({
     setOriginal(data);
   }
 
+  function rollBack(isFolder, previous) {
+    isFolder ? setFolders(previous) : setFiles(previous);
+  }
+
   // compare two folders at a time
   // pinned = 1 gets placed before unpinned = 0
-    const sortedFolders = [...folders.sort((a,b) => b.isPinned - a.isPinned)]
-    const sortedFiles = [...files.sort((a,b) => b.isPinned - a.isPinned)]
-  
-  return ( 
+  const sortedFolders = [...folders].sort((a, b) => b.isPinned - a.isPinned);
+  const sortedFiles = [...files].sort((a, b) => b.isPinned - a.isPinned);
+
+  return (
     <>
-
-
       <div className={styles.fileExplorer}>
         <div className={styles.snippetControls}>
           <RiFolderAddLine
@@ -374,25 +379,24 @@ export default function FileExplorer({
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
-
-                    setTags([...tags, e.target.value]);
-
+                    setFilterTags([...filterTags, e.target.value]);
                     e.target.value = "";
                   }
                 }}
               />
-
               <FiPlus className={styles.addBtn} />
             </div>
 
             <div className={styles.filterContainer}>
-              {tags.map((tag, index) => (
+              {filterTags.map((tag, index) => (
                 <div key={index} className={styles.tag}>
                   <p>{tag}</p>
 
                   <FiX
                     className={styles.removeTag}
-                    onClick={() => setTags(tags.filter((_, i) => i !== index))}
+                    onClick={() =>
+                      setFilterTags(filterTags.filter((_, i) => i !== index))
+                    }
                   />
                 </div>
               ))}
@@ -416,6 +420,7 @@ export default function FileExplorer({
         >
           {sortedFolders.map((folder, index) => (
             <div
+              key={folder.id}
               className={styles.folderItem}
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
@@ -465,12 +470,13 @@ export default function FileExplorer({
 
                 {folder.isPinned && (
                   <RiPushpinFill
-                    onClick={() => {
+                    onClick={(e) => {
                       const item = {
                         type: "FOLDER",
                         data: folder,
                       };
 
+                      e.stopPropagation();
                       updateItemPinStatus(item);
                     }}
                   />
@@ -492,6 +498,7 @@ export default function FileExplorer({
                   .filter((file) => file.folderId === folder.id)
                   .map((file) => (
                     <div
+                      key={file.id}
                       className={styles.fileItem}
                       draggable={true}
                       onDragStart={(e) => {
@@ -505,17 +512,20 @@ export default function FileExplorer({
                             ? styles.selected
                             : ""
                         }`}
-                        onClick={() => {selectFile(file)}}
+                        onClick={() => {
+                          selectFile(file);
+                        }}
                       >
                         <RiFile2Fill className={styles.fileIcon} />
                         {file.isPinned && (
                           <RiPushpinFill
-                            onClick={() => {
+                            onClick={(e) => {
                               const item = {
                                 type: "FILE",
                                 data: file,
                               };
 
+                              e.stopPropagation();
                               updateItemPinStatus(item);
                             }}
                           />
@@ -532,6 +542,7 @@ export default function FileExplorer({
             .filter((file) => file.folderId === null)
             .map((file) => (
               <div
+                key={file.id}
                 className={styles.fileItem}
                 draggable={true}
                 onDragStart={(e) => {
@@ -540,17 +551,19 @@ export default function FileExplorer({
               >
                 <div
                   className={`${styles.fileHeader} ${selectedItem?.type === "FILE" && selectedItem?.data?.id === file?.id ? styles.selected : ""}`}
-
-                  onClick={() => { selectFile(file)}}
+                  onClick={() => {
+                    selectFile(file);
+                  }}
                 >
                   <RiFile2Fill className={styles.fileIcon} />
                   {file.isPinned && (
                     <RiPushpinFill
-                      onClick={() => {
+                      onClick={(e) => {
                         const item = {
                           type: "FILE",
                           data: file,
                         };
+                        e.stopPropagation();
                         updateItemPinStatus(item);
                       }}
                     />

@@ -1,4 +1,5 @@
 package com.xhibril.snipr.service;
+
 import com.xhibril.snipr.dto.api.ApiResponse;
 import com.xhibril.snipr.dto.snippet.FolderResponse;
 import com.xhibril.snipr.dto.snippet.SnippetRequest;
@@ -76,10 +77,10 @@ public class SnippetService {
             snippet.setTitle("Untitled");
             snippet.setTagAmount(0);
 
-            if(folderId != null){
+            if (folderId != null) {
                 Optional<Folder> folderOpt = folderRepo.findById(folderId);
 
-                if(folderOpt.isPresent()){
+                if (folderOpt.isPresent()) {
                     Folder folder = folderOpt.get();
                     snippet.setFolder(folder);
                 }
@@ -93,7 +94,7 @@ public class SnippetService {
             snippetResponse.setId(savedSnippet.getId());
             snippetResponse.setTitle(snippet.getTitle());
 
-            if(snippet.getFolder() != null){
+            if (snippet.getFolder() != null) {
                 snippetResponse.setFolderId(snippet.getFolder().getId());
             }
 
@@ -107,26 +108,39 @@ public class SnippetService {
     @Transactional
     public ResponseEntity<ApiResponse> moveSnippet(Long userId, Long snippetId, Long folderId) {
         Optional<Snippet> snippetOpt = snippetRepo.findById(snippetId);
-        Optional<Folder> folderOpt = folderRepo.findById(folderId);
 
-        if (snippetOpt.isPresent() && folderOpt.isPresent()) {
-            Snippet snippet = snippetOpt.get();
-            Folder folder = folderOpt.get();
-
-            User userSnippet = snippet.getUser();
-            User userFolder = folder.getUser();
-
-            // check if user owns the snippet n folder
-            if (!(userSnippet.getId().equals(userId) && userFolder.getId().equals(userId))) {
-                return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
-            }
-
-            snippetRepo.moveSnippet(folder, snippetId);
-            return ResponseEntity.ok().body(new ApiResponse("Snippet successfully moved"));
-
-        } else {
+        if (snippetOpt.isEmpty()) {
             return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
         }
+
+        Snippet snippet = snippetOpt.get();
+        User userSnippet = snippet.getUser();
+
+        if (!userSnippet.getId().equals(userId)) {
+            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
+        }
+
+        if (folderId == null) {
+            snippetRepo.moveSnippet(null, snippetId);
+            return ResponseEntity.ok().body(new ApiResponse("Snippet successfully moved"));
+        }
+
+        Optional<Folder> folderOpt = folderRepo.findById(folderId);
+
+        if (folderOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
+        }
+
+        Folder folder = folderOpt.get();
+        User userFolder = folder.getUser();
+
+        if (!userFolder.getId().equals(userId)) {
+            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
+        }
+
+        snippetRepo.moveSnippet(folder, snippetId);
+        return ResponseEntity.ok().body(new ApiResponse("Snippet successfully moved"));
+
     }
 
 
@@ -159,12 +173,12 @@ public class SnippetService {
         }
     }
 
-    public List<FolderResponse> getFolders(Long userId){
+    public List<FolderResponse> getFolders(Long userId) {
         List<Folder> folders = folderRepo.findByUserId(userId);
         List<FolderResponse> foldersToReturn = new ArrayList<>();
 
 
-        for(Folder folder : folders){
+        for (Folder folder : folders) {
             FolderResponse folderResponse = new FolderResponse();
             folderResponse.setId(folder.getId());
             folderResponse.setName(folder.getName());
@@ -175,14 +189,14 @@ public class SnippetService {
         return foldersToReturn;
     }
 
-    public List<SnippetResponse> getSnippets(Long userId){
-        List<Snippet> snippets =  snippetRepo.findByUserId(userId);
+    public List<SnippetResponse> getSnippets(Long userId) {
+        List<Snippet> snippets = snippetRepo.findByUserId(userId);
         List<SnippetResponse> snippetsToReturn = new ArrayList<>();
 
-        for(Snippet snippet : snippets){
+        for (Snippet snippet : snippets) {
             SnippetResponse snippetResponse = new SnippetResponse();
 
-            if(snippet.getFolder()!= null){
+            if (snippet.getFolder() != null) {
                 Folder folder = snippet.getFolder();
                 snippetResponse.setFolderId(folder.getId());
             }
@@ -202,14 +216,14 @@ public class SnippetService {
 
 
     @Transactional
-    public ResponseEntity<ApiResponse> updateSnippetPinStatus(Long userId, Long snippetId){
+    public ResponseEntity<ApiResponse> updateSnippetPinStatus(Long userId, Long snippetId) {
         Optional<Snippet> snippetOpt = snippetRepo.findById(snippetId);
 
-        if(snippetOpt.isPresent()){
+        if (snippetOpt.isPresent()) {
             Snippet snippet = snippetOpt.get();
             User user = snippet.getUser();
 
-            if(user.getId() == userId){
+            if (user.getId() == userId) {
                 Boolean pinStatus = !Boolean.TRUE.equals(snippet.getIsPinned());
                 snippetRepo.updatePinStatus(pinStatus, snippetId);
                 return ResponseEntity.ok().body(new ApiResponse("Snippet successfully updated"));
@@ -220,15 +234,15 @@ public class SnippetService {
 
 
     @Transactional
-    public ResponseEntity<ApiResponse> updateFolderPinStatus(Long userId, Long folderId){
+    public ResponseEntity<ApiResponse> updateFolderPinStatus(Long userId, Long folderId) {
         Optional<Folder> folderOpt = folderRepo.findById(folderId);
 
 
-        if(folderOpt.isPresent()){
+        if (folderOpt.isPresent()) {
             Folder folder = folderOpt.get();
             User user = folder.getUser();
 
-            if(user.getId() == userId){
+            if (user.getId() == userId) {
                 Boolean pinStatus = !Boolean.TRUE.equals(folder.getIsPinned());
                 folderRepo.updatePinStatus(pinStatus, folderId);
                 return ResponseEntity.ok().body(new ApiResponse("Snippet successfully updated"));
@@ -238,21 +252,19 @@ public class SnippetService {
     }
 
 
-
-
-    public ResponseEntity<SnippetResponse> updateSnippet(Long userId, SnippetRequest request){
+    public ResponseEntity<SnippetResponse> updateSnippet(Long userId, SnippetRequest request) {
         Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, request.getId());
 
-        if(snippetOpt.isPresent()){
+        if (snippetOpt.isPresent()) {
             Snippet snippet = snippetOpt.get();
             snippet.setFileName(request.getName());
             snippet.setBody(request.getBody());
             snippet.setTitle(request.getTitle());
 
-            if(request.getFolderId() != null){
+            if (request.getFolderId() != null) {
                 Optional<Folder> folderOpt = folderRepo.findById(request.getFolderId());
 
-                if(folderOpt.isPresent()) {
+                if (folderOpt.isPresent()) {
                     snippet.setFolder(folderOpt.get());
                 }
             }

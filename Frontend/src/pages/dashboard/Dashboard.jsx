@@ -183,7 +183,6 @@ export default function Dashboard({ notify }) {
           setDraft={setDraft}
           updateSnippet={updateSnippet}
           setIsViewingFile={setIsViewingFile}
-          updateSnippet = {updateSnippet}
         />
 
         <FileEditor

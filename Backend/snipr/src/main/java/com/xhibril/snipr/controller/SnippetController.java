@@ -71,20 +71,6 @@ public class SnippetController {
         return snippetService.deleteFolder(userId, folderId);
     }
 
-    @PostMapping("/snippets/{snippetId}/tag")
-    public ResponseEntity<ApiResponse> addTag(@PathVariable Long snippetId, @RequestBody TagRequest request){
-        Long userId = 1L; // place holder;
-
-        return snippetService.addTag(userId, snippetId, request.getTag());
-    }
-
-    @DeleteMapping("/snippets/{snippetId}/tag")
-    public ResponseEntity<ApiResponse> deleteTag(@PathVariable Long snippetId, @RequestBody TagRequest request){
-        Long userId = 1L;
-        return snippetService.deleteTag(userId, snippetId, request.getTag());
-    }
-
-
     @GetMapping("/folders")
     public List<FolderResponse> getFolders(){
         Long userId = 1L; // place holder;

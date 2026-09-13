@@ -2,8 +2,6 @@ import styles from "../../../pages/dashboard/Dashboard.module.css"
 
 import logo from "../../../assets/images/logo.svg"
 
-
-
 import {
   FiFolder,
   FiShare2,
