@@ -253,6 +253,8 @@ public class SnippetService {
 
 
     public ResponseEntity<SnippetResponse> updateSnippet(Long userId, SnippetRequest request) {
+
+        System.out.println("TAGSSSSSSSSS: "+ request.getTags() );
         Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, request.getId());
 
         if (snippetOpt.isPresent()) {

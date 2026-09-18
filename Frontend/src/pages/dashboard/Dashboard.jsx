@@ -40,15 +40,18 @@ export default function Dashboard({ notify }) {
 
   useEffect(() => {
     if (
-      draft.body !== selectedItem?.data.body ||
-      draft.title !== selectedItem?.data.title ||
-      selectedItem?.data.tags != draft.tags
+      draft.body !== original.body ||
+      draft.title !== original.title ||
+      (original.tags || []).join() !== draft.tags.join()
     ) {
       setUnsavedChanges("Unsaved Changes");
     } else {
       setUnsavedChanges("");
     }
-  }, [draft.body, draft.title, draft.tags]);
+
+
+  }, [draft, original]);
+
 
   useEffect(() => {
     if (selectedItem?.type !== "FILE") return;
@@ -121,19 +124,24 @@ export default function Dashboard({ notify }) {
       return;
     }
 
-    syncSelected(data);
-    syncDraft();
+  syncSelected(data);
+  syncDraft();
   }
 
   function syncDraft() {
-    if (!selectedItem?.data) return;
+  if (!selectedItem?.data) return;
 
-    const { title, body, tags } = selectedItem.data;
-    const data = { title, body, tags };
+  const { title, body, tags } = selectedItem.data;
 
-    setOriginal(data);
-    setDraft(data);
-  }
+  const data = {
+    title: title || "",
+    body: body || "",
+    tags: tags || [],
+  };
+
+  setOriginal(data);
+  setDraft(data);
+}
 
   function syncSelected(data) {
     setSelectedItem((prev) => ({
@@ -147,14 +155,16 @@ export default function Dashboard({ notify }) {
       <div
         className={styles.mainContent}
         onKeyDown={(e) => {
-          if (e.ctrlKey && e.key === "s" && unsavedChanges) {
+          if (e.ctrlKey && e.key === "s") {
             e.preventDefault();
 
+            if(unsavedChanges){
             const snippet = {
               ...selectedItem?.data,
               ...draft
             };
             updateSnippet(snippet);
+          }
           }
         }}
       >

@@ -280,6 +280,9 @@ export default function FileExplorer({
 
     setDraft(data);
     setOriginal(data);
+
+
+    console.log("SELECTED FILEEEE: " + data.title + data.body + data.tags);
   }
 
   function rollBack(isFolder, previous) {
@@ -297,7 +300,7 @@ export default function FileExplorer({
         <div className={styles.snippetControls}>
           <RiFolderAddLine
             className={styles.snippetAction}
-            onClick={() => {
+            onClick={() => {~
               setCreatingState({
                 type: "FOLDER",
                 tick: Date.now(),

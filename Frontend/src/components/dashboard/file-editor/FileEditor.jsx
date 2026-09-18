@@ -21,6 +21,7 @@ export default function FileEditor({
   setDraft,
   setOriginal
 }) {
+
   return (
     <>
       <div className={styles.fileBody}>
@@ -55,12 +56,13 @@ export default function FileEditor({
                       onSubmit={(e) => {
                         e.preventDefault();
 
-                        const snippet = {
-                          ...selectedItem?.data,
-                          tags: [...(selectedItem.data.tags ?? []), newTag],
-                        };
+                        setDraft({
+                          ...draft, 
+                          title: draft.title,
+                          body: draft.body,
+                          tags: [...(draft.tags ?? []), newTag]
+                        })
 
-                        updateSnippet(snippet);
                         setNewTag("");
                       }}
                     >
@@ -86,12 +88,10 @@ export default function FileEditor({
                             (_, i) => i !== index,
                           );
 
-                          const snippet = {
-                            ...selectedItem.data,
-                            tags: newTags ?? [],
-                          };
-
-                          updateSnippet(snippet);
+                          setDraft({
+                            ...draft,
+                            tags: newTags ?? []
+                          })
                         }}
                       />
                     </>
@@ -149,9 +149,8 @@ export default function FileEditor({
               className={styles.saveBtn}
               onClick={() => {
                 const snippet = {
-                  ...selectedItem?.data,
-                  body: draft.body,
-                  title: draft.title,
+                          ...selectedItem?.data,
+                  ...draft,
                 };
                 updateSnippet(snippet);
               }}
