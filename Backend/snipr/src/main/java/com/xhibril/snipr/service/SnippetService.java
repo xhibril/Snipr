@@ -263,6 +263,7 @@ public class SnippetService {
             snippet.setBody(request.getBody());
             snippet.setTitle(request.getTitle());
 
+
             if (request.getFolderId() != null) {
                 Optional<Folder> folderOpt = folderRepo.findById(request.getFolderId());
 
@@ -270,7 +271,6 @@ public class SnippetService {
                     snippet.setFolder(folderOpt.get());
                 }
             }
-
 
             List<String> tags = request.getTags();
 
@@ -289,7 +289,6 @@ public class SnippetService {
             }
 
             snippetRepo.save(snippet);
-
             SnippetResponse snippetRes = new SnippetResponse();
             snippetRes.setId(snippet.getId());
 

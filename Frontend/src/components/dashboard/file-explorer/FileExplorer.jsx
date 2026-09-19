@@ -1,4 +1,5 @@
 import styles from "./FileExplorer.module.css";
+import { ValidateInput } from "../../utils/Validation.jsx";
 
 import {
   FiX,
@@ -76,69 +77,106 @@ export default function FileExplorer({
     }
   }, [isCreatingItem, isCreatingFolder]);
 
-  async function handleCreateItem(path, itemName) {
-    let methods = {};
-    let newFolder;
-    let newFile;
-    let folderId = null;
 
-    if (selectedItem?.type === "FOLDER") folderId = selectedItem?.data.id;
 
-    const previous = isCreatingFolder ? structuredClone(folders) : structuredClone(files);
-
-    // opt update
-    if (isCreatingFolder) {
-      newFolder = { name: itemName };
-      setFolders([...folders, newFolder]);
-
-      methods = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: itemName }),
-      };
-    } else {
-      newFile = {
-        name: itemName,
-        folderId: null,
-      };
-
-      setFiles([...files, newFile]);
-
-      methods = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: itemName, folderId: folderId }),
-      };
+  function getAvailableName(name, items){
+    // name exists
+    if(items.some((item) => item.name === name)){
+      return null;
     }
-    const res = await ApiFetch(path, methods, notify, nav);
 
-    if (!res) {
-      rollBack(isCreatingFolder, previous);
+    const trimmedName = name.trim();
+
+    if(!trimmedName){
+      name = isCreatingFolder ? "New Folder" : "New File";
+    } else {
+      name = trimmedName;
+    }
+
+    // name doesnt exist
+    if(!items.some((item) => item.name === name)){
+      return name;
+    }
+
+    let counter = 2;
+
+    while(items.some((item) => item.name === `${name} (${counter})`)){
+      counter++;
+    }
+      return `${name} (${counter})`;
+
+  }
+
+  async function handleCreateItem(path, itemName) {
+    const isFolder = isCreatingFolder;
+    const items = isFolder ? folders : files;
+
+    const inputRes = ValidateInput(itemName, "GENERAL");
+
+    console.log("INPUT:", JSON.stringify(itemName));
+console.log("TYPE:", typeof itemName);
+console.log("RESULT:", ValidateInput(itemName, "GENERAL"));
+
+    if(inputRes !== "VALID"){
+      notify(`Invalid ${isFolder ? "folder" : "file"} name`, "ERROR");
+      return;
+    }
+
+    itemName = getAvailableName(itemName, items);
+
+    if(!itemName){
+      notify(`This ${isFolder ? "folder" : "file"} already exists`);
+      return;
+    }
+
+    const folderId = selectedItem?.type === "FOLDER" ? selectedItem.data.id : null;
+
+    const previous = structuredClone(items)
+
+    const newItem = isFolder ? 
+    { name: itemName } :
+    { name: itemName, folderId : folderId};
+
+
+    if(isFolder){
+      setFolders((prev) => [...prev, newItem]);
+    } else {
+      setFiles((prev) => [...prev, newItem]);
+    }
+
+    const res = await ApiFetch(
+      path,
+      {
+        method: "POST",
+        headers: { "Content-Type" : "application/json"},
+        body: JSON.stringify(newItem)
+      },
+      notify,
+      nav
+    );
+
+
+    if(!res){
+      rollBack(isFolder, previous);
       return;
     }
 
     const data = await res.json();
 
-    if (!res.ok) {
-      notify(
-        data.message ||
-          (isCreatingFolder
-            ? "Something went wrong while creating folder"
-            : "Something went wrong while creating file"),
-        "ERROR",
-      );
+    if(!res.ok){
+      notify(data.message || `Something went wrong while creating ${isFolder ? "folder" : "file"}`, 
+      "ERROR");
 
-      rollBack(isCreatingFolder, previous);
+      rollBack(isFolder, previous);
       return;
     }
 
-    // replace item after returned
-    if (isCreatingFolder) {
+     if (isFolder) {
       setFolders((prev) =>
-        prev.map((folder) => (folder === newFolder ? data : folder)),
+        prev.map((folder) => (folder === newItem ? data : folder)),
       );
     } else {
-      setFiles((prev) => prev.map((file) => (file === newFile ? data : file)));
+      setFiles((prev) => prev.map((file) => (file === newItem ? data : file)));
     }
   }
 
@@ -336,7 +374,7 @@ export default function FileExplorer({
               e.preventDefault();
               handleCreateItem(
                 isCreatingFolder ? "/folders" : "/snippets",
-                inputRef.current.value,
+                inputRef.current.value || "",
               );
               inputRef.current.value = "";
             }}
