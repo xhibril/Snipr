@@ -1,5 +1,6 @@
 package com.xhibril.snipr.service;
 import com.xhibril.snipr.dto.snippet.SnippetResponse;
+import com.xhibril.snipr.model.Folder;
 import com.xhibril.snipr.model.Snippet;
 import com.xhibril.snipr.repository.SnippetRepository;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,27 @@ public class SearchService {
         List<Snippet> snippetList = snippetRepo.findAllByUserId(userId);
         List<Snippet> firstFilteredSnippets = firstFilter(snippetList, tags);
 
+
         if(query == null){
             List<SnippetResponse> snippetResponses = new ArrayList<>();
 
             for(Snippet snippet : firstFilteredSnippets){
-                SnippetResponse res = new SnippetResponse(snippet.getTitle(), snippet.getBody(), snippet.getTitle());
+                Long folderId = null;
+
+                if (snippet.getFolder() != null) {
+                    folderId = snippet.getFolder().getId();
+                }
+
+                SnippetResponse res = new SnippetResponse(
+                        snippet.getId(),
+                        snippet.getFileName(),
+                        snippet.getTitle(),
+                        snippet.getBody(),
+                        snippet.getTags(),
+                        snippet.getIsPinned(),
+                        folderId
+                );
+
                 snippetResponses.add(res);
             }
             return snippetResponses;
@@ -79,13 +96,24 @@ public class SearchService {
             }
 
             if(score > 0){
-                SnippetResponse snippetResponse = new SnippetResponse(
+
+                Long folderId = null;
+
+                if (snippet.getFolder() != null) {
+                    folderId = snippet.getFolder().getId();
+                }
+
+                SnippetResponse res = new SnippetResponse(
+                        snippet.getId(),
+                        snippet.getFileName(),
                         snippet.getTitle(),
                         snippet.getBody(),
-                        snippet.getTitle()
+                        snippet.getTags(),
+                        snippet.getIsPinned(),
+                        folderId
                 );
 
-                filteredList.add(snippetResponse);
+                filteredList.add(res);
             }
         }
 
@@ -97,16 +125,21 @@ public class SearchService {
         int score = 0;
 
         char[] queryChars = word.toCharArray();
-        String title = snippet.getTitle().toLowerCase();
+
+        String fileName = snippet.getFileName() != null
+                ? snippet.getFileName().toLowerCase()
+                : "";
 
         for(char c : queryChars){
-            if(title.indexOf(c) != -1){ // check if exists inside
+            if(fileName.indexOf(c) != -1){ // check if exists inside
                 score ++;
+            } else {
+                score --;
             }
         }
 
         // allow for small mistakes
-        if(score > word.length() - 1){
+        if(score >= word.length() - 1){
             return 1;
         } else {
             return 0;

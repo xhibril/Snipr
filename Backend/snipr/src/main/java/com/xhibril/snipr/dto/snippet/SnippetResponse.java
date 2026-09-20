@@ -14,11 +14,25 @@ public class SnippetResponse {
     private List<String> tags;
     private Integer tagAmount;
 
-    public SnippetResponse(String title, String body, String name) {
+    public SnippetResponse(
+            Long id,
+            String name,
+            String title,
+            String body,
+            List<String> tags,
+            Boolean isPinned,
+            Long folderId
+    ) {
+        this.id = id;
+        this.name = name;
         this.title = title;
         this.body = body;
-        this.name = name;
+        this.tags = tags;
+        this.isPinned = isPinned;
+        this.folderId = folderId;
     }
+
+
 
     public SnippetResponse(String message) {
         this.message = message;

@@ -46,8 +46,9 @@ export default function FileExplorer({
   const [isCreatingItem, setIsCreatingItem] = useState(false);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [filterTags, setFilterTags] = useState([]);
-
   const nav = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoadingSearching, setIsLoadingSearching] = useState(false);
 
   // updating input field for creating folder or file
   useEffect(() => {
@@ -77,34 +78,63 @@ export default function FileExplorer({
     }
   }, [isCreatingItem, isCreatingFolder]);
 
+  async function searchItems() {
+    const res = await ApiFetch(
+      "/snippets/find",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tags: filterTags, query: searchQuery }),
+      },
+      notify,
+      nav,
+    );
 
+    const data = await res.json();
 
-  function getAvailableName(name, items){
+    if (!res.ok) {
+      notify("Failed to search, please try again", "ERROR");
+      return;
+    }
+
+    setFiles(data);
+    setIsLoadingSearching(false)
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchItems();
+
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  function getAvailableName(name, items) {
     // name exists
-    if(items.some((item) => item.name === name)){
+    if (items.some((item) => item.name === name)) {
       return null;
     }
 
     const trimmedName = name.trim();
 
-    if(!trimmedName){
+    if (!trimmedName) {
       name = isCreatingFolder ? "New Folder" : "New File";
     } else {
       name = trimmedName;
     }
 
     // name doesnt exist
-    if(!items.some((item) => item.name === name)){
+    if (!items.some((item) => item.name === name)) {
       return name;
     }
 
     let counter = 2;
 
-    while(items.some((item) => item.name === `${name} (${counter})`)){
+    while (items.some((item) => item.name === `${name} (${counter})`)) {
       counter++;
     }
-      return `${name} (${counter})`;
-
+    return `${name} (${counter})`;
   }
 
   async function handleCreateItem(path, itemName) {
@@ -113,32 +143,28 @@ export default function FileExplorer({
 
     const inputRes = ValidateInput(itemName, "GENERAL");
 
-    console.log("INPUT:", JSON.stringify(itemName));
-console.log("TYPE:", typeof itemName);
-console.log("RESULT:", ValidateInput(itemName, "GENERAL"));
-
-    if(inputRes !== "VALID"){
+    if (inputRes !== "VALID") {
       notify(`Invalid ${isFolder ? "folder" : "file"} name`, "ERROR");
       return;
     }
 
     itemName = getAvailableName(itemName, items);
 
-    if(!itemName){
+    if (!itemName) {
       notify(`This ${isFolder ? "folder" : "file"} already exists`);
       return;
     }
 
-    const folderId = selectedItem?.type === "FOLDER" ? selectedItem.data.id : null;
+    const folderId =
+      selectedItem?.type === "FOLDER" ? selectedItem.data.id : null;
 
-    const previous = structuredClone(items)
+    const previous = structuredClone(items);
 
-    const newItem = isFolder ? 
-    { name: itemName } :
-    { name: itemName, folderId : folderId};
+    const newItem = isFolder
+      ? { name: itemName }
+      : { name: itemName, folderId: folderId };
 
-
-    if(isFolder){
+    if (isFolder) {
       setFolders((prev) => [...prev, newItem]);
     } else {
       setFiles((prev) => [...prev, newItem]);
@@ -148,30 +174,32 @@ console.log("RESULT:", ValidateInput(itemName, "GENERAL"));
       path,
       {
         method: "POST",
-        headers: { "Content-Type" : "application/json"},
-        body: JSON.stringify(newItem)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newItem),
       },
       notify,
-      nav
+      nav,
     );
 
-
-    if(!res){
+    if (!res) {
       rollBack(isFolder, previous);
       return;
     }
 
     const data = await res.json();
 
-    if(!res.ok){
-      notify(data.message || `Something went wrong while creating ${isFolder ? "folder" : "file"}`, 
-      "ERROR");
+    if (!res.ok) {
+      notify(
+        data.message ||
+          `Something went wrong while creating ${isFolder ? "folder" : "file"}`,
+        "ERROR",
+      );
 
       rollBack(isFolder, previous);
       return;
     }
 
-     if (isFolder) {
+    if (isFolder) {
       setFolders((prev) =>
         prev.map((folder) => (folder === newItem ? data : folder)),
       );
@@ -318,9 +346,6 @@ console.log("RESULT:", ValidateInput(itemName, "GENERAL"));
 
     setDraft(data);
     setOriginal(data);
-
-
-    console.log("SELECTED FILEEEE: " + data.title + data.body + data.tags);
   }
 
   function rollBack(isFolder, previous) {
@@ -332,14 +357,16 @@ console.log("RESULT:", ValidateInput(itemName, "GENERAL"));
   const sortedFolders = [...folders].sort((a, b) => b.isPinned - a.isPinned);
   const sortedFiles = [...files].sort((a, b) => b.isPinned - a.isPinned);
 
+  const isSearching = searchQuery.trim() !== "";
+
   return (
     <>
       <div className={styles.fileExplorer}>
         <div className={styles.snippetControls}>
           <RiFolderAddLine
             className={styles.snippetAction}
-            onClick={() => {~
-              setCreatingState({
+            onClick={() => {
+              ~setCreatingState({
                 type: "FOLDER",
                 tick: Date.now(),
               });
@@ -397,6 +424,12 @@ console.log("RESULT:", ValidateInput(itemName, "GENERAL"));
               type="text"
               className={styles.searchField}
               placeholder="Search"
+              value={searchQuery}
+              onChange={(e) =>{
+                  const value = e.target.value;
+    setSearchQuery(value);
+    setIsLoadingSearching(value.trim() !== "");
+              }}
             />
 
             <FiSearch className={styles.searchIcon} />
@@ -459,160 +492,165 @@ console.log("RESULT:", ValidateInput(itemName, "GENERAL"));
             moveSnippet(snippet);
           }}
         >
-          {sortedFolders.map((folder, index) => (
-            <div
-              key={folder.id}
-              className={styles.folderItem}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.stopPropagation(); // prevent outer container from firing
-                const file = JSON.parse(e.dataTransfer.getData("file"));
-
-                const snippet = {
-                  ...file,
-                  folderId: folder.id,
-                };
-
-                if (file.folderId !== folder.id) {
-                  moveSnippet(snippet);
-                }
-              }}
-            >
+          {!isSearching &&
+            sortedFolders.map((folder, index) => (
               <div
-                className={`${styles.folderHeader} ${
-                  selectedItem?.type === "FOLDER" &&
-                  selectedItem?.data?.id === folder?.id
-                    ? styles.selected
-                    : ""
-                }`}
-                onClick={() => {
-                  if (
-                    selectedItem?.type === "FOLDER" &&
-                    selectedItem?.data?.id === folder?.id
-                  ) {
-                    setSelectedItem(null);
-                  } else {
-                    setSelectedItem({
-                      type: "FOLDER",
-                      data: folder,
-                    });
+                key={folder.id}
+                className={styles.folderItem}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.stopPropagation(); // prevent outer container from firing
+                  const file = JSON.parse(e.dataTransfer.getData("file"));
+
+                  const snippet = {
+                    ...file,
+                    folderId: folder.id,
+                  };
+
+                  if (file.folderId !== folder.id) {
+                    moveSnippet(snippet);
                   }
-
-                  if (foldersToggled.includes(index)) {
-                    setFoldersToggle(
-                      foldersToggled.filter((folder) => folder !== index),
-                    );
-                  } else {
-                    setFoldersToggle([...foldersToggled, index]);
-                  }
-                }}
-              >
-                <RiFolderFill className={styles.folderIcon} />
-
-                {folder.isPinned && (
-                  <RiPushpinFill
-                    onClick={(e) => {
-                      const item = {
-                        type: "FOLDER",
-                        data: folder,
-                      };
-
-                      e.stopPropagation();
-                      updateItemPinStatus(item);
-                    }}
-                  />
-                )}
-
-                <p className={styles.folderName}>{folder.name}</p>
-                {foldersToggled.includes(index) ? (
-                  <FiChevronUp className={styles.toggleFolder} />
-                ) : (
-                  <FiChevronDown className={styles.toggleFolder} />
-                )}
-              </div>
-
-              <div
-                className={`${styles.folderFiles} ${foldersToggled.includes(index) ? styles.show : ""}`}
-              >
-                {/*add files belonging to folders */}
-                {sortedFiles
-                  .filter((file) => file.folderId === folder.id)
-                  .map((file) => (
-                    <div
-                      key={file.id}
-                      className={styles.fileItem}
-                      draggable={true}
-                      onDragStart={(e) => {
-                        e.dataTransfer.setData("file", JSON.stringify(file));
-                      }}
-                    >
-                      <div
-                        className={`${styles.fileHeader} ${
-                          selectedItem?.type === "FILE" &&
-                          selectedItem?.data?.id === file?.id
-                            ? styles.selected
-                            : ""
-                        }`}
-                        onClick={() => {
-                          selectFile(file);
-                        }}
-                      >
-                        <RiFile2Fill className={styles.fileIcon} />
-                        {file.isPinned && (
-                          <RiPushpinFill
-                            onClick={(e) => {
-                              const item = {
-                                type: "FILE",
-                                data: file,
-                              };
-
-                              e.stopPropagation();
-                              updateItemPinStatus(item);
-                            }}
-                          />
-                        )}
-                        <p className={styles.fileName}>{file.name}</p>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          ))}
-
-          {sortedFiles
-            .filter((file) => file.folderId === null)
-            .map((file) => (
-              <div
-                key={file.id}
-                className={styles.fileItem}
-                draggable={true}
-                onDragStart={(e) => {
-                  e.dataTransfer.setData("file", JSON.stringify(file));
                 }}
               >
                 <div
-                  className={`${styles.fileHeader} ${selectedItem?.type === "FILE" && selectedItem?.data?.id === file?.id ? styles.selected : ""}`}
+                  className={`${styles.folderHeader} ${
+                    selectedItem?.type === "FOLDER" &&
+                    selectedItem?.data?.id === folder?.id
+                      ? styles.selected
+                      : ""
+                  }`}
                   onClick={() => {
-                    selectFile(file);
+                    if (
+                      selectedItem?.type === "FOLDER" &&
+                      selectedItem?.data?.id === folder?.id
+                    ) {
+                      setSelectedItem(null);
+                    } else {
+                      setSelectedItem({
+                        type: "FOLDER",
+                        data: folder,
+                      });
+                    }
+
+                    if (foldersToggled.includes(index)) {
+                      setFoldersToggle(
+                        foldersToggled.filter((folder) => folder !== index),
+                      );
+                    } else {
+                      setFoldersToggle([...foldersToggled, index]);
+                    }
                   }}
                 >
-                  <RiFile2Fill className={styles.fileIcon} />
-                  {file.isPinned && (
+                  <RiFolderFill className={styles.folderIcon} />
+
+                  {folder.isPinned && (
                     <RiPushpinFill
                       onClick={(e) => {
                         const item = {
-                          type: "FILE",
-                          data: file,
+                          type: "FOLDER",
+                          data: folder,
                         };
+
                         e.stopPropagation();
                         updateItemPinStatus(item);
                       }}
                     />
                   )}
-                  <p className={styles.fileName}>{file.name}</p>
+
+                  <p className={styles.folderName}>{folder.name}</p>
+                  {foldersToggled.includes(index) ? (
+                    <FiChevronUp className={styles.toggleFolder} />
+                  ) : (
+                    <FiChevronDown className={styles.toggleFolder} />
+                  )}
+                </div>
+
+                <div
+                  className={`${styles.folderFiles} ${foldersToggled.includes(index) ? styles.show : ""}`}
+                >
+                  {/*add files belonging to folders */}
+                  {sortedFiles
+                    .filter((file) => file.folderId === folder.id)
+                    .map((file) => (
+                      <div
+                        key={file.id}
+                        className={styles.fileItem}
+                        draggable={true}
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData("file", JSON.stringify(file));
+                        }}
+                      >
+                        <div
+                          className={`${styles.fileHeader} ${
+                            selectedItem?.type === "FILE" &&
+                            selectedItem?.data?.id === file?.id
+                              ? styles.selected
+                              : ""
+                          }`}
+                          onClick={() => {
+                            selectFile(file);
+                          }}
+                        >
+                          <RiFile2Fill className={styles.fileIcon} />
+                          {file.isPinned && (
+                            <RiPushpinFill
+                              onClick={(e) => {
+                                const item = {
+                                  type: "FILE",
+                                  data: file,
+                                };
+
+                                e.stopPropagation();
+                                updateItemPinStatus(item);
+                              }}
+                            />
+                          )}
+                          <p className={styles.fileName}>{file.name}</p>
+                        </div>
+                      </div>
+                    ))}
                 </div>
               </div>
             ))}
+
+          {isLoadingSearching ? (
+            <p className={styles.searchStatus}>Searching...</p>
+          ) : (
+            sortedFiles
+              .filter((file) => isSearching || file.folderId === null)
+              .map((file) => (
+                <div
+                  key={file.id}
+                  className={styles.fileItem}
+                  draggable={true}
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData("file", JSON.stringify(file));
+                  }}
+                >
+                  <div
+                    className={`${styles.fileHeader} ${selectedItem?.type === "FILE" && selectedItem?.data?.id === file?.id ? styles.selected : ""}`}
+                    onClick={() => {
+                      selectFile(file);
+                    }}
+                  >
+                    <RiFile2Fill className={styles.fileIcon} />
+                    {file.isPinned && (
+                      <RiPushpinFill
+                        onClick={(e) => {
+                          const item = {
+                            type: "FILE",
+                            data: file,
+                          };
+                          e.stopPropagation();
+                          updateItemPinStatus(item);
+                        }}
+                      />
+                    )}
+                    <p className={styles.fileName}>{file.name}</p>
+                  </div>
+                </div>
+              ))
+          )}
         </div>
       </div>
     </>

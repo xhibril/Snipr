@@ -22,10 +22,4 @@ public class SearchController {
 
         return searchService.searchSnippets(userId, request.getQuery(), request.getTags());
     }
-
-
-
-
-
-
 }
