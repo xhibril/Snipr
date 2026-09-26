@@ -1,5 +1,6 @@
 import styles from "./FileExplorer.module.css";
 import { ValidateInput } from "../../utils/Validation.jsx";
+import SearchFiles from "../../utils/Search.jsx";
 
 import {
   FiX,
@@ -48,7 +49,7 @@ export default function FileExplorer({
   const [filterTags, setFilterTags] = useState([]);
   const nav = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoadingSearching, setIsLoadingSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
 
   // updating input field for creating folder or file
   useEffect(() => {
@@ -78,27 +79,10 @@ export default function FileExplorer({
     }
   }, [isCreatingItem, isCreatingFolder]);
 
+
   async function searchItems() {
-    const res = await ApiFetch(
-      "/snippets/find",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tags: filterTags, query: searchQuery }),
-      },
-      notify,
-      nav,
-    );
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      notify("Failed to search, please try again", "ERROR");
-      return;
-    }
-
-    setFiles(data);
-    setIsLoadingSearching(false)
+   const result = SearchFiles(files, searchQuery, filterTags)
+    setSearchResults(result);
   }
 
   useEffect(() => {
@@ -108,7 +92,9 @@ export default function FileExplorer({
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [searchQuery, filterTags]);
+
+
 
   function getAvailableName(name, items) {
     // name exists
@@ -288,8 +274,8 @@ export default function FileExplorer({
       return;
     }
 
-    notify(data.message, "SUCCESS");
-    setIsViewingFile(false);
+   setIsViewingFile(false);
+setSelectedItem(null);
   }
 
   async function moveSnippet(snippet) {
@@ -357,7 +343,11 @@ export default function FileExplorer({
   const sortedFolders = [...folders].sort((a, b) => b.isPinned - a.isPinned);
   const sortedFiles = [...files].sort((a, b) => b.isPinned - a.isPinned);
 
-  const isSearching = searchQuery.trim() !== "";
+const isSearching =
+ searchQuery.trim() !== "" || filterTags.length > 0;
+
+
+ const displayedFiles = isSearching ? searchResults : sortedFiles;
 
   return (
     <>
@@ -428,7 +418,6 @@ export default function FileExplorer({
               onChange={(e) =>{
                   const value = e.target.value;
     setSearchQuery(value);
-    setIsLoadingSearching(value.trim() !== "");
               }}
             />
 
@@ -569,7 +558,7 @@ export default function FileExplorer({
                   className={`${styles.folderFiles} ${foldersToggled.includes(index) ? styles.show : ""}`}
                 >
                   {/*add files belonging to folders */}
-                  {sortedFiles
+                  {displayedFiles
                     .filter((file) => file.folderId === folder.id)
                     .map((file) => (
                       <div
@@ -613,10 +602,7 @@ export default function FileExplorer({
               </div>
             ))}
 
-          {isLoadingSearching ? (
-            <p className={styles.searchStatus}>Searching...</p>
-          ) : (
-            sortedFiles
+           { displayedFiles
               .filter((file) => isSearching || file.folderId === null)
               .map((file) => (
                 <div
@@ -650,7 +636,7 @@ export default function FileExplorer({
                   </div>
                 </div>
               ))
-          )}
+            }
         </div>
       </div>
     </>
