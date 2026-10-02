@@ -1,10 +1,7 @@
 package com.xhibril.snipr.controller;
 import com.xhibril.snipr.dto.api.ApiResponse;
 import com.xhibril.snipr.dto.snippet.*;
-import com.xhibril.snipr.model.Folder;
-import com.xhibril.snipr.model.Snippet;
 import com.xhibril.snipr.service.SnippetService;
-import jakarta.persistence.PreUpdate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,19 +68,46 @@ public class SnippetController {
         return snippetService.deleteFolder(userId, folderId);
     }
 
+
+    @DeleteMapping("/snippets/{snippetId}/permanent")
+    public ResponseEntity<ApiResponse> permanentlyDeleteSnippet(@PathVariable Long snippetId){
+        Long userId = 1L;
+
+        return snippetService.permanentlyDeleteSnippet(userId, snippetId);
+    }
+
+    @DeleteMapping("/folders/{folderId}/permanent")
+    public ResponseEntity<ApiResponse> permanentlyDeleteFolder(@PathVariable Long folderId){
+        Long userId = 1L;
+
+        return snippetService.permanentlyDeleteFolder(userId, folderId);
+    }
+
+
+
     @GetMapping("/folders")
-    public List<FolderResponse> getFolders(){
+    public List<FolderResponse> getFolders(
+            @RequestParam(required = false) Boolean shared,
+            @RequestParam(required = false) Boolean starred,
+            @RequestParam(required = false) Boolean deleted
+    ){
         Long userId = 1L; // place holder;
 
-        return snippetService.getFolders(userId);
+        return snippetService.getFolders(userId, shared, starred, deleted);
     }
 
     @GetMapping("/snippets")
-    public List<SnippetResponse> getSnippets(){
+    public List<SnippetResponse> getSnippets(
+            @RequestParam(required = false) Boolean shared,
+            @RequestParam(required = false) Boolean starred,
+            @RequestParam(required = false) Boolean deleted
+    ){
         Long userId = 1L; // place holder;
 
-        return snippetService.getSnippets(userId);
+        return snippetService.getSnippets(userId, shared, starred, deleted);
     }
+
+
 
 
     @PatchMapping("/snippets")

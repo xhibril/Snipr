@@ -40,6 +40,8 @@ export default function FileExplorer({
   setIsViewingFile,
   setDraft,
   setOriginal,
+  activePage,
+  setActivePage
 }) {
   const [toggleSearchFilter, setToggleSearchFilter] = useState(false);
   const inputRef = useRef(null);

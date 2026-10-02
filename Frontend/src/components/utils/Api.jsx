@@ -25,9 +25,5 @@ export default async function ApiFetch(url, options = {}, notify, nav){
 
 
     return res;
-
-
-
-
-
 }
+

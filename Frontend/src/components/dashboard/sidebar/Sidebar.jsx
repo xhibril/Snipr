@@ -11,7 +11,7 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 
-export default function Sidebar({ toggleSettings, setToggleSettings }) {
+export default function Sidebar({ toggleSettings, setToggleSettings, activePage, setActivePage }) {
     
   return (
     <div className={styles.sideBar}>
@@ -21,22 +21,26 @@ export default function Sidebar({ toggleSettings, setToggleSettings }) {
       </div>
 
       <div className={styles.options}>
-        <button className={styles.optionRow}>
+        <button className={styles.optionRow}
+        onClick={() => setActivePage("files")}>
           <FiFolder className={styles.optionIcon} />
           <p className={styles.optionText}>My Files</p>
         </button>
 
-        <button className={styles.optionRow}>
+        <button className={styles.optionRow}
+        onClick={() => setActivePage("shared")}>
           <FiShare2 className={styles.optionIcon} />
           <p className={styles.optionText}>Shared Files</p>
         </button>
 
-        <button className={styles.optionRow}>
+        <button className={styles.optionRow}
+        onClick={() => setActivePage("starred")}>
           <FiStar className={styles.optionIcon} />
           <p className={styles.optionText}>Starred</p>
         </button>
 
-        <button className={styles.optionRow}>
+        <button className={styles.optionRow}
+        onClick={() => setActivePage("trash")}>
           <FiTrash className={styles.optionIcon} />
           <p className={styles.optionText}>Trash</p>
         </button>

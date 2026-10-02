@@ -19,7 +19,9 @@ export default function FileEditor({
   draft,
   original,
   setDraft,
-  setOriginal
+  setOriginal,
+    activePage,
+  setActivePage
 }) {
 
   return (

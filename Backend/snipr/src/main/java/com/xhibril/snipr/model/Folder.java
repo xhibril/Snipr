@@ -16,6 +16,8 @@ public class Folder {
     private String name;
     private Boolean isPinned;
 
+    private Boolean isDeleted;
+    private Boolean isShared;
 
     public Long getId() { return id; }
     public User getUser() { return user; }
@@ -32,5 +34,22 @@ public class Folder {
 
     public Boolean getIsPinned(){
         return isPinned;
+    }
+
+    public Boolean getIsDeleted(){
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted){
+        this.isDeleted = isDeleted;
+    }
+
+
+    public void setIsShared(Boolean isShared){
+        this.isShared = isShared;
+    }
+
+    public Boolean getIsShared(){
+        return isShared;
     }
 }

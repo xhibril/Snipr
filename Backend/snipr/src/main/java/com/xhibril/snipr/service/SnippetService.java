@@ -148,70 +148,146 @@ public class SnippetService {
     public ResponseEntity<ApiResponse> deleteSnippet(Long userId, Long snippetId) {
         Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, snippetId);
 
-        if (snippetOpt.isPresent()) {
-            snippetRepo.deleteById(snippetId);
-
-            return ResponseEntity.ok().body(new ApiResponse("Snippet deleted"));
-        } else {
+        if(snippetOpt.isEmpty()){
             return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
         }
+
+        Snippet snippet = snippetOpt.get();
+        snippet.setIsDeleted(true);
+        snippetRepo.save(snippet);
+
+        return ResponseEntity.ok().body(new ApiResponse("Snippet moved to trash"));
     }
+
+
+    @Transactional
+    public ResponseEntity<ApiResponse> permanentlyDeleteSnippet(Long userId, Long snippetId){
+        Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, snippetId);
+
+        if(snippetOpt.isEmpty()){
+            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
+        }
+
+        Snippet snippet = snippetOpt.get();
+
+        if(!Boolean.TRUE.equals(snippet.getIsDeleted())){
+            return ResponseEntity.badRequest().body(new ApiResponse("Snippet is not in trash"));
+        }
+
+        snippetRepo.delete(snippet);
+
+        return ResponseEntity.ok().body(new ApiResponse("Snippet permanently deleted"));
+    }
+
+
 
     @Transactional
     public ResponseEntity<ApiResponse> deleteFolder(Long userId, Long folderId) {
         Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, folderId);
 
-        if (folderOpt.isPresent()) {
-            // delete all snippets inside of folder
-            snippetRepo.deleteByUserIdAndFolderId(userId, folderId);
-
-            folderRepo.deleteById(folderId);
-
-            return ResponseEntity.ok().body(new ApiResponse("Successfully deleted"));
-        } else {
+        if(folderOpt.isEmpty()){
             return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
         }
+
+        Folder folder = folderOpt.get();
+
+        folder.setIsDeleted(true);
+        folderRepo.save(folder);
+        snippetRepo.updateDeletedByUserIdAndFolderId(userId, folderId, true);
+
+        return ResponseEntity.ok().body(new ApiResponse("Folder moved to trash"));
     }
 
-    public List<FolderResponse> getFolders(Long userId) {
-        List<Folder> folders = folderRepo.findByUserId(userId);
-        List<FolderResponse> foldersToReturn = new ArrayList<>();
 
+    @Transactional
+    public ResponseEntity<ApiResponse> permanentlyDeleteFolder(Long userId, Long folderId){
+        Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, folderId);
 
-        for (Folder folder : folders) {
-            FolderResponse folderResponse = new FolderResponse();
-            folderResponse.setId(folder.getId());
-            folderResponse.setName(folder.getName());
-            folderResponse.setIsPinned(folder.getIsPinned());
-            foldersToReturn.add(folderResponse);
+        if(folderOpt.isEmpty()){
+            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
         }
 
-        return foldersToReturn;
+        Folder folder = folderOpt.get();
+
+        if(!Boolean.TRUE.equals(folder.getIsDeleted())){
+            return ResponseEntity.badRequest().body(new ApiResponse("Folder is not in trash"));
+        }
+
+        snippetRepo.deleteByUserIdAndFolderId(userId, folderId);
+        folderRepo.delete(folder);
+
+        return ResponseEntity.ok().body(new ApiResponse("Folder permanently deleted"));
     }
 
-    public List<SnippetResponse> getSnippets(Long userId) {
-        List<Snippet> snippets = snippetRepo.findByUserId(userId);
-        List<SnippetResponse> snippetsToReturn = new ArrayList<>();
+    public List<FolderResponse> getFolders(Long userId, Boolean shared, Boolean starred, Boolean deleted) {
+        List<Folder> folders;
 
-        for (Snippet snippet : snippets) {
-            SnippetResponse snippetResponse = new SnippetResponse();
-
-            if (snippet.getFolder() != null) {
-                Folder folder = snippet.getFolder();
-                snippetResponse.setFolderId(folder.getId());
-            }
-
-            snippetResponse.setId(snippet.getId());
-            snippetResponse.setName(snippet.getFileName());
-            snippetResponse.setBody(snippet.getBody());
-            snippetResponse.setTitle(snippet.getTitle());
-            snippetResponse.setIsPinned(snippet.getIsPinned());
-            snippetResponse.setTags(snippet.getTags());
-            snippetResponse.setTagAmount(snippet.getTagAmount());
-            snippetsToReturn.add(snippetResponse);
+        if (Boolean.TRUE.equals(starred)) {
+            folders = folderRepo.findByUserIdAndIsPinned(userId, true);
+        } else if (Boolean.TRUE.equals(shared)) {
+            folders = folderRepo.findByUserIdAndIsShared(userId, true);
+        } else if (Boolean.TRUE.equals(deleted)) {
+            folders = folderRepo.findByUserIdAndIsDeleted(userId, true);
+        } else {
+            folders = folderRepo.findByUserId(userId);
         }
 
-        return snippetsToReturn;
+
+        return folders.stream()
+                .map(this::toFolderResponse)
+                .toList();
+    }
+
+
+    public FolderResponse toFolderResponse(Folder folder){
+        FolderResponse folderResponse = new FolderResponse();
+        folderResponse.setId(folder.getId());
+        folderResponse.setName(folder.getName());
+        folderResponse.setIsPinned(folder.getIsPinned());
+        return folderResponse;
+    }
+
+
+
+
+
+    public List<SnippetResponse> getSnippets(Long userId, Boolean shared, Boolean starred, Boolean deleted) {
+        List<Snippet> snippets;
+
+        if (Boolean.TRUE.equals(starred)) {
+            snippets = snippetRepo.findByUserIdAndIsPinned(userId, true);
+        } else if (Boolean.TRUE.equals(shared)) {
+            snippets = snippetRepo.findByUserIdAndIsShared(userId, true);
+        } else if (Boolean.TRUE.equals(deleted)) {
+            snippets = snippetRepo.findByUserIdAndIsDeleted(userId, true);
+        } else {
+            snippets = snippetRepo.findByUserId(userId);
+        }
+
+
+        return snippets.stream()
+                .map(this::toSnippetResponse)
+                .toList();
+    }
+
+
+    public SnippetResponse toSnippetResponse(Snippet snippet){
+        SnippetResponse snippetResponse = new SnippetResponse();
+        if (snippet.getFolder() != null) {
+            Folder folder = snippet.getFolder();
+            snippetResponse.setFolderId(folder.getId());
+        }
+
+        snippetResponse.setId(snippet.getId());
+        snippetResponse.setName(snippet.getFileName());
+        snippetResponse.setBody(snippet.getBody());
+        snippetResponse.setTitle(snippet.getTitle());
+        snippetResponse.setIsPinned(snippet.getIsPinned());
+        snippetResponse.setTags(snippet.getTags());
+        snippetResponse.setTagAmount(snippet.getTagAmount());
+
+
+        return snippetResponse;
     }
 
 
@@ -253,8 +329,6 @@ public class SnippetService {
 
 
     public ResponseEntity<SnippetResponse> updateSnippet(Long userId, SnippetRequest request) {
-
-        System.out.println("TAGSSSSSSSSS: "+ request.getTags() );
         Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, request.getId());
 
         if (snippetOpt.isPresent()) {
@@ -302,8 +376,6 @@ public class SnippetService {
             snippetRes.setTags(snippet.getTags());
             snippetRes.setTagAmount(snippet.getTagAmount());
             snippetRes.setMessage("Snippet updated");
-
-            System.out.println("TAG AMOUNT: " + snippet.getTagAmount());
 
             return ResponseEntity.ok().body(snippetRes);
         } else {

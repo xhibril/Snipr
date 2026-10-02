@@ -28,6 +28,13 @@ public class Snippet {
     @Column(name = "tag_amount")
     private Integer tagAmount;
 
+    private Boolean isDeleted;
+
+
+    private Boolean isShared;
+
+
+
 
 
 
@@ -99,12 +106,29 @@ public class Snippet {
     }
 
 
+    public Boolean getIsDeleted(){
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted){
+        this.isDeleted = isDeleted;
+    }
+
     public void setTagAmount(Integer tagAmount){
         this.tagAmount = tagAmount;
     }
 
     public Integer getTagAmount(){
         return tagAmount;
+    }
+
+
+    public Boolean getIsShared(){
+        return isShared;
+    }
+
+    public void setIsShared(Boolean isShared){
+        this.isShared = isShared;
     }
 }
 

@@ -35,4 +35,16 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
 
 
     List<Snippet> findByUserId(Long userId);
+
+    @Modifying
+            @Query("UPDATE Snippet s SET s.isDeleted = :isDeleted WHERE s.user.id = :userId AND s.folder.id = :folderId")
+    void updateDeletedByUserIdAndFolderId(@Param("userId") Long userId,
+                                          @Param("folderId") Long folderId,
+                                          @Param("isDeleted") Boolean isDeleted);
+
+    List<Snippet> findByUserIdAndIsPinned(Long userId, Boolean isPinned);
+
+    List<Snippet> findByUserIdAndIsShared(Long userId, Boolean isShared);
+
+    List<Snippet> findByUserIdAndIsDeleted(Long userId, Boolean isDeleted);
 }

@@ -18,6 +18,20 @@ export default function Dashboard({ notify }) {
   const [selectedItem, setSelectedItem] = useState(null);
   const nav = useNavigate();
 
+ const [activePage, setActivePage] = useState("files");
+
+const endpoint = {
+  files: "",
+  shared: "?shared=true",
+  starred: "?starred=true",
+  trash: "?deleted=true",
+};
+
+const endpointSuffix = endpoint[activePage];
+
+const endpointSnippet = `/snippets${endpointSuffix}`;
+const endpointFolders = `/folders${endpointSuffix}`;
+
   const [creatingState, setCreatingState] = useState({
     type: null,
     tick: 0,
@@ -60,7 +74,7 @@ export default function Dashboard({ notify }) {
   }, [selectedItem]);
 
   async function fetchFolders() {
-    const res = await ApiFetch("/folders", { method: "GET" }, notify, nav);
+    const res = await ApiFetch(endpointFolders, { method: "GET" }, notify, nav);
 
     if (!res) return;
 
@@ -76,10 +90,10 @@ export default function Dashboard({ notify }) {
   useEffect(() => {
     fetchFolders();
     fetchFiles();
-  }, []);
+  }, [activePage]);
 
   async function fetchFiles() {
-    const res = await ApiFetch("/snippets", { method: "GET" }, notify, nav);
+    const res = await ApiFetch(endpointSnippet, { method: "GET" }, notify, nav);
 
     if (!res) return;
 
@@ -171,6 +185,8 @@ export default function Dashboard({ notify }) {
         <Sidebar
           toggleSettings={toggleSettings}
           setToggleSettings={setToggleSettings}
+          activePage={activePage}
+          setActivePage = {setActivePage}
         />
 
         <FileExplorer
@@ -193,6 +209,8 @@ export default function Dashboard({ notify }) {
           setDraft={setDraft}
           updateSnippet={updateSnippet}
           setIsViewingFile={setIsViewingFile}
+                   activePage={activePage}
+          setActivePage = {setActivePage}
         />
 
         <FileEditor
@@ -211,6 +229,8 @@ export default function Dashboard({ notify }) {
           setNewTag={setNewTag}
           newTag={newTag}
           updateSnippet={updateSnippet}
+                   activePage={activePage}
+          setActivePage = {setActivePage}
         />
       </div>
     </div>
