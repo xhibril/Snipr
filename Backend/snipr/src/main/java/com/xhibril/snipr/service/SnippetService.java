@@ -229,7 +229,7 @@ public class SnippetService {
         } else if (Boolean.TRUE.equals(deleted)) {
             folders = folderRepo.findByUserIdAndIsDeleted(userId, true);
         } else {
-            folders = folderRepo.findByUserId(userId);
+            folders = folderRepo.findByUserIdAndIsDeletedFalse(userId);
         }
 
 
@@ -261,7 +261,7 @@ public class SnippetService {
         } else if (Boolean.TRUE.equals(deleted)) {
             snippets = snippetRepo.findByUserIdAndIsDeleted(userId, true);
         } else {
-            snippets = snippetRepo.findByUserId(userId);
+            snippets = snippetRepo.findByUserIdAndIsDeletedFalse(userId);
         }
 
 

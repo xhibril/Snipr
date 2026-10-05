@@ -16,7 +16,7 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
     Optional<Folder> findByUserIdAndId(Long userId, Long folderId);
 
 
-    List<Folder> findByUserId(Long userId);
+    List<Folder> findByUserIdAndIsDeletedFalse(Long userId);
 
     @Modifying
     @Query("UPDATE Folder f SET f.isPinned = :isPinned  WHERE f.id = :folderId")

@@ -14,10 +14,10 @@ public class Folder {
     private User user;
 
     private String name;
-    private Boolean isPinned;
+    private Boolean isPinned = false;
 
-    private Boolean isDeleted;
-    private Boolean isShared;
+    private Boolean isDeleted = false;
+    private Boolean isShared = false;
 
     public Long getId() { return id; }
     public User getUser() { return user; }

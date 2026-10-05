@@ -1,6 +1,10 @@
 import styles from "./FileExplorer.module.css";
 import { ValidateInput } from "../../utils/Validation.jsx";
 import SearchFiles from "../../utils/Search.jsx";
+import ExplorerToolBar from "./ExplorerToolBar";
+import SearchBar from "./SearchBar";
+import FolderItem from "./FolderItem.jsx";
+import FileItem from "./FileItem.jsx";
 
 import {
   FiX,
@@ -41,11 +45,11 @@ export default function FileExplorer({
   setDraft,
   setOriginal,
   activePage,
-  setActivePage
+  setActivePage,
 }) {
   const [toggleSearchFilter, setToggleSearchFilter] = useState(false);
   const inputRef = useRef(null);
-  const [foldersToggled, setFoldersToggle] = useState([]);
+  const [openFolders, setOpenFolders] = useState([]);
   const [isCreatingItem, setIsCreatingItem] = useState(false);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [filterTags, setFilterTags] = useState([]);
@@ -81,22 +85,18 @@ export default function FileExplorer({
     }
   }, [isCreatingItem, isCreatingFolder]);
 
-
   async function searchItems() {
-   const result = SearchFiles(files, searchQuery, filterTags)
+    const result = SearchFiles(pageFiles, searchQuery, filterTags);
     setSearchResults(result);
   }
 
   useEffect(() => {
     const timer = setTimeout(() => {
       searchItems();
-
     }, 300);
 
     return () => clearTimeout(timer);
   }, [searchQuery, filterTags]);
-
-
 
   function getAvailableName(name, items) {
     // name exists
@@ -276,8 +276,8 @@ export default function FileExplorer({
       return;
     }
 
-   setIsViewingFile(false);
-setSelectedItem(null);
+    setIsViewingFile(false);
+    setSelectedItem(null);
   }
 
   async function moveSnippet(snippet) {
@@ -345,129 +345,44 @@ setSelectedItem(null);
   const sortedFolders = [...folders].sort((a, b) => b.isPinned - a.isPinned);
   const sortedFiles = [...files].sort((a, b) => b.isPinned - a.isPinned);
 
-const isSearching =
- searchQuery.trim() !== "" || filterTags.length > 0;
+  const isSearching = searchQuery.trim() !== "" || filterTags.length > 0;
+
+const pageFiles = {
+  REGULAR: sortedFiles.filter((file) => file.folderId === null),
+  SHARED: sortedFiles.filter((file) => file.folderId === null),
+  STARRED: sortedFiles.filter((file) => file.folderId === null),
+  DELETED: sortedFiles,
+}[activePage];
+
+const displayedFiles = isSearching
+  ? searchResults
+  : pageFiles;
 
 
- const displayedFiles = isSearching ? searchResults : sortedFiles;
+
 
   return (
     <>
       <div className={styles.fileExplorer}>
-        <div className={styles.snippetControls}>
-          <RiFolderAddLine
-            className={styles.snippetAction}
-            onClick={() => {
-              ~setCreatingState({
-                type: "FOLDER",
-                tick: Date.now(),
-              });
-            }}
-          />
+        <ExplorerToolBar
+          setCreatingState={setCreatingState}
+          deleteItem={deleteItem}
+          updateItemPinStatus={updateItemPinStatus}
+          handleCreateItem={handleCreateItem}
+          selectedItem={selectedItem}
+          isCreatingItem={isCreatingItem}
+          isCreatingFolder={isCreatingFolder}
+          inputRef={inputRef}
+        />
 
-          <RiFileAddLine
-            className={styles.snippetAction}
-            onClick={() => {
-              setCreatingState({
-                type: "FILE",
-                tick: Date.now(),
-              });
-            }}
-          />
-
-          <FiTrash
-            className={styles.snippetAction}
-            onClick={() => deleteItem()}
-          />
-          <FiStar
-            className={styles.snippetAction}
-            onClick={() => updateItemPinStatus(selectedItem)}
-          />
-          <FiShare2 className={styles.snippetAction} />
-        </div>
-
-        {isCreatingItem && (
-          <form
-            className={styles.addFile}
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleCreateItem(
-                isCreatingFolder ? "/folders" : "/snippets",
-                inputRef.current.value || "",
-              );
-              inputRef.current.value = "";
-            }}
-          >
-            <input
-              className={styles.addFileField}
-              ref={inputRef}
-              placeholder={isCreatingFolder ? "Folder name" : "File name"}
-            />
-
-            <button type="submit">
-              <FiPlus className={styles.addBtn} />
-            </button>
-          </form>
-        )}
-
-        <div className={styles.searchContainer}>
-          <div className={styles.search}>
-            <input
-              type="text"
-              className={styles.searchField}
-              placeholder="Search"
-              value={searchQuery}
-              onChange={(e) =>{
-                  const value = e.target.value;
-    setSearchQuery(value);
-              }}
-            />
-
-            <FiSearch className={styles.searchIcon} />
-
-            <FiSliders
-              className={styles.searchFilter}
-              onClick={() => setToggleSearchFilter(!toggleSearchFilter)}
-            />
-          </div>
-
-          <div
-            className={`${styles.filter} ${
-              toggleSearchFilter ? styles.show : ""
-            }`}
-          >
-            <div className={styles.filterFieldWrapper}>
-              <input
-                type="text"
-                className={styles.filterField}
-                placeholder="Add tags"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    setFilterTags([...filterTags, e.target.value]);
-                    e.target.value = "";
-                  }
-                }}
-              />
-              <FiPlus className={styles.addBtn} />
-            </div>
-
-            <div className={styles.filterContainer}>
-              {filterTags.map((tag, index) => (
-                <div key={index} className={styles.tag}>
-                  <p>{tag}</p>
-
-                  <FiX
-                    className={styles.removeTag}
-                    onClick={() =>
-                      setFilterTags(filterTags.filter((_, i) => i !== index))
-                    }
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <SearchBar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          toggleSearchFilter={toggleSearchFilter}
+          setToggleSearchFilter={setToggleSearchFilter}
+          filterTags={filterTags}
+          setFilterTags={setFilterTags}
+        />
 
         <div
           className={styles.snippetFiles}
@@ -475,170 +390,41 @@ const isSearching =
           onDrop={(e) => {
             const file = JSON.parse(e.dataTransfer.getData("file"));
 
-            const snippet = {
+            moveSnippet({
               ...file,
               folderId: null,
-            };
-
-            moveSnippet(snippet);
+            });
           }}
         >
           {!isSearching &&
-            sortedFolders.map((folder, index) => (
-              <div
-                key={folder.id}
-                className={styles.folderItem}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.stopPropagation(); // prevent outer container from firing
-                  const file = JSON.parse(e.dataTransfer.getData("file"));
+            sortedFolders.map((folder, index) => {
+              return (
+                <FolderItem
+                  key={folder.id}
+                  folder={folder}
+                  files={files}
+                  index={index}
+                  isOpen={openFolders.includes(index)}
+                  setOpenFolders={setOpenFolders}
+                  selectedItem={selectedItem}
+                  setSelectedItem={setSelectedItem}
+                  selectFile={selectFile}
+                  updateItemPinStatus={updateItemPinStatus}
+                  moveSnippet={moveSnippet}
+                />
+              );
+            })}
 
-                  const snippet = {
-                    ...file,
-                    folderId: folder.id,
-                  };
-
-                  if (file.folderId !== folder.id) {
-                    moveSnippet(snippet);
-                  }
-                }}
-              >
-                <div
-                  className={`${styles.folderHeader} ${
-                    selectedItem?.type === "FOLDER" &&
-                    selectedItem?.data?.id === folder?.id
-                      ? styles.selected
-                      : ""
-                  }`}
-                  onClick={() => {
-                    if (
-                      selectedItem?.type === "FOLDER" &&
-                      selectedItem?.data?.id === folder?.id
-                    ) {
-                      setSelectedItem(null);
-                    } else {
-                      setSelectedItem({
-                        type: "FOLDER",
-                        data: folder,
-                      });
-                    }
-
-                    if (foldersToggled.includes(index)) {
-                      setFoldersToggle(
-                        foldersToggled.filter((folder) => folder !== index),
-                      );
-                    } else {
-                      setFoldersToggle([...foldersToggled, index]);
-                    }
-                  }}
-                >
-                  <RiFolderFill className={styles.folderIcon} />
-
-                  {folder.isPinned && (
-                    <RiPushpinFill
-                      onClick={(e) => {
-                        const item = {
-                          type: "FOLDER",
-                          data: folder,
-                        };
-
-                        e.stopPropagation();
-                        updateItemPinStatus(item);
-                      }}
-                    />
-                  )}
-
-                  <p className={styles.folderName}>{folder.name}</p>
-                  {foldersToggled.includes(index) ? (
-                    <FiChevronUp className={styles.toggleFolder} />
-                  ) : (
-                    <FiChevronDown className={styles.toggleFolder} />
-                  )}
-                </div>
-
-                <div
-                  className={`${styles.folderFiles} ${foldersToggled.includes(index) ? styles.show : ""}`}
-                >
-                  {/*add files belonging to folders */}
-                  {displayedFiles
-                    .filter((file) => file.folderId === folder.id)
-                    .map((file) => (
-                      <div
-                        key={file.id}
-                        className={styles.fileItem}
-                        draggable={true}
-                        onDragStart={(e) => {
-                          e.dataTransfer.setData("file", JSON.stringify(file));
-                        }}
-                      >
-                        <div
-                          className={`${styles.fileHeader} ${
-                            selectedItem?.type === "FILE" &&
-                            selectedItem?.data?.id === file?.id
-                              ? styles.selected
-                              : ""
-                          }`}
-                          onClick={() => {
-                            selectFile(file);
-                          }}
-                        >
-                          <RiFile2Fill className={styles.fileIcon} />
-                          {file.isPinned && (
-                            <RiPushpinFill
-                              onClick={(e) => {
-                                const item = {
-                                  type: "FILE",
-                                  data: file,
-                                };
-
-                                e.stopPropagation();
-                                updateItemPinStatus(item);
-                              }}
-                            />
-                          )}
-                          <p className={styles.fileName}>{file.name}</p>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            ))}
-
-           { displayedFiles
-              .filter((file) => isSearching || file.folderId === null)
-              .map((file) => (
-                <div
-                  key={file.id}
-                  className={styles.fileItem}
-                  draggable={true}
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData("file", JSON.stringify(file));
-                  }}
-                >
-                  <div
-                    className={`${styles.fileHeader} ${selectedItem?.type === "FILE" && selectedItem?.data?.id === file?.id ? styles.selected : ""}`}
-                    onClick={() => {
-                      selectFile(file);
-                    }}
-                  >
-                    <RiFile2Fill className={styles.fileIcon} />
-                    {file.isPinned && (
-                      <RiPushpinFill
-                        onClick={(e) => {
-                          const item = {
-                            type: "FILE",
-                            data: file,
-                          };
-                          e.stopPropagation();
-                          updateItemPinStatus(item);
-                        }}
-                      />
-                    )}
-                    <p className={styles.fileName}>{file.name}</p>
-                  </div>
-                </div>
-              ))
-            }
+          {displayedFiles.map((file) => {
+              return (
+                <FileItem
+                  file={file}
+                  selectedItem={selectedItem}
+                  selectFile={selectFile}
+                  updateItemPinStatus={updateItemPinStatus}
+                />
+              );
+            })}
         </div>
       </div>
     </>

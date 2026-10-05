@@ -22,25 +22,25 @@ export default function Sidebar({ toggleSettings, setToggleSettings, activePage,
 
       <div className={styles.options}>
         <button className={styles.optionRow}
-        onClick={() => setActivePage("files")}>
+        onClick={() => setActivePage("REGULAR")}>
           <FiFolder className={styles.optionIcon} />
           <p className={styles.optionText}>My Files</p>
         </button>
 
         <button className={styles.optionRow}
-        onClick={() => setActivePage("shared")}>
+        onClick={() => setActivePage("SHARED")}>
           <FiShare2 className={styles.optionIcon} />
           <p className={styles.optionText}>Shared Files</p>
         </button>
 
         <button className={styles.optionRow}
-        onClick={() => setActivePage("starred")}>
+        onClick={() => setActivePage("STARRED")}>
           <FiStar className={styles.optionIcon} />
           <p className={styles.optionText}>Starred</p>
         </button>
 
         <button className={styles.optionRow}
-        onClick={() => setActivePage("trash")}>
+        onClick={() => setActivePage("DELETED")}>
           <FiTrash className={styles.optionIcon} />
           <p className={styles.optionText}>Trash</p>
         </button>

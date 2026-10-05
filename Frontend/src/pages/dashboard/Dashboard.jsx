@@ -18,13 +18,13 @@ export default function Dashboard({ notify }) {
   const [selectedItem, setSelectedItem] = useState(null);
   const nav = useNavigate();
 
- const [activePage, setActivePage] = useState("files");
+ const [activePage, setActivePage] = useState("REGULAR");
 
 const endpoint = {
-  files: "",
-  shared: "?shared=true",
-  starred: "?starred=true",
-  trash: "?deleted=true",
+  REGULAR: "",
+  SHARED: "?shared=true",
+  STARRED: "?starred=true",
+  DELETED: "?deleted=true",
 };
 
 const endpointSuffix = endpoint[activePage];

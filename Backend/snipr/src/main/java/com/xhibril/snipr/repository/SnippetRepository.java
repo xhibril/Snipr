@@ -33,8 +33,8 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
 
 
 
+    List<Snippet> findByUserIdAndIsDeletedFalse(Long userId);
 
-    List<Snippet> findByUserId(Long userId);
 
     @Modifying
             @Query("UPDATE Snippet s SET s.isDeleted = :isDeleted WHERE s.user.id = :userId AND s.folder.id = :folderId")

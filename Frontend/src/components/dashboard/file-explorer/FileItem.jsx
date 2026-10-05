@@ -1,0 +1,46 @@
+import styles from "./FileExplorer.module.css";
+import { RiFile2Fill, RiPushpinFill } from "react-icons/ri";
+
+export default function FileItem({
+  file,
+  selectedItem,
+  selectFile,
+  updateItemPinStatus,
+}) {
+  return (
+    <div
+      className={styles.fileItem}
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.setData("file", JSON.stringify(file));
+      }}
+    >
+      <div
+        className={`${styles.fileHeader} ${
+          selectedItem?.type === "FILE" &&
+          selectedItem?.data?.id === file.id
+            ? styles.selected
+            : ""
+        }`}
+        onClick={() => selectFile(file)}
+      >
+        <RiFile2Fill className={styles.fileIcon} />
+
+        {file.isPinned && (
+          <RiPushpinFill
+            onClick={(e) => {
+              e.stopPropagation();
+
+              updateItemPinStatus({
+                type: "FILE",
+                data: file,
+              });
+            }}
+          />
+        )}
+
+        <p className={styles.fileName}>{file.name}</p>
+      </div>
+    </div>
+  );
+}

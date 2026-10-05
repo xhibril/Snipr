@@ -23,15 +23,15 @@ public class Snippet {
     private String fileName;
     private String body;
     private String title;
-    private Boolean isPinned;
+    private Boolean isPinned = false;
 
     @Column(name = "tag_amount")
     private Integer tagAmount;
 
-    private Boolean isDeleted;
+    private Boolean isDeleted = false;
 
 
-    private Boolean isShared;
+    private Boolean isShared = false;
 
 
 
