@@ -2,6 +2,7 @@ package com.xhibril.snipr.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,8 @@ public class Snippet {
 
 
     private Boolean isShared = false;
+
+    private LocalDateTime deletedAt;
 
 
 
@@ -129,6 +132,15 @@ public class Snippet {
 
     public void setIsShared(Boolean isShared){
         this.isShared = isShared;
+    }
+    
+
+    public void setDeletedAt(LocalDateTime deletedAt){
+        this.deletedAt = deletedAt;
+    }
+
+    public LocalDateTime getDeletedAt(){
+        return deletedAt;
     }
 }
 

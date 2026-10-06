@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -154,6 +155,7 @@ public class SnippetService {
 
         Snippet snippet = snippetOpt.get();
         snippet.setIsDeleted(true);
+        snippet.setDeletedAt(LocalDateTime.now());
         snippetRepo.save(snippet);
 
         return ResponseEntity.ok().body(new ApiResponse("Snippet moved to trash"));
@@ -192,6 +194,7 @@ public class SnippetService {
         Folder folder = folderOpt.get();
 
         folder.setIsDeleted(true);
+        folder.setDeletedAt(LocalDateTime.now());
         folderRepo.save(folder);
         snippetRepo.updateDeletedByUserIdAndFolderId(userId, folderId, true);
 
@@ -227,7 +230,7 @@ public class SnippetService {
         } else if (Boolean.TRUE.equals(shared)) {
             folders = folderRepo.findByUserIdAndIsShared(userId, true);
         } else if (Boolean.TRUE.equals(deleted)) {
-            folders = folderRepo.findByUserIdAndIsDeleted(userId, true);
+            folders = folderRepo.getDeletedFolders(userId, LocalDateTime.now().minusDays(30));
         } else {
             folders = folderRepo.findByUserIdAndIsDeletedFalse(userId);
         }
@@ -239,17 +242,13 @@ public class SnippetService {
     }
 
 
-    public FolderResponse toFolderResponse(Folder folder){
+    public FolderResponse toFolderResponse(Folder folder) {
         FolderResponse folderResponse = new FolderResponse();
         folderResponse.setId(folder.getId());
         folderResponse.setName(folder.getName());
         folderResponse.setIsPinned(folder.getIsPinned());
         return folderResponse;
     }
-
-
-
-
 
     public List<SnippetResponse> getSnippets(Long userId, Boolean shared, Boolean starred, Boolean deleted) {
         List<Snippet> snippets;
@@ -259,7 +258,7 @@ public class SnippetService {
         } else if (Boolean.TRUE.equals(shared)) {
             snippets = snippetRepo.findByUserIdAndIsShared(userId, true);
         } else if (Boolean.TRUE.equals(deleted)) {
-            snippets = snippetRepo.findByUserIdAndIsDeleted(userId, true);
+            snippets = snippetRepo.getDeletedSnippets(userId, LocalDateTime.now().minusDays(30));
         } else {
             snippets = snippetRepo.findByUserIdAndIsDeletedFalse(userId);
         }
@@ -278,6 +277,8 @@ public class SnippetService {
             snippetResponse.setFolderId(folder.getId());
         }
 
+
+        
         snippetResponse.setId(snippet.getId());
         snippetResponse.setName(snippet.getFileName());
         snippetResponse.setBody(snippet.getBody());

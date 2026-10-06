@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,4 +30,15 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
     List<Folder> findByUserIdAndIsShared(Long userId, Boolean isShared);
 
     List<Folder> findByUserIdAndIsDeleted(Long userId, Boolean isDeleted);
+
+
+
+    @Query("""
+SELECT f FROM Folder f 
+WHERE f.user.id = :userId
+AND f.isDeleted = true
+AND f.deletedAt > :time
+""")
+    List<Folder> getDeletedFolders(@Param("userId") Long userId,
+                                   @Param("time")LocalDateTime time);
 }

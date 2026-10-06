@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,4 +48,16 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
     List<Snippet> findByUserIdAndIsShared(Long userId, Boolean isShared);
 
     List<Snippet> findByUserIdAndIsDeleted(Long userId, Boolean isDeleted);
+
+
+
+
+    @Query("""
+            SELECT s FROM Snippet s
+            WHERE s.user.id = :userId 
+            AND s.isDeleted = true 
+            AND s.deletedAt > :time
+            """)
+    List <Snippet> getDeletedSnippets(@Param("userId") Long userId ,
+                                      @Param("time") LocalDateTime time);
 }

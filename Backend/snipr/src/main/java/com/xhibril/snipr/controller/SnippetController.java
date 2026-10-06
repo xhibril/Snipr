@@ -13,12 +13,12 @@ public class SnippetController {
 
     private final SnippetService snippetService;
 
-    public SnippetController(SnippetService snippetService){
+    public SnippetController(SnippetService snippetService) {
         this.snippetService = snippetService;
     }
 
     @PostMapping("/folders")
-    public ResponseEntity<FolderResponse> addFolder(@RequestBody FolderRequest request){
+    public ResponseEntity<FolderResponse> addFolder(@RequestBody FolderRequest request) {
         Long userId = 1L; // placeholder
 
         return snippetService.addFolder(userId, request.getName());
@@ -26,7 +26,7 @@ public class SnippetController {
 
 
     @PostMapping("/snippets")
-    public ResponseEntity<SnippetResponse> addSnippet(@RequestBody SnippetRequest request){
+    public ResponseEntity<SnippetResponse> addSnippet(@RequestBody SnippetRequest request) {
         Long userId = 1L; // placeholder
 
         return snippetService.addSnippet(userId, request.getName(), request.getFolderId());
@@ -34,35 +34,35 @@ public class SnippetController {
 
 
     @PatchMapping("/snippets/{snippetId}")
-    public ResponseEntity<ApiResponse> moveSnippet(@PathVariable Long snippetId, @RequestBody UpdateSnipperRequest request){
+    public ResponseEntity<ApiResponse> moveSnippet(@PathVariable Long snippetId, @RequestBody UpdateSnipperRequest request) {
         Long userId = 1L; // placeholder
 
         return snippetService.moveSnippet(userId, snippetId, request.getFolderId());
     }
 
     @PatchMapping("/snippets/{snippetId}/pin")
-    public ResponseEntity<ApiResponse> pinSnippet(@PathVariable Long snippetId){
+    public ResponseEntity<ApiResponse> pinSnippet(@PathVariable Long snippetId) {
         Long userId = 1L; // placeholder
 
         return snippetService.updateSnippetPinStatus(userId, snippetId);
     }
 
     @PatchMapping("/folders/{folderId}/pin")
-    public ResponseEntity<ApiResponse> pinFolder(@PathVariable Long folderId){
+    public ResponseEntity<ApiResponse> pinFolder(@PathVariable Long folderId) {
         Long userId = 1L;
 
-                return snippetService.updateFolderPinStatus(userId, folderId);
+        return snippetService.updateFolderPinStatus(userId, folderId);
     }
 
     @DeleteMapping("/snippets/{snippetId}")
-    public ResponseEntity<ApiResponse> deleteSnippet(@PathVariable Long snippetId){
+    public ResponseEntity<ApiResponse> deleteSnippet(@PathVariable Long snippetId) {
         Long userId = 1L; // place holder;
         return snippetService.deleteSnippet(userId, snippetId);
     }
 
 
     @DeleteMapping("/folders/{folderId}")
-    public ResponseEntity<ApiResponse> deleteFolder(@PathVariable Long folderId){
+    public ResponseEntity<ApiResponse> deleteFolder(@PathVariable Long folderId) {
         Long userId = 1L;
 
         return snippetService.deleteFolder(userId, folderId);
@@ -70,19 +70,18 @@ public class SnippetController {
 
 
     @DeleteMapping("/snippets/{snippetId}/permanent")
-    public ResponseEntity<ApiResponse> permanentlyDeleteSnippet(@PathVariable Long snippetId){
+    public ResponseEntity<ApiResponse> permanentlyDeleteSnippet(@PathVariable Long snippetId) {
         Long userId = 1L;
 
         return snippetService.permanentlyDeleteSnippet(userId, snippetId);
     }
 
     @DeleteMapping("/folders/{folderId}/permanent")
-    public ResponseEntity<ApiResponse> permanentlyDeleteFolder(@PathVariable Long folderId){
+    public ResponseEntity<ApiResponse> permanentlyDeleteFolder(@PathVariable Long folderId) {
         Long userId = 1L;
 
         return snippetService.permanentlyDeleteFolder(userId, folderId);
     }
-
 
 
     @GetMapping("/folders")
@@ -90,7 +89,7 @@ public class SnippetController {
             @RequestParam(required = false) Boolean shared,
             @RequestParam(required = false) Boolean starred,
             @RequestParam(required = false) Boolean deleted
-    ){
+    ) {
         Long userId = 1L; // place holder;
 
         return snippetService.getFolders(userId, shared, starred, deleted);
@@ -101,18 +100,17 @@ public class SnippetController {
             @RequestParam(required = false) Boolean shared,
             @RequestParam(required = false) Boolean starred,
             @RequestParam(required = false) Boolean deleted
-    ){
+    ) {
         Long userId = 1L; // place holder;
 
         return snippetService.getSnippets(userId, shared, starred, deleted);
     }
 
 
-
-
     @PatchMapping("/snippets")
-    public ResponseEntity<SnippetResponse> updateSnippet(@RequestBody SnippetRequest request){
+    public ResponseEntity<SnippetResponse> updateSnippet(@RequestBody SnippetRequest request) {
         Long userId = 1L;
         return snippetService.updateSnippet(userId, request);
     }
+
 }

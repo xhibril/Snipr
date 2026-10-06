@@ -2,6 +2,8 @@ package com.xhibril.snipr.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class Folder {
 
@@ -18,6 +20,7 @@ public class Folder {
 
     private Boolean isDeleted = false;
     private Boolean isShared = false;
+    public LocalDateTime deletedAt;
 
     public Long getId() { return id; }
     public User getUser() { return user; }
@@ -51,5 +54,14 @@ public class Folder {
 
     public Boolean getIsShared(){
         return isShared;
+    }
+
+
+    public void setDeletedAt(LocalDateTime deletedAt){
+     this.deletedAt = deletedAt;
+    }
+
+    public LocalDateTime getDeletedAt(){
+        return deletedAt;
     }
 }
