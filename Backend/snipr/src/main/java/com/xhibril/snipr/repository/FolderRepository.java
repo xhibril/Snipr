@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,13 +33,20 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
     List<Folder> findByUserIdAndIsDeleted(Long userId, Boolean isDeleted);
 
 
-
     @Query("""
-SELECT f FROM Folder f 
-WHERE f.user.id = :userId
-AND f.isDeleted = true
-AND f.deletedAt > :time
-""")
+            SELECT f FROM Folder f 
+            WHERE f.user.id = :userId
+            AND f.isDeleted = true
+            AND f.deletedAt > :time
+            """)
     List<Folder> getDeletedFolders(@Param("userId") Long userId,
-                                   @Param("time")LocalDateTime time);
+                                   @Param("time") LocalDateTime time);
+
+
+    @Modifying
+    @Query("""
+            DELETE FROM Folder f 
+            WHERE f.deletedAt < :time
+            """)
+    void deleteExpiredFolders(@Param("time") LocalDateTime time);
 }

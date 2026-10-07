@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,20 +26,17 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
     List<Snippet> findAllByUserId(Long userId);
 
 
-
     @Modifying
     @Query("UPDATE Snippet s SET s.isPinned = :isPinned  WHERE s.id = :snippetId")
     void updatePinStatus(@Param("isPinned") Boolean isPinned,
                          @Param("snippetId") Long snippetId);
 
 
-
-
     List<Snippet> findByUserIdAndIsDeletedFalse(Long userId);
 
 
     @Modifying
-            @Query("UPDATE Snippet s SET s.isDeleted = :isDeleted WHERE s.user.id = :userId AND s.folder.id = :folderId")
+    @Query("UPDATE Snippet s SET s.isDeleted = :isDeleted WHERE s.user.id = :userId AND s.folder.id = :folderId")
     void updateDeletedByUserIdAndFolderId(@Param("userId") Long userId,
                                           @Param("folderId") Long folderId,
                                           @Param("isDeleted") Boolean isDeleted);
@@ -50,14 +48,24 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
     List<Snippet> findByUserIdAndIsDeleted(Long userId, Boolean isDeleted);
 
 
-
-
     @Query("""
             SELECT s FROM Snippet s
             WHERE s.user.id = :userId 
             AND s.isDeleted = true 
             AND s.deletedAt > :time
             """)
-    List <Snippet> getDeletedSnippets(@Param("userId") Long userId ,
-                                      @Param("time") LocalDateTime time);
+    List<Snippet> getDeletedSnippets(@Param("userId") Long userId,
+                                     @Param("time") LocalDateTime time);
+
+
+    @Modifying
+    @Query("""
+            DELETE FROM Snippet s 
+            WHERE s.deletedAt < :time
+            """)
+    void deleteExpiredFiles(@Param("time") LocalDateTime time);
+
+
+
+
 }
