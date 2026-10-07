@@ -196,7 +196,7 @@ public class SnippetService {
         folder.setIsDeleted(true);
         folder.setDeletedAt(LocalDateTime.now());
         folderRepo.save(folder);
-        snippetRepo.updateDeletedByUserIdAndFolderId(userId, folderId, true);
+        snippetRepo.updateDeletedByUserIdAndFolderId(userId, folderId, LocalDateTime.now());
 
         return ResponseEntity.ok().body(new ApiResponse("Folder moved to trash"));
     }

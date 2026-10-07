@@ -247,17 +247,18 @@ export default function FileExplorer({
 
   async function deleteItem() {
     const isFolder = selectedItem.type === "FOLDER";
-    const path = `/${isFolder ? "folders" : "snippets"}/${selectedItem.data.id}`;
+    const path = `/${isFolder ? "folders" : "snippets"}/${selectedItem?.data.id} ${activePage === "DELETED" ? "/permanent" : ""}`;
 
-    const previous = isFolder
-      ? structuredClone(folders)
-      : structuredClone(files);
+   const previousFolders = structuredClone(folders)
+   const previousFiles = structuredClone(files)
 
     // opt update
     if (isFolder) {
       setFolders(
         folders.filter((folder) => folder.id !== selectedItem.data.id),
       );
+
+      setFiles(files.filter((file) => file.folderId !== selectedItem.data.id))
     } else {
       setFiles(files.filter((file) => file.id !== selectedItem.data.id));
     }
@@ -272,7 +273,8 @@ export default function FileExplorer({
     if (!res.ok) {
       const data = await res.json();
       notify(data.message || "Could not delete, please try again", "ERROR");
-      rollBack(isFolder, previous);
+      setFolders(previousFolders);
+      setFiles(previousFiles);
       return;
     }
 
@@ -351,7 +353,7 @@ const pageFiles = {
   REGULAR: sortedFiles.filter((file) => file.folderId === null),
   SHARED: sortedFiles.filter((file) => file.folderId === null),
   STARRED: sortedFiles.filter((file) => file.folderId === null),
-  DELETED: sortedFiles,
+  DELETED: sortedFiles.filter((file) => file.folderId === null || !folders.some(folder => folder.id === file.folderId))
 }[activePage];
 
 const displayedFiles = isSearching
