@@ -110,7 +110,7 @@ export default function FileExplorer({
   }, [isCreatingItem, isCreatingFolder]);
 
   async function searchItems() {
-    const result = SearchFiles(pageFiles, searchQuery, filterTags);
+    const result = SearchFiles(sortedFiles, searchQuery, filterTags);
     setSearchResults(result);
   }
 
@@ -424,22 +424,13 @@ export default function FileExplorer({
   // compare two folders at a time
   // pinned = 1 gets placed before unpinned = 0
   const sortedFolders = [...folders].sort((a, b) => b.isPinned - a.isPinned);
-  const sortedFiles = [...files].sort((a, b) => b.isPinned - a.isPinned);
+  const sortedFiles = [...files].sort((a, b) => b.isPinned - a.isPinned)
+  .filter((file) => file.folderId === null || !folders.some((folder) => folder.id === file.folderId));
 
   const isSearching = searchQuery.trim() !== "" || filterTags.length > 0;
 
-  const pageFiles = {
-    REGULAR: sortedFiles.filter((file) => file.folderId === null),
-    SHARED: sortedFiles.filter((file) => file.folderId === null),
-    STARRED: sortedFiles.filter((file) => file.folderId === null),
-    DELETED: sortedFiles.filter(
-      (file) =>
-        file.folderId === null ||
-        !folders.some((folder) => folder.id === file.folderId),
-    ),
-  }[activePage];
 
-  const displayedFiles = isSearching ? searchResults : pageFiles;
+  const displayedFiles = isSearching ? searchResults : sortedFiles;
 
   return (
     <>

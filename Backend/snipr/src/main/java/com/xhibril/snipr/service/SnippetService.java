@@ -255,7 +255,8 @@ public class SnippetService {
         List<Snippet> snippets;
 
         if (Boolean.TRUE.equals(starred)) {
-            snippets = snippetRepo.findByUserIdAndIsPinned(userId, true);
+            snippets = snippetRepo.findStarredSnippets(userId);
+
         } else if (Boolean.TRUE.equals(shared)) {
             snippets = snippetRepo.findByUserIdAndIsShared(userId, true);
         } else if (Boolean.TRUE.equals(deleted)) {
@@ -315,6 +316,7 @@ public class SnippetService {
     @Transactional
     public ResponseEntity<ApiResponse> updateFolderPinStatus(Long userId, Long folderId) {
         Optional<Folder> folderOpt = folderRepo.findById(folderId);
+        List<Snippet> snippets = snippetRepo.findByUserIdAndFolderId(userId, folderId);
 
 
         if (folderOpt.isPresent()) {
@@ -327,6 +329,9 @@ public class SnippetService {
                 return ResponseEntity.ok().body(new ApiResponse("Snippet successfully updated"));
             }
         }
+
+
+
         return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
     }
 

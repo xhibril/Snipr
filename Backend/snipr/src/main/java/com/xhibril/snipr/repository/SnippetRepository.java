@@ -42,6 +42,14 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
                                           @Param("isDeleted") Boolean isDeleted,
                                           @Param("deletedAt") LocalDateTime deletedAt);
 
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Snippet s SET s.isPinned = :isPinned WHERE s.user.id = :userId AND s.folder.id = :folderId")
+    void updatePinnedByUserIdAndFolderId(@Param("userId") Long userId,
+                                         @Param("folderId") Long folderId,
+                                         @Param("isPinned") Boolean isPinned);
+
     List<Snippet> findByUserIdAndIsPinned(Long userId, Boolean isPinned);
 
     List<Snippet> findByUserIdAndIsShared(Long userId, Boolean isShared);
@@ -67,5 +75,18 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
     void deleteExpiredFiles(@Param("time") LocalDateTime time);
 
     List<Snippet> findByUserIdAndFolderId(Long userId, Long folderId);
+
+
+
+
+
+    @Query("""
+SELECT s FROM Snippet s 
+LEFT JOIN s.folder f
+WHERE s.user.id = :userId
+AND (s.isPinned = true OR f.isPinned = true)
+AND s.isDeleted = false
+""")
+    List<Snippet> findStarredSnippets(@Param("userId") Long userId);
 
 }
