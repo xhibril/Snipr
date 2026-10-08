@@ -24,6 +24,7 @@ export default function FolderItem({
   selectFile,
   updateItemPinStatus,
   moveSnippet,
+  handleContextMenu,
 }){
 
   const folderFiles = files.filter(
@@ -75,9 +76,9 @@ export default function FolderItem({
             prev.filter((i) => i !== index) :
             [...prev, index]
           )
-
-          
         }}
+
+        onContextMenu={(e) => handleContextMenu(e, folder, "FOLDER")}
       >
         <RiFolderFill className={styles.folderIcon} />
 
@@ -115,6 +116,7 @@ export default function FolderItem({
             selectedItem={selectedItem}
             selectFile={selectFile}
             updateItemPinStatus={updateItemPinStatus}
+            handleContextMenu={handleContextMenu}
           />
         ))}
       </div>

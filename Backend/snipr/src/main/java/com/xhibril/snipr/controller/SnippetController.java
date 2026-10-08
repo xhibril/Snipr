@@ -113,4 +113,19 @@ public class SnippetController {
         return snippetService.updateSnippet(userId, request);
     }
 
+
+    @PatchMapping("/snippets/{snippetId}/recover")
+    public ResponseEntity<ApiResponse> recoverSnippet(@PathVariable Long snippetId){
+        Long userId = 1L;
+
+        return snippetService.recoverSnippet(userId, snippetId);
+    }
+
+    @PatchMapping("/folders/{folderId}/recover")
+    public ResponseEntity<ApiResponse> recoverFolder(@PathVariable Long folderId){
+        Long userId = 1L;
+
+        return snippetService.recoverFolder(userId, folderId);
+    }
+
 }

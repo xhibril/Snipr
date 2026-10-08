@@ -5,6 +5,7 @@ import ExplorerToolBar from "./ExplorerToolBar";
 import SearchBar from "./SearchBar";
 import FolderItem from "./FolderItem.jsx";
 import FileItem from "./FileItem.jsx";
+import ContextMenu from "./ContextMenu.jsx";
 
 import {
   FiX,
@@ -56,6 +57,7 @@ export default function FileExplorer({
   const nav = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [contextMenu, setContextMenu] = useState(null);
 
   // updating input field for creating folder or file
   useEffect(() => {
@@ -77,6 +79,28 @@ export default function FileExplorer({
       }
     }
   }, [creatingState]);
+
+  function handleContextMenu(e, file, type) {
+    e.preventDefault();
+
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      item: file,
+      type: type
+    });
+  }
+
+
+  // close context menu
+  useEffect(() => {
+    const closeMenu = () => setContextMenu(null)
+    document.addEventListener("click", closeMenu);
+
+    return () =>{
+    document.removeEventListener("click", closeMenu)
+    };
+  }, [])
 
   // focus on field
   useEffect(() => {
@@ -245,22 +269,30 @@ export default function FileExplorer({
     }
   }
 
-  async function deleteItem() {
-    const isFolder = selectedItem.type === "FOLDER";
-    const path = `/${isFolder ? "folders" : "snippets"}/${selectedItem?.data.id} ${activePage === "DELETED" ? "/permanent" : ""}`;
+  async function deleteItem(item, type) {
 
-   const previousFolders = structuredClone(folders)
-   const previousFiles = structuredClone(files)
+
+    if(!item || !type){
+      item = selectedItem?.data
+      type = selectedItem?.type
+    }
+
+
+    const isFolder = type === "FOLDER";
+    const path = `/${isFolder ? "folders" : "snippets"}/${item.id} ${activePage === "DELETED" ? "/permanent" : ""}`;
+
+    const previousFolders = structuredClone(folders);
+    const previousFiles = structuredClone(files);
 
     // opt update
     if (isFolder) {
       setFolders(
-        folders.filter((folder) => folder.id !== selectedItem.data.id),
+        folders.filter((folder) => folder.id !== item.id),
       );
 
-      setFiles(files.filter((file) => file.folderId !== selectedItem.data.id))
+      setFiles(files.filter((file) => file.folderId !== item.id));
     } else {
-      setFiles(files.filter((file) => file.id !== selectedItem.data.id));
+      setFiles(files.filter((file) => file.id !== item.id));
     }
 
     const res = await ApiFetch(path, { method: "DELETE" }, notify, nav);
@@ -278,8 +310,55 @@ export default function FileExplorer({
       return;
     }
 
-    setIsViewingFile(false);
-    setSelectedItem(null);
+    if(selectedItem?.data.id === item.id){
+      setSelectedItem(null)
+      setIsViewingFile(false);
+    }
+  }
+
+
+
+  async function recoverFiles(item, type){
+
+    const isFolder = type === "FOLDER";
+
+    const path = `${isFolder ? "/folders" : "/snippets"}/${item.id}/recover`;
+
+    const previousFolders = structuredClone(folders);
+    const previousFiles = structuredClone(files);
+
+
+    if(isFolder){
+      setFolders(folders.filter((folder) => folder.id !== item.id))
+      setFiles(files.filter((file) => file.folderId !== item.id))
+    } else {
+      setFiles(files.filter((file) => file.id !== item.id))
+    }
+
+    const res = await ApiFetch(path, {method: "PATCH"}, notify, nav)
+
+
+    if(!res){
+      setFolders(previousFolders);
+      setFiles(previousFiles);
+      return;
+    }
+
+
+    if(!res.ok){
+
+      const data = await res.json();
+      notify(data.message || `Could not recover ${isFolder ? "folder" : "file"}`, "ERROR");
+      setFolders(previousFolders);
+      setFiles(previousFiles);
+      return;
+    }
+
+
+    if(selectedItem?.data.id === item.id){
+      setSelectedItem(null)
+      setIsViewingFile(false);
+    }
   }
 
   async function moveSnippet(snippet) {
@@ -349,19 +428,18 @@ export default function FileExplorer({
 
   const isSearching = searchQuery.trim() !== "" || filterTags.length > 0;
 
-const pageFiles = {
-  REGULAR: sortedFiles.filter((file) => file.folderId === null),
-  SHARED: sortedFiles.filter((file) => file.folderId === null),
-  STARRED: sortedFiles.filter((file) => file.folderId === null),
-  DELETED: sortedFiles.filter((file) => file.folderId === null || !folders.some(folder => folder.id === file.folderId))
-}[activePage];
+  const pageFiles = {
+    REGULAR: sortedFiles.filter((file) => file.folderId === null),
+    SHARED: sortedFiles.filter((file) => file.folderId === null),
+    STARRED: sortedFiles.filter((file) => file.folderId === null),
+    DELETED: sortedFiles.filter(
+      (file) =>
+        file.folderId === null ||
+        !folders.some((folder) => folder.id === file.folderId),
+    ),
+  }[activePage];
 
-const displayedFiles = isSearching
-  ? searchResults
-  : pageFiles;
-
-
-
+  const displayedFiles = isSearching ? searchResults : pageFiles;
 
   return (
     <>
@@ -413,21 +491,36 @@ const displayedFiles = isSearching
                   selectFile={selectFile}
                   updateItemPinStatus={updateItemPinStatus}
                   moveSnippet={moveSnippet}
+                  handleContextMenu={handleContextMenu}
+              
                 />
               );
             })}
 
           {displayedFiles.map((file) => {
-              return (
-                <FileItem
-                  file={file}
-                  selectedItem={selectedItem}
-                  selectFile={selectFile}
-                  updateItemPinStatus={updateItemPinStatus}
-                />
-              );
-            })}
+            return (
+              <FileItem
+                file={file}
+                selectedItem={selectedItem}
+                selectFile={selectFile}
+                updateItemPinStatus={updateItemPinStatus}
+                handleContextMenu={handleContextMenu}
+            
+              />
+            );
+          })}
         </div>
+
+        {contextMenu && (
+          <ContextMenu
+            x={contextMenu.x}
+            y={contextMenu.y}
+            file={contextMenu.item}
+            onDelete={deleteItem}
+            type = {contextMenu.type}
+            onRecover = {recoverFiles}
+          />
+        )}
       </div>
     </>
   );

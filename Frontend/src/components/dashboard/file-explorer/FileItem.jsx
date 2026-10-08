@@ -6,6 +6,7 @@ export default function FileItem({
   selectedItem,
   selectFile,
   updateItemPinStatus,
+  handleContextMenu
 }) {
   return (
     <div
@@ -23,6 +24,7 @@ export default function FileItem({
             : ""
         }`}
         onClick={() => selectFile(file)}
+        onContextMenu={(e) => handleContextMenu(e, file, "FILE")}
       >
         <RiFile2Fill className={styles.fileIcon} />
 

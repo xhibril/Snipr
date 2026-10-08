@@ -5,8 +5,7 @@ public class FolderResponse {
     private Long id;
     private String message;
     private Boolean isPinned;
-
-
+    private Boolean isDeleted;
 
     public FolderResponse(){}
 
@@ -44,5 +43,13 @@ public class FolderResponse {
 
     public Boolean getIsPinned(){
         return isPinned;
+    }
+
+    public Boolean getIsDeleted(){
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted){
+        this.isDeleted = isDeleted;
     }
 }

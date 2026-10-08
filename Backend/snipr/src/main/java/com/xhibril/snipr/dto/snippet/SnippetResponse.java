@@ -13,6 +13,7 @@ public class SnippetResponse {
     private Boolean isPinned;
     private List<String> tags;
     private Integer tagAmount;
+    private Boolean isDeleted;
 
     public SnippetResponse(
             Long id,
@@ -111,5 +112,13 @@ public class SnippetResponse {
 
     public Integer getTagAmount(){
         return tagAmount;
+    }
+
+    public Boolean getIsDeleted(){
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted){
+        this.isDeleted = isDeleted;
     }
 }
