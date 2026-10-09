@@ -25,6 +25,7 @@ export default function FolderItem({
   updateItemPinStatus,
   moveSnippet,
   handleContextMenu,
+  page
 }){
 
   const folderFiles = files.filter(

@@ -6,6 +6,7 @@ import SearchBar from "./SearchBar";
 import FolderItem from "./FolderItem.jsx";
 import FileItem from "./FileItem.jsx";
 import ContextMenu from "./ContextMenu.jsx";
+import { PAGE_CONFIG } from "../../../config/pageConfig.jsx";
 
 import {
   FiX,
@@ -59,6 +60,9 @@ export default function FileExplorer({
   const [searchResults, setSearchResults] = useState([]);
   const [contextMenu, setContextMenu] = useState(null);
 
+
+  const page = PAGE_CONFIG[activePage] ?? PAGE_CONFIG.REGULAR;
+
   // updating input field for creating folder or file
   useEffect(() => {
     if (creatingState?.type === "FOLDER") {
@@ -87,20 +91,19 @@ export default function FileExplorer({
       x: e.clientX,
       y: e.clientY,
       item: file,
-      type: type
+      type: type,
     });
   }
 
-
   // close context menu
   useEffect(() => {
-    const closeMenu = () => setContextMenu(null)
+    const closeMenu = () => setContextMenu(null);
     document.addEventListener("click", closeMenu);
 
-    return () =>{
-    document.removeEventListener("click", closeMenu)
+    return () => {
+      document.removeEventListener("click", closeMenu);
     };
-  }, [])
+  }, []);
 
   // focus on field
   useEffect(() => {
@@ -270,25 +273,23 @@ export default function FileExplorer({
   }
 
   async function deleteItem(item, type) {
-
-
-    if(!item || !type){
-      item = selectedItem?.data
-      type = selectedItem?.type
+    if (!item || !type) {
+      item = selectedItem?.data;
+      type = selectedItem?.type;
     }
 
+     const isFolder = type === "FOLDER";
 
-    const isFolder = type === "FOLDER";
-    const path = `/${isFolder ? "folders" : "snippets"}/${item.id} ${activePage === "DELETED" ? "/permanent" : ""}`;
+     const isPermanent = page.deleteMode === "permanent";
+    const path = `/${isFolder ? "folders" : "snippets"}/${item.id} 
+    ${ isPermanent ? "/permanent" : ""}`;
 
     const previousFolders = structuredClone(folders);
     const previousFiles = structuredClone(files);
 
     // opt update
     if (isFolder) {
-      setFolders(
-        folders.filter((folder) => folder.id !== item.id),
-      );
+      setFolders(folders.filter((folder) => folder.id !== item.id));
 
       setFiles(files.filter((file) => file.folderId !== item.id));
     } else {
@@ -310,16 +311,13 @@ export default function FileExplorer({
       return;
     }
 
-    if(selectedItem?.data.id === item.id){
-      setSelectedItem(null)
+    if (selectedItem?.data.id === item.id) {
+      setSelectedItem(null);
       setIsViewingFile(false);
     }
   }
 
-
-
-  async function recoverFiles(item, type){
-
+  async function recoverFiles(item, type) {
     const isFolder = type === "FOLDER";
 
     const path = `${isFolder ? "/folders" : "/snippets"}/${item.id}/recover`;
@@ -327,36 +325,34 @@ export default function FileExplorer({
     const previousFolders = structuredClone(folders);
     const previousFiles = structuredClone(files);
 
-
-    if(isFolder){
-      setFolders(folders.filter((folder) => folder.id !== item.id))
-      setFiles(files.filter((file) => file.folderId !== item.id))
+    if (isFolder) {
+      setFolders(folders.filter((folder) => folder.id !== item.id));
+      setFiles(files.filter((file) => file.folderId !== item.id));
     } else {
-      setFiles(files.filter((file) => file.id !== item.id))
+      setFiles(files.filter((file) => file.id !== item.id));
     }
 
-    const res = await ApiFetch(path, {method: "PATCH"}, notify, nav)
+    const res = await ApiFetch(path, { method: "PATCH" }, notify, nav);
 
-
-    if(!res){
+    if (!res) {
       setFolders(previousFolders);
       setFiles(previousFiles);
       return;
     }
 
-
-    if(!res.ok){
-
+    if (!res.ok) {
       const data = await res.json();
-      notify(data.message || `Could not recover ${isFolder ? "folder" : "file"}`, "ERROR");
+      notify(
+        data.message || `Could not recover ${isFolder ? "folder" : "file"}`,
+        "ERROR",
+      );
       setFolders(previousFolders);
       setFiles(previousFiles);
       return;
     }
 
-
-    if(selectedItem?.data.id === item.id){
-      setSelectedItem(null)
+    if (selectedItem?.data.id === item.id) {
+      setSelectedItem(null);
       setIsViewingFile(false);
     }
   }
@@ -424,17 +420,23 @@ export default function FileExplorer({
   // compare two folders at a time
   // pinned = 1 gets placed before unpinned = 0
   const sortedFolders = [...folders].sort((a, b) => b.isPinned - a.isPinned);
-  const sortedFiles = [...files].sort((a, b) => b.isPinned - a.isPinned)
-  .filter((file) => file.folderId === null || !folders.some((folder) => folder.id === file.folderId));
+  const sortedFiles = [...files]
+    .sort((a, b) => b.isPinned - a.isPinned)
+    .filter(
+      (file) =>
+        file.folderId === null ||
+        !folders.some((folder) => folder.id === file.folderId),
+    );
 
   const isSearching = searchQuery.trim() !== "" || filterTags.length > 0;
-
 
   const displayedFiles = isSearching ? searchResults : sortedFiles;
 
   return (
     <>
       <div className={styles.fileExplorer}>
+
+        {page.showExplorerToolBar &&
         <ExplorerToolBar
           setCreatingState={setCreatingState}
           deleteItem={deleteItem}
@@ -444,8 +446,11 @@ export default function FileExplorer({
           isCreatingItem={isCreatingItem}
           isCreatingFolder={isCreatingFolder}
           inputRef={inputRef}
+           page = {page}
         />
+}
 
+{page.showSearch &&
         <SearchBar
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -453,7 +458,9 @@ export default function FileExplorer({
           setToggleSearchFilter={setToggleSearchFilter}
           filterTags={filterTags}
           setFilterTags={setFilterTags}
+           page = {page}
         />
+}
 
         <div
           className={styles.snippetFiles}
@@ -467,7 +474,8 @@ export default function FileExplorer({
             });
           }}
         >
-          {!isSearching &&
+
+          {!isSearching && page.showFolders &&
             sortedFolders.map((folder, index) => {
               return (
                 <FolderItem
@@ -483,10 +491,11 @@ export default function FileExplorer({
                   updateItemPinStatus={updateItemPinStatus}
                   moveSnippet={moveSnippet}
                   handleContextMenu={handleContextMenu}
-              
+                  page = {page}
                 />
               );
             })}
+          
 
           {displayedFiles.map((file) => {
             return (
@@ -496,7 +505,7 @@ export default function FileExplorer({
                 selectFile={selectFile}
                 updateItemPinStatus={updateItemPinStatus}
                 handleContextMenu={handleContextMenu}
-            
+                page = {page}
               />
             );
           })}
@@ -508,8 +517,8 @@ export default function FileExplorer({
             y={contextMenu.y}
             file={contextMenu.item}
             onDelete={deleteItem}
-            type = {contextMenu.type}
-            onRecover = {recoverFiles}
+            type={contextMenu.type}
+            onRecover={recoverFiles}
           />
         )}
       </div>

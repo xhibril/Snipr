@@ -21,10 +21,15 @@ export default function ExplorerToolBar({
   isCreatingItem,
   isCreatingFolder,
   inputRef,
+  page
 }) {
   return (
     <>
+
+    
       <div className={styles.snippetControls}>
+        {page.itemActions.includes("create") && (
+          <>
         <RiFolderAddLine
           className={styles.snippetAction}
           onClick={() =>
@@ -44,21 +49,33 @@ export default function ExplorerToolBar({
             })
           }
         />
+        </>
+        )
+      }
+    
 
+{page.itemActions.includes("trash") &&
         <FiTrash
           className={styles.snippetAction}
           onClick={deleteItem}
         />
+}
 
+{page.itemActions.includes("pin") &&
         <FiStar
           className={styles.snippetAction}
           onClick={() => updateItemPinStatus(selectedItem)}
         />
+}
 
+{page.itemActions.includes("share") &&
         <FiShare2 className={styles.snippetAction} />
-      </div>
+    
+}
+</div>
 
-      {isCreatingItem && (
+
+      {isCreatingItem && page.itemActions.includes("create") && (
         <form
           className={styles.addFile}
           onSubmit={(e) => {

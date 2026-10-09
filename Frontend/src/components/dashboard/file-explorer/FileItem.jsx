@@ -6,7 +6,8 @@ export default function FileItem({
   selectedItem,
   selectFile,
   updateItemPinStatus,
-  handleContextMenu
+  handleContextMenu,
+  page
 }) {
   return (
     <div

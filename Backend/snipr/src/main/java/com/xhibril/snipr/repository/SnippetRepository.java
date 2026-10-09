@@ -77,16 +77,13 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
     List<Snippet> findByUserIdAndFolderId(Long userId, Long folderId);
 
 
-
-
-
     @Query("""
-SELECT s FROM Snippet s 
-LEFT JOIN s.folder f
-WHERE s.user.id = :userId
-AND (s.isPinned = true OR f.isPinned = true)
-AND s.isDeleted = false
-""")
+            SELECT s FROM Snippet s 
+            LEFT JOIN s.folder f
+            WHERE s.user.id = :userId
+            AND (s.isPinned = true OR f.isPinned = true)
+            AND s.isDeleted = false
+            """)
     List<Snippet> findStarredSnippets(@Param("userId") Long userId);
 
 }
