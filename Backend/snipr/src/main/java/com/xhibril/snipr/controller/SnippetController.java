@@ -128,4 +128,21 @@ public class SnippetController {
         return snippetService.recoverFolder(userId, folderId);
     }
 
+
+    @PatchMapping("/snippets/{snippetId}/rename")
+    public ResponseEntity<ApiResponse> renameSnippet(@PathVariable Long snippetId, @RequestBody SnippetRequest snippetRequest){
+        Long userId = 1L;
+        return snippetService.renameSnippet(userId, snippetId, snippetRequest.getName());
+    }
+
+    @PatchMapping("/folders/{folderId}/rename")
+public ResponseEntity<ApiResponse> renameFolder(@PathVariable Long folderId, @RequestBody FolderRequest folderRequest){
+        Long userId = 1L;
+        return snippetService.renameFolder(userId, folderId, folderRequest.getName());
+
+
+
+
+    }
+
 }

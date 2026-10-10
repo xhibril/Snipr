@@ -7,7 +7,13 @@ export default function FileItem({
   selectFile,
   updateItemPinStatus,
   handleContextMenu,
-  page
+  page,
+  setIsEditing,
+  isEditing,
+  renameFile,
+  toName,
+  setToName,
+  editingId
 }) {
   return (
     <div
@@ -19,8 +25,7 @@ export default function FileItem({
     >
       <div
         className={`${styles.fileHeader} ${
-          selectedItem?.type === "FILE" &&
-          selectedItem?.data?.id === file.id
+          selectedItem?.type === "FILE" && selectedItem?.data?.id === file.id
             ? styles.selected
             : ""
         }`}
@@ -42,7 +47,22 @@ export default function FileItem({
           />
         )}
 
-        <p className={styles.fileName}>{file.name}</p>
+        {isEditing&& editingId === file.id? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              renameFile(file, "FILE", toName);
+              setIsEditing(false);
+            }}
+          >
+            <input value={toName} onChange={(e) => setToName(e.target.value)} />
+          </form>
+        ) : (
+          <p className={styles.fileName}>{file.name}</p>
+        )}
+
+
+
       </div>
     </div>
   );

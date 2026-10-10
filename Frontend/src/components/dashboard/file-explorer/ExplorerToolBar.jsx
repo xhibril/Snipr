@@ -1,16 +1,8 @@
 import styles from "./FileExplorer.module.css";
 
-import {
-  FiTrash,
-  FiStar,
-  FiShare2,
-  FiPlus,
-} from "react-icons/fi";
+import { FiTrash, FiStar, FiShare2, FiPlus } from "react-icons/fi";
 
-import {
-  RiFolderAddLine,
-  RiFileAddLine,
-} from "react-icons/ri";
+import { RiFolderAddLine, RiFileAddLine } from "react-icons/ri";
 
 export default function ExplorerToolBar({
   setCreatingState,
@@ -21,59 +13,50 @@ export default function ExplorerToolBar({
   isCreatingItem,
   isCreatingFolder,
   inputRef,
-  page
+  page,
 }) {
   return (
     <>
-
-    
       <div className={styles.snippetControls}>
         {page.itemActions.includes("create") && (
           <>
-        <RiFolderAddLine
-          className={styles.snippetAction}
-          onClick={() =>
-            setCreatingState({
-              type: "FOLDER",
-              tick: Date.now(),
-            })
-          }
-        />
+            <RiFolderAddLine
+              className={styles.snippetAction}
+              onClick={() =>
+                setCreatingState({
+                  type: "FOLDER",
+                  tick: Date.now(),
+                })
+              }
+            />
 
-        <RiFileAddLine
-          className={styles.snippetAction}
-          onClick={() =>
-            setCreatingState({
-              type: "FILE",
-              tick: Date.now(),
-            })
-          }
-        />
-        </>
-        )
-      }
-    
+            <RiFileAddLine
+              className={styles.snippetAction}
+              onClick={() =>
+                setCreatingState({
+                  type: "FILE",
+                  tick: Date.now(),
+                })
+              }
+            />
+          </>
+        )}
 
-{page.itemActions.includes("delete") &&
-        <FiTrash
-          className={styles.snippetAction}
-          onClick={deleteItem}
-        />
-}
+        {page.itemActions.includes("delete") && (
+          <FiTrash className={styles.snippetAction} onClick={deleteItem} />
+        )}
 
-{page.itemActions.includes("pin") &&
-        <FiStar
-          className={styles.snippetAction}
-          onClick={() => updateItemPinStatus(selectedItem)}
-        />
-}
+        {page.itemActions.includes("pin") && (
+          <FiStar
+            className={styles.snippetAction}
+            onClick={() => updateItemPinStatus(selectedItem)}
+          />
+        )}
 
-{page.itemActions.includes("share") &&
-        <FiShare2 className={styles.snippetAction} />
-    
-}
-</div>
-
+        {page.itemActions.includes("share") && (
+          <FiShare2 className={styles.snippetAction} />
+        )}
+      </div>
 
       {isCreatingItem && page.itemActions.includes("create") && (
         <form
@@ -83,7 +66,7 @@ export default function ExplorerToolBar({
 
             handleCreateItem(
               isCreatingFolder ? "/folders" : "/snippets",
-              inputRef.current.value || ""
+              inputRef.current.value || "",
             );
 
             inputRef.current.value = "";
@@ -92,9 +75,7 @@ export default function ExplorerToolBar({
           <input
             className={styles.addFileField}
             ref={inputRef}
-            placeholder={
-              isCreatingFolder ? "Folder name" : "File name"
-            }
+            placeholder={isCreatingFolder ? "Folder name" : "File name"}
           />
 
           <button type="submit">

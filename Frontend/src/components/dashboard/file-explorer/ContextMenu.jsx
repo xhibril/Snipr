@@ -7,8 +7,11 @@ export default function ContextMenu({
   onRecover,
   type,
   setSelectedItem,
+  onOpen,
   onRename,
-  onOpen
+  isEditing,
+  setIsEditing,
+  setEditingId
 }) {
   return (
     <div
@@ -32,8 +35,11 @@ export default function ContextMenu({
       </button>
 
       
-      <button>Rename</button>
-
+      <button onClick={() => {setIsEditing(true)
+       setEditingId(file.id)
+        setContextMenu(null)
+       
+      }}>Rename</button>
 
 
 

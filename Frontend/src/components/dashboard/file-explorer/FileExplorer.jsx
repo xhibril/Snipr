@@ -59,7 +59,10 @@ export default function FileExplorer({
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [contextMenu, setContextMenu] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
+  const [toName, setToName] = useState(null)
 
   const page = PAGE_CONFIG[activePage] ?? PAGE_CONFIG.REGULAR;
 
@@ -397,6 +400,44 @@ export default function FileExplorer({
     }
   }
 
+
+
+  async function renameFile(item, type, toName){
+    const isFolder = type === "FOLDER";
+    const path = `${isFolder ? "/folders" : "/snippets"}/${item.id}/rename`;
+
+    const previous = isFolder ? structuredClone(folders) : structuredClone(files);
+
+    // opt update
+    if(isFolder){
+      setFolders(prev => prev.map((folder) => folder.id === item.id ? 
+      {...folder, name: toName} : folder)) 
+    } else {
+      setFiles(prev => prev.map((file) => file.id === item.id ? {...file, name: toName} : file))
+    }
+
+    const res = await ApiFetch(path, {
+      method: "PATCH",
+      headers: {"Content-Type" : "application/json"},
+      body: JSON.stringify({name: toName})
+    }, notify, nav)
+
+    if(!res){
+      rollBack(isFolder, previous);
+      return;
+    }
+
+    if(!res.ok){
+      const data = await res.json();
+      notify(data.message || `Could not change name of ${isFolder ? "folder" : "file"}`, "ERROR");
+      rollBack(isFolder, previous);
+      return;
+    }
+    setToName(null)
+    setEditingId(null)
+
+  }
+
   function selectFile(file) {
     setSelectedItem({
       type: "FILE",
@@ -511,6 +552,12 @@ export default function FileExplorer({
                   moveSnippet={moveSnippet}
                   handleContextMenu={handleContextMenu}
                   page = {page}
+                     isEditing = {isEditing}
+            setIsEditing = {setIsEditing}
+            renameFile = {renameFile}
+            toName = {toName}
+            setToName = {setToName}
+   
                 />
               );
             })}
@@ -525,6 +572,12 @@ export default function FileExplorer({
                 updateItemPinStatus={updateItemPinStatus}
                 handleContextMenu={handleContextMenu}
                 page = {page}
+                   isEditing = {isEditing}
+            setIsEditing = {setIsEditing}
+            renameFile = {renameFile}
+            toName = {toName}
+            setToName = {setToName}
+   
               />
             );
           })}
@@ -541,6 +594,11 @@ export default function FileExplorer({
             setSelectedItem={setSelectedItem}
             setContextMenu={setContextMenu}
             onOpen = {onOpen}
+            onRename={renameFile}
+            isEditing = {isEditing}
+            setIsEditing = {setIsEditing}
+            setEditingId={setEditingId}
+            
           />
         )}
       </div>

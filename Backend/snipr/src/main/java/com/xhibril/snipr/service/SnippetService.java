@@ -427,4 +427,35 @@ public class SnippetService {
 
         return ResponseEntity.ok().body(new ApiResponse("Folder successfully recovered"));
     }
+
+
+
+    public ResponseEntity<ApiResponse> renameSnippet(Long userId, Long snippetId, String toName){
+        Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, snippetId);
+
+        if(snippetOpt.isEmpty()){
+            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
+        }
+
+        Snippet snippet = snippetOpt.get();
+        snippet.setFileName(toName);
+        snippetRepo.save(snippet);
+        return ResponseEntity.ok().body(new ApiResponse("Snippet successfully updated"));
+    }
+
+
+   public ResponseEntity<ApiResponse> renameFolder(Long userId, Long folderId, String toName){
+        Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, folderId);
+        if(folderOpt.isEmpty()){
+            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
+        }
+
+        Folder folder = folderOpt.get();
+        folder.setName(toName);
+        folderRepo.save(folder);
+        return ResponseEntity.ok().body(new ApiResponse("Folder successfully updated"));
+   }
+
+
+
 }
