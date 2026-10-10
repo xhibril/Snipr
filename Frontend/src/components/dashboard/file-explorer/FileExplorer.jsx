@@ -417,6 +417,25 @@ export default function FileExplorer({
     isFolder ? setFolders(previous) : setFiles(previous);
   }
 
+
+  function onOpen(item, type){
+    setSelectedItem({
+      data:item,
+      type:type
+    })
+
+
+    if(type === "FOLDER"){
+      const index = sortedFolders.findIndex((folder) => folder.id === item.id);
+
+      if(index !== -1){
+        setOpenFolders((prev) => prev.includes(index) ? prev : [...prev, index]);
+      }
+   
+    }
+       setContextMenu(null);
+  }
+
   // compare two folders at a time
   // pinned = 1 gets placed before unpinned = 0
   const sortedFolders = [...folders].sort((a, b) => b.isPinned - a.isPinned);
@@ -519,6 +538,9 @@ export default function FileExplorer({
             onDelete={deleteItem}
             type={contextMenu.type}
             onRecover={recoverFiles}
+            setSelectedItem={setSelectedItem}
+            setContextMenu={setContextMenu}
+            onOpen = {onOpen}
           />
         )}
       </div>

@@ -54,7 +54,7 @@ export default function ExplorerToolBar({
       }
     
 
-{page.itemActions.includes("trash") &&
+{page.itemActions.includes("delete") &&
         <FiTrash
           className={styles.snippetAction}
           onClick={deleteItem}

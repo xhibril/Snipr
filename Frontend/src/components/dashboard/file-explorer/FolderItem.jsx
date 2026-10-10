@@ -98,13 +98,18 @@ export default function FolderItem({
 
         <p className={styles.folderName}>{folder.name}</p>
 
+{page.itemActions.includes("openFolders") &&
+<>
         {isOpen ? (
           <FiChevronUp className={styles.toggleFolder} />
         ) : (
           <FiChevronDown className={styles.toggleFolder} />
         )}
+        </>
+      }
       </div>
 
+{page.itemActions.includes("openFolders") && 
       <div
         className={`${styles.folderFiles} ${
           isOpen ? styles.show : ""
@@ -121,6 +126,7 @@ export default function FolderItem({
           />
         ))}
       </div>
+}
     </div>
   );
 }
