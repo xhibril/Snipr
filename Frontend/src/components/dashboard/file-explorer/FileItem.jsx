@@ -50,9 +50,11 @@ export default function FileItem({
         {isEditing&& editingId === file.id? (
           <form
             onSubmit={(e) => {
+              e.stopPropagation();
               e.preventDefault();
               renameFile(file, "FILE", toName);
               setIsEditing(false);
+
             }}
           >
             <input value={toName} onChange={(e) => setToName(e.target.value)} />

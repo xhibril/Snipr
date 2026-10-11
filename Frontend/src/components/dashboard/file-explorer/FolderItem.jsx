@@ -20,6 +20,7 @@ export default function FolderItem({
   moveSnippet,
   handleContextMenu,
   page,
+
   isEditing,
   setIsEditing,
   renameFile,
@@ -91,9 +92,11 @@ export default function FolderItem({
         )}
 
         {isEditing && editingId === folder.id ? (
+      
           <form
             onSubmit={(e) => {
               e.preventDefault();
+                e.stopPropagation();
               renameFile(folder, "FOLDER", toName);
               setIsEditing(false)
             }}
@@ -122,12 +125,18 @@ export default function FolderItem({
         <div className={`${styles.folderFiles} ${isOpen ? styles.show : ""}`}>
           {folderFiles.map((file) => (
             <FileItem
-              key={file.id}
-              file={file}
-              selectedItem={selectedItem}
-              selectFile={selectFile}
-              updateItemPinStatus={updateItemPinStatus}
-              handleContextMenu={handleContextMenu}
+                        file={file}
+                selectedItem={selectedItem}
+                selectFile={selectFile}
+                updateItemPinStatus={updateItemPinStatus}
+                handleContextMenu={handleContextMenu}
+                page = {page}
+                   isEditing = {isEditing}
+            setIsEditing = {setIsEditing}
+            renameFile = {renameFile}
+            toName = {toName}
+            setToName = {setToName}
+            editingId = {editingId}
             />
           ))}
         </div>

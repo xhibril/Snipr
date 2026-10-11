@@ -8,10 +8,11 @@ export default function ContextMenu({
   type,
   setSelectedItem,
   onOpen,
-  onRename,
-  isEditing,
   setIsEditing,
-  setEditingId
+  setEditingId,
+  editingId,
+  page,
+  updatePinStatus,
 }) {
   return (
     <div
@@ -23,30 +24,65 @@ export default function ContextMenu({
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      <button onClick={() => onOpen(file, type)}>Open</button>
+      {type === "PANEL" ? (
+        <>
+          <button>New file</button>
+          <button>New folder</button>
+          <button>Paste</button>
+        </>
+      ) : (
+        <>
+          <button onClick={() => onOpen(file, type)}>Open</button>
 
-      <button
-        onClick={() => {
-          onDelete(file, type);
-          setContextMenu(null);
-        }}
-      >
-        Delete
-      </button>
+          {page.itemActions.includes("pin") && (
+            <button
+              onClick={() => {
+                updatePinStatus(file, type);
+                setContextMenu(null);
+              }}
+            >
+              {file?.isPinned ? "Unpin" : "Pin"}
+            </button>
+          )}
 
-      
-      <button onClick={() => {setIsEditing(true)
-       setEditingId(file.id)
-        setContextMenu(null)
-       
-      }}>Rename</button>
+          {page.itemActions.includes("rename") && (
+            <button
+              onClick={() => {
+                setIsEditing(true);
+                setEditingId(file.id);
+                setContextMenu(null);
+              }}
+            >
+              Rename
+            </button>
+          )}
 
+          {page.itemActions.includes("delete") && (
+            <button
+              onClick={() => {
+                onDelete(file, type);
+                setContextMenu(null);
+              }}
+            >
+              Delete
+            </button>
+          )}
 
+          {page.itemActions.includes("share") && (
+            <button onClick={() => setContextMenu(null)}>Share</button>
+          )}
 
-      <button onClick={() => setContextMenu(null)}>Close</button>
-
-      {file?.isDeleted && (
-        <button onClick={() => { onRecover(file, type); setContextMenu(null)}}>Recover</button>
+          {page.itemActions.includes("recover") && (
+            <button
+              onClick={() => {
+                onRecover(file, type);
+                setContextMenu(null);
+              }}
+            >
+              Recover
+            </button>
+          )}
+        </>
       )}
     </div>
   );

@@ -8,26 +8,6 @@ import FileItem from "./FileItem.jsx";
 import ContextMenu from "./ContextMenu.jsx";
 import { PAGE_CONFIG } from "../../../config/pageConfig.jsx";
 
-import {
-  FiX,
-  FiSliders,
-  FiShare2,
-  FiStar,
-  FiChevronUp,
-  FiChevronDown,
-  FiTrash,
-  FiSearch,
-  FiPlus,
-} from "react-icons/fi";
-
-import {
-  RiFile2Fill,
-  RiFolderFill,
-  RiFolderAddLine,
-  RiFileAddLine,
-  RiPushpinFill,
-} from "react-icons/ri";
-
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ApiFetch from "../../utils/Api.jsx";
@@ -226,11 +206,13 @@ export default function FileExplorer({
     }
   }
 
-  async function updateItemPinStatus(selectedItem) {
-    const isFolder = selectedItem.type === "FOLDER";
-    const status = !selectedItem.data.isPinned;
+  async function updateItemPinStatus(item, type) {
+    const isFolder = type === "FOLDER";
+    console.log(item)
 
-    const path = `/${isFolder ? "folders" : "snippets"}/${selectedItem.data.id}/pin`;
+    const status = !item.isPinned;
+
+    const path = `/${isFolder ? "folders" : "snippets"}/${item.id}/pin`;
     const previous = isFolder
       ? structuredClone(folders)
       : structuredClone(files);
@@ -239,7 +221,7 @@ export default function FileExplorer({
     if (isFolder) {
       setFolders(
         folders.map((folder) =>
-          folder.id === selectedItem.data.id
+          folder.id === item.id
             ? {
                 ...folder,
                 isPinned: status,
@@ -250,7 +232,7 @@ export default function FileExplorer({
     } else {
       setFiles(
         files.map((file) =>
-          file.id === selectedItem.data.id
+          file.id === item.id
             ? {
                 ...file,
                 isPinned: status,
@@ -522,7 +504,13 @@ export default function FileExplorer({
         />
 }
 
-        <div
+        <div onContextMenu={(e) => {
+          {/*if file or folder is clicked instead of panel stop the handler */}
+          if (e.target !== e.currentTarget) return;
+
+  e.preventDefault();
+          handleContextMenu(e, null, "PANEL")
+        }}
           className={styles.snippetFiles}
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => {
@@ -557,6 +545,7 @@ export default function FileExplorer({
             renameFile = {renameFile}
             toName = {toName}
             setToName = {setToName}
+            editingId = {editingId}
    
                 />
               );
@@ -577,6 +566,7 @@ export default function FileExplorer({
             renameFile = {renameFile}
             toName = {toName}
             setToName = {setToName}
+            editingId = {editingId}
    
               />
             );
@@ -598,6 +588,9 @@ export default function FileExplorer({
             isEditing = {isEditing}
             setIsEditing = {setIsEditing}
             setEditingId={setEditingId}
+            editingID = {editingId}
+            page = {page}
+            updatePinStatus={updateItemPinStatus}
             
           />
         )}

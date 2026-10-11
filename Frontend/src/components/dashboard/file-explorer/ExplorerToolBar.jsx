@@ -49,7 +49,7 @@ export default function ExplorerToolBar({
         {page.itemActions.includes("pin") && (
           <FiStar
             className={styles.snippetAction}
-            onClick={() => updateItemPinStatus(selectedItem)}
+            onClick={() => updateItemPinStatus(selectedItem?.data, selectedItem?.type)}
           />
         )}
 
