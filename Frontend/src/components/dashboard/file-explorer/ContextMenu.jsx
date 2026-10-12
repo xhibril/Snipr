@@ -13,6 +13,9 @@ export default function ContextMenu({
   editingId,
   page,
   updatePinStatus,
+  setIsCreatingItem,
+  setIsCreatingFolder
+
 }) {
   return (
     <div
@@ -22,13 +25,41 @@ export default function ContextMenu({
         left: x,
         top: y,
       }}
-      onClick={(e) => e.stopPropagation()}
+      onClick={(e) => {
+        
+        
+        e.stopPropagation()
+
+        console.log("TYPE CONTEXT MENU: " + type)
+        console.log("DOES IT ALLOW: "+ page.itemActions.includes("paste"))
+
+      
+      }
+
+
+
+
+
+
+      }
     >
       {type === "PANEL" ? (
         <>
-          <button>New file</button>
-          <button>New folder</button>
-          <button>Paste</button>
+          <button onClick={(e) => {
+            setIsCreatingFolder(false)
+            setIsCreatingItem(true)
+            setContextMenu(null)
+          }}>New file</button>
+
+
+          <button
+        onClick={(e) => {setIsCreatingFolder(true)
+          setIsCreatingItem(true);
+          setContextMenu(null)
+        }
+
+        }>New folder</button>
+
         </>
       ) : (
         <>
@@ -82,8 +113,20 @@ export default function ContextMenu({
               Recover
             </button>
           )}
+
+
+
+
+          {page.itemActions.includes("copy") && 
+          <button>Copy</button>}
         </>
       )}
+
+{/*allow it to appear in panel n folder, not file */}
+{page.itemActions.includes("paste") && 
+(type === "FOLDER" || type === "PANEL") && (
+  <button>Paste</button>
+)}
     </div>
   );
 }

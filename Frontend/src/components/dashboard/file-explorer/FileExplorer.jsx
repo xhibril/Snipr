@@ -20,8 +20,6 @@ export default function FileExplorer({
   notify,
   selectedItem,
   setSelectedItem,
-  setCreatingState,
-  creatingState,
   updateSnippet,
   setIsViewingFile,
   setDraft,
@@ -42,30 +40,11 @@ export default function FileExplorer({
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
+
   const [toName, setToName] = useState(null)
 
   const page = PAGE_CONFIG[activePage] ?? PAGE_CONFIG.REGULAR;
 
-  // updating input field for creating folder or file
-  useEffect(() => {
-    if (creatingState?.type === "FOLDER") {
-      if (isCreatingFolder && isCreatingItem) {
-        setIsCreatingFolder(false);
-        setIsCreatingItem(false);
-      } else {
-        setIsCreatingFolder(true);
-        setIsCreatingItem(true);
-      }
-    } else {
-      if (!isCreatingFolder && isCreatingItem) {
-        setIsCreatingFolder(false);
-        setIsCreatingItem(false);
-      } else {
-        setIsCreatingFolder(false);
-        setIsCreatingItem(true);
-      }
-    }
-  }, [creatingState]);
 
   function handleContextMenu(e, file, type) {
     e.preventDefault();
@@ -78,7 +57,7 @@ export default function FileExplorer({
     });
   }
 
-  // close context menu
+  // close context menu on click
   useEffect(() => {
     const closeMenu = () => setContextMenu(null);
     document.addEventListener("click", closeMenu);
@@ -135,9 +114,10 @@ export default function FileExplorer({
     return `${name} (${counter})`;
   }
 
-  async function handleCreateItem(path, itemName) {
+  async function handleCreateItem(itemName) {
     const isFolder = isCreatingFolder;
     const items = isFolder ? folders : files;
+    const path = isCreatingFolder ? "/folders" : "/snippets"
 
     const inputRes = ValidateInput(itemName, "GENERAL");
 
@@ -480,13 +460,17 @@ export default function FileExplorer({
 
         {page.showExplorerToolBar &&
         <ExplorerToolBar
-          setCreatingState={setCreatingState}
+                setIsCreatingItem = {setIsCreatingItem}
+           isCreatingItem = {isCreatingItem}
+           setIsCreatingFolder = {setIsCreatingFolder}
+           isCreatingFolder = {isCreatingFolder}
+
           deleteItem={deleteItem}
           updateItemPinStatus={updateItemPinStatus}
           handleCreateItem={handleCreateItem}
           selectedItem={selectedItem}
-          isCreatingItem={isCreatingItem}
-          isCreatingFolder={isCreatingFolder}
+
+      
           inputRef={inputRef}
            page = {page}
         />
@@ -501,6 +485,8 @@ export default function FileExplorer({
           filterTags={filterTags}
           setFilterTags={setFilterTags}
            page = {page}
+   
+              
         />
 }
 
@@ -591,6 +577,9 @@ export default function FileExplorer({
             editingID = {editingId}
             page = {page}
             updatePinStatus={updateItemPinStatus}
+            setIsCreatingFolder = {setIsCreatingFolder}
+            setIsCreatingItem = {setIsCreatingItem}
+  
             
           />
         )}

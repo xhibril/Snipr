@@ -3,7 +3,7 @@ export const PAGE_CONFIG = {
     showFolders: true,
     showSearch: true,
     showExplorerToolBar: true,
-    itemActions: ["pin", "move", "delete", "openFolders", "create", "share", "rename", "share"],
+    itemActions: ["pin", "move", "delete", "openFolders", "create", "share", "rename", "share", "copy", "paste"],
     deleteMode: "trash",
   },
 
@@ -19,7 +19,7 @@ export const PAGE_CONFIG = {
     showFolders: true,
     showSearch: true,
     showExplorerToolBar: true,
-    itemActions: ["pin", "move", "delete", "openFolders" ,"share", "rename", "share"],
+    itemActions: ["pin", "move", "delete", "openFolders" ,"share", "rename", "share", "copy", "paste"],
     deleteMode: "trash",
   },
 

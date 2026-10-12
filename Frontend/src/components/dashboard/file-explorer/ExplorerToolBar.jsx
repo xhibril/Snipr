@@ -4,17 +4,35 @@ import { FiTrash, FiStar, FiShare2, FiPlus } from "react-icons/fi";
 
 import { RiFolderAddLine, RiFileAddLine } from "react-icons/ri";
 
+
+import { useEffect } from "react";
+
 export default function ExplorerToolBar({
-  setCreatingState,
+  isCreatingItem, 
+  setIsCreatingItem,
+  isCreatingFolder,
+  setIsCreatingFolder,
   deleteItem,
   updateItemPinStatus,
   handleCreateItem,
   selectedItem,
-  isCreatingItem,
-  isCreatingFolder,
   inputRef,
   page,
 }) {
+
+  
+
+  useEffect(() => {
+
+
+
+      setIsCreatingFolder(isCreatingItem.type === "FOLDER")
+
+
+    
+  }, [isCreatingItem]);
+
+
   return (
     <>
       <div className={styles.snippetControls}>
@@ -23,20 +41,14 @@ export default function ExplorerToolBar({
             <RiFolderAddLine
               className={styles.snippetAction}
               onClick={() =>
-                setCreatingState({
-                  type: "FOLDER",
-                  tick: Date.now(),
-                })
+                setIsCreatingItem(prev => prev?.type === "FOLDER" ? false : {type: "FOLDER"})
               }
             />
 
             <RiFileAddLine
               className={styles.snippetAction}
               onClick={() =>
-                setCreatingState({
-                  type: "FILE",
-                  tick: Date.now(),
-                })
+                setIsCreatingItem(prev => prev?.type === "FILE" ? false : {type: "FILE"})
               }
             />
           </>
@@ -63,13 +75,9 @@ export default function ExplorerToolBar({
           className={styles.addFile}
           onSubmit={(e) => {
             e.preventDefault();
-
-            handleCreateItem(
-              isCreatingFolder ? "/folders" : "/snippets",
-              inputRef.current.value || "",
-            );
-
+            handleCreateItem(inputRef.current.value || "");
             inputRef.current.value = "";
+            setIsCreatingItem(false);
           }}
         >
           <input

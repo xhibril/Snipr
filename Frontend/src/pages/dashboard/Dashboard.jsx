@@ -32,11 +32,6 @@ const endpointSuffix = endpoint[activePage];
 const endpointSnippet = `/snippets${endpointSuffix}`;
 const endpointFolders = `/folders${endpointSuffix}`;
 
-  const [creatingState, setCreatingState] = useState({
-    type: null,
-    tick: 0,
-  });
-
   const [draft, setDraft] = useState({
     title: "",
     body: "",
@@ -201,8 +196,7 @@ const endpointFolders = `/folders${endpointSuffix}`;
           notify={notify}
           setSelectedItem={setSelectedItem}
           selectedItem={selectedItem}
-          creatingState={creatingState}
-          setCreatingState={setCreatingState}
+      
           original={original}
           setOriginal={setOriginal}
           draft={draft}
