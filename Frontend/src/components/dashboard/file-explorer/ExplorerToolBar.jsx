@@ -69,28 +69,6 @@ export default function ExplorerToolBar({
           <FiShare2 className={styles.snippetAction} />
         )}
       </div>
-
-      {isCreatingItem && page.itemActions.includes("create") && (
-        <form
-          className={styles.addFile}
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleCreateItem(inputRef.current.value || "");
-            inputRef.current.value = "";
-            setIsCreatingItem(false);
-          }}
-        >
-          <input
-            className={styles.addFileField}
-            ref={inputRef}
-            placeholder={isCreatingFolder ? "Folder name" : "File name"}
-          />
-
-          <button type="submit">
-            <FiPlus className={styles.addBtn} />
-          </button>
-        </form>
-      )}
     </>
   );
 }

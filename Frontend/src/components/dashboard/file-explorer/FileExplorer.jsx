@@ -7,6 +7,7 @@ import FolderItem from "./FolderItem.jsx";
 import FileItem from "./FileItem.jsx";
 import ContextMenu from "./ContextMenu.jsx";
 import { PAGE_CONFIG } from "../../../config/pageConfig.jsx";
+import NewItem from "../../ui/NewItemInput.jsx";
 
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -67,12 +68,7 @@ export default function FileExplorer({
     };
   }, []);
 
-  // focus on field
-  useEffect(() => {
-    if (isCreatingItem) {
-      inputRef.current.focus();
-    }
-  }, [isCreatingItem, isCreatingFolder]);
+
 
   async function searchItems() {
     const result = SearchFiles(sortedFiles, searchQuery, filterTags);
@@ -532,6 +528,10 @@ export default function FileExplorer({
             toName = {toName}
             setToName = {setToName}
             editingId = {editingId}
+              isCreatingItem = {isCreatingItem}
+  setIsCreatingItem = {setIsCreatingItem}
+  isCreatingFolder = {isCreatingFolder}
+  inputRef = {inputRef}
    
                 />
               );
@@ -583,7 +583,29 @@ export default function FileExplorer({
             
           />
         )}
+
+
+
+        {isCreatingItem && selectedItem?.data.type !== "FOLDER" && (
+          <NewItem
+
+
+              isCreatingItem = {isCreatingItem}
+    setIsCreatingItem = {setIsCreatingItem}
+    isCreatingFolder = {isCreatingFolder}
+    page = {page}
+    inputRef = {inputRef}
+            
+          
+          
+          
+          
+          />
+        )}
       </div>
+
+
+
     </>
   );
 }

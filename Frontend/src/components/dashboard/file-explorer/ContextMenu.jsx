@@ -46,15 +46,21 @@ export default function ContextMenu({
       {type === "PANEL" ? (
         <>
           <button onClick={(e) => {
+
+      
             setIsCreatingFolder(false)
-            setIsCreatingItem(true)
+                 setIsCreatingItem(prev => prev?.type === "FILE" ? false : {type: "FILE"})
             setContextMenu(null)
           }}>New file</button>
 
 
+
+{/*set selected item null incase user has folder open n clicks on panel */}
           <button
+      
         onClick={(e) => {setIsCreatingFolder(true)
-          setIsCreatingItem(true);
+              setSelectedItem(null)
+             setIsCreatingItem(prev => prev?.type === "FILE" ? false : {type: "FILE"})
           setContextMenu(null)
         }
 

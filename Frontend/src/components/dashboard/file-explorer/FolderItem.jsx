@@ -7,6 +7,7 @@ import { RiFolderFill, RiPushpinFill } from "react-icons/ri";
 
 import FileItem from "./FileItem";
 
+import NewItem from "../../ui/NewItemInput";
 export default function FolderItem({
   folder,
   files,
@@ -26,6 +27,11 @@ export default function FolderItem({
   renameFile,
   toName,
   setToName,
+
+  isCreatingItem,
+  setIsCreatingItem,
+  isCreatingFolder,
+  inputRef,
   
   editingId
 }) {
@@ -141,6 +147,19 @@ export default function FolderItem({
           ))}
         </div>
       )}
+
+
+  {isCreatingItem &&
+  selectedItem?.type === "FOLDER" &&
+   selectedItem?.data?.id === folder.id && (
+    <NewItem
+      isCreatingItem={isCreatingItem}
+      setIsCreatingItem={setIsCreatingItem}
+      isCreatingFolder={isCreatingFolder}
+      page={page}
+      inputRef={inputRef}
+    />
+  )}
     </div>
   );
 }
