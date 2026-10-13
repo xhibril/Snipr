@@ -32,6 +32,7 @@ export default function FolderItem({
   setIsCreatingItem,
   isCreatingFolder,
   inputRef,
+  handleCreateItem,
   
   editingId
 }) {
@@ -72,6 +73,8 @@ export default function FolderItem({
               type: "FOLDER",
               data: folder,
             });
+
+
           }
 
           setOpenFolders((prev) =>
@@ -80,7 +83,12 @@ export default function FolderItem({
               : [...prev, index],
           );
         }}
-        onContextMenu={(e) => handleContextMenu(e, folder, "FOLDER")}
+        onContextMenu={(e) => handleContextMenu(e, folder, "FOLDER")
+
+
+
+          
+        }
       >
         <RiFolderFill className={styles.folderIcon} />
 
@@ -158,6 +166,7 @@ export default function FolderItem({
       isCreatingFolder={isCreatingFolder}
       page={page}
       inputRef={inputRef}
+      handleCreateItem = {handleCreateItem}
     />
   )}
     </div>

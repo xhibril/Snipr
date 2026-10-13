@@ -7,7 +7,7 @@ export default function NewItem({
     isCreatingItem,
     setIsCreatingItem,
     isCreatingFolder,
-
+    handleCreateItem,
     page,
     inputRef
 
@@ -24,18 +24,23 @@ export default function NewItem({
       }, [isCreatingItem, isCreatingFolder]);
 
 
+      // close field
+
+
       useEffect(() => {
-        const closeField = () => {    
-            setIsCreatingItem(false)
+
+        const closeField = () => {
+          setIsCreatingItem(false)
+          document.removeEventListener("click", closeField);
         }
 
-        document.addEventListener("click" , closeField)
-
+        document.addEventListener("click", closeField);
 
         return () => {
-            document.removeEventListener("click", closeField)
+          document.removeEventListener("click", closeField)
         }
-     }, [isCreatingItem, isCreatingFolder]);
+
+      }, [isCreatingItem])
 
 
 
@@ -52,12 +57,15 @@ export default function NewItem({
             handleCreateItem(inputRef.current.value || "");
             inputRef.current.value = "";
             setIsCreatingItem(false);
+            e.stopPropagation();
           }}
         >
           <input
             className={styles.addFileField}
             ref={inputRef}
+            
             placeholder={isCreatingFolder ? "Folder name" : "File name"}
+          
           />
 
           <button type="submit">

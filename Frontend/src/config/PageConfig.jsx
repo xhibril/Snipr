@@ -26,8 +26,8 @@ export const PAGE_CONFIG = {
   DELETED: {
     showFolders: true,
     showSearch: true,
-    showExplorerToolBar: true,
-    itemActions: ["recover", "permanentDelete"],
+    showExplorerToolBar: false,
+    itemActions: ["recover", "delete"],
     deleteMode: "permanent",
   },
 };

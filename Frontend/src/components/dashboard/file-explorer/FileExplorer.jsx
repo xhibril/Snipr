@@ -47,8 +47,20 @@ export default function FileExplorer({
   const page = PAGE_CONFIG[activePage] ?? PAGE_CONFIG.REGULAR;
 
 
+
+  useEffect(()=> {
+
+    setSelectedItem(null)
+    setOpenFolders([])
+
+
+
+  }, [page])
+
+
   function handleContextMenu(e, file, type) {
     e.preventDefault();
+       setIsCreatingItem(false)
 
     setContextMenu({
       x: e.clientX,
@@ -58,15 +70,20 @@ export default function FileExplorer({
     });
   }
 
+
   // close context menu on click
   useEffect(() => {
-    const closeMenu = () => setContextMenu(null);
-    document.addEventListener("click", closeMenu);
+  const closeMenu = () => {
+    setContextMenu(null);
+    document.removeEventListener("click", closeMenu);
+  };
 
-    return () => {
-      document.removeEventListener("click", closeMenu);
-    };
-  }, []);
+  document.addEventListener("click", closeMenu);
+
+  return () => {
+    document.removeEventListener("click", closeMenu);
+  };
+}, [contextMenu]);
 
 
 
@@ -450,6 +467,7 @@ export default function FileExplorer({
 
   const displayedFiles = isSearching ? searchResults : sortedFiles;
 
+
   return (
     <>
       <div className={styles.fileExplorer}>
@@ -489,6 +507,11 @@ export default function FileExplorer({
         <div onContextMenu={(e) => {
           {/*if file or folder is clicked instead of panel stop the handler */}
           if (e.target !== e.currentTarget) return;
+
+
+        
+          setSelectedItem(null)
+          setIsCreatingItem(false)
 
   e.preventDefault();
           handleContextMenu(e, null, "PANEL")
@@ -532,6 +555,7 @@ export default function FileExplorer({
   setIsCreatingItem = {setIsCreatingItem}
   isCreatingFolder = {isCreatingFolder}
   inputRef = {inputRef}
+  handleCreateItem={handleCreateItem}
    
                 />
               );
@@ -586,7 +610,7 @@ export default function FileExplorer({
 
 
 
-        {isCreatingItem && selectedItem?.data.type !== "FOLDER" && (
+        {isCreatingItem && selectedItem?.type !== "FOLDER" && (
           <NewItem
 
 
@@ -595,6 +619,7 @@ export default function FileExplorer({
     isCreatingFolder = {isCreatingFolder}
     page = {page}
     inputRef = {inputRef}
+    handleCreateItem = {handleCreateItem}
             
           
           

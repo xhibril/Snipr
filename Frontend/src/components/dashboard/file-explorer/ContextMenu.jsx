@@ -26,49 +26,63 @@ export default function ContextMenu({
         top: y,
       }}
       onClick={(e) => {
-        
-        
         e.stopPropagation()
 
-        console.log("TYPE CONTEXT MENU: " + type)
-        console.log("DOES IT ALLOW: "+ page.itemActions.includes("paste"))
+    
+      }}
+        
+        
+        
+        >
+
+
+
+
+{type !== "FILE" &&
+<>
+                    <button onClick={(e) => {
 
       
-      }
-
-
-
-
-
-
-      }
-    >
-      {type === "PANEL" ? (
-        <>
-          <button onClick={(e) => {
-
-      
+setSelectedItem({
+  data: file,
+  type: type
+})
             setIsCreatingFolder(false)
                  setIsCreatingItem(prev => prev?.type === "FILE" ? false : {type: "FILE"})
             setContextMenu(null)
           }}>New file</button>
+        
 
 
 
-{/*set selected item null incase user has folder open n clicks on panel */}
+
           <button
       
         onClick={(e) => {setIsCreatingFolder(true)
-              setSelectedItem(null)
-             setIsCreatingItem(prev => prev?.type === "FILE" ? false : {type: "FILE"})
+
+          setSelectedItem({
+  data: file,
+  type: type
+})
+              
+             setIsCreatingItem(prev => prev?.type === "FOLDER" ? false : {type: "FOLDER"})
           setContextMenu(null)
         }
 
         }>New folder</button>
-
         </>
-      ) : (
-        <>
+        }
+
+
+
+
+
+
+
+
+   
+   {type !== "PANEL" &&
+    <>
           <button onClick={() => onOpen(file, type)}>Open</button>
 
           {page.itemActions.includes("pin") && (
@@ -125,8 +139,9 @@ export default function ContextMenu({
 
           {page.itemActions.includes("copy") && 
           <button>Copy</button>}
-        </>
-      )}
+          </>
+          }
+      
 
 {/*allow it to appear in panel n folder, not file */}
 {page.itemActions.includes("paste") && 

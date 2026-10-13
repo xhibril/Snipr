@@ -40,15 +40,19 @@ export default function ExplorerToolBar({
           <>
             <RiFolderAddLine
               className={styles.snippetAction}
-              onClick={() =>
+              onClick={() => {
                 setIsCreatingItem(prev => prev?.type === "FOLDER" ? false : {type: "FOLDER"})
+                setIsCreatingFolder(true)
+              }
               }
             />
 
             <RiFileAddLine
               className={styles.snippetAction}
-              onClick={() =>
+              onClick={() => {
                 setIsCreatingItem(prev => prev?.type === "FILE" ? false : {type: "FILE"})
+                setIsCreatingFolder(false)
+              }
               }
             />
           </>
