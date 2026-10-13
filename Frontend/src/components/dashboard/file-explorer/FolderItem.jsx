@@ -1,5 +1,5 @@
 import styles from "./FileExplorer.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 
@@ -37,6 +37,17 @@ export default function FolderItem({
   editingId
 }) {
   const folderFiles = files.filter((file) => file.folderId === folder.id);
+
+
+
+  const editingInputRef = useRef(null)
+
+useEffect(() => {
+  if (isEditing && editingId === folder.id) {
+    editingInputRef.current?.focus();
+  }
+}, [isEditing, editingId, folder.id]);
+
 
   return (
     <div
@@ -83,12 +94,7 @@ export default function FolderItem({
               : [...prev, index],
           );
         }}
-        onContextMenu={(e) => handleContextMenu(e, folder, "FOLDER")
-
-
-
-          
-        }
+        onContextMenu={(e) => handleContextMenu(e, folder, "FOLDER")}
       >
         <RiFolderFill className={styles.folderIcon} />
 
@@ -115,7 +121,8 @@ export default function FolderItem({
               setIsEditing(false)
             }}
           >
-            <input value={toName} onChange={(e) => setToName(e.target.value)} />
+            <input value={toName} onChange={(e) => setToName(e.target.value)} 
+            ref = {editingInputRef}/>
           </form>
         ) : (
           <p className={styles.folderName}>{folder.name}</p>

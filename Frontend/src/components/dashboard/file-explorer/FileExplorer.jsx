@@ -61,6 +61,7 @@ export default function FileExplorer({
   function handleContextMenu(e, file, type) {
     e.preventDefault();
        setIsCreatingItem(false)
+       setIsEditing(false)
 
     setContextMenu({
       x: e.clientX,
@@ -75,6 +76,7 @@ export default function FileExplorer({
   useEffect(() => {
   const closeMenu = () => {
     setContextMenu(null);
+        setIsEditing(false)
     document.removeEventListener("click", closeMenu);
   };
 
@@ -100,16 +102,16 @@ export default function FileExplorer({
     return () => clearTimeout(timer);
   }, [searchQuery, filterTags]);
 
-  function getAvailableName(name, items) {
+  function getAvailableName(name, items, type) {
     // name exists
     if (items.some((item) => item.name === name)) {
       return null;
     }
 
-    const trimmedName = name.trim();
+    const trimmedName = name?.trim();
 
     if (!trimmedName) {
-      name = isCreatingFolder ? "New Folder" : "New File";
+      name = type === "FOLDER" ? "New Folder" : "New File";
     } else {
       name = trimmedName;
     }
@@ -139,7 +141,7 @@ export default function FileExplorer({
       return;
     }
 
-    itemName = getAvailableName(itemName, items);
+    itemName = getAvailableName(itemName, items, isCreatingFolder ? "FOLDER" : "FILE");
 
     if (!itemName) {
       notify(`This ${isFolder ? "folder" : "file"} already exists`);
@@ -378,23 +380,25 @@ export default function FileExplorer({
 
 
   async function renameFile(item, type, toName){
+
     const isFolder = type === "FOLDER";
     const path = `${isFolder ? "/folders" : "/snippets"}/${item.id}/rename`;
+        const finalizedName = getAvailableName(toName, isFolder ? folders : files, type)
 
     const previous = isFolder ? structuredClone(folders) : structuredClone(files);
 
     // opt update
     if(isFolder){
       setFolders(prev => prev.map((folder) => folder.id === item.id ? 
-      {...folder, name: toName} : folder)) 
+      {...folder, name: finalizedName} : folder)) 
     } else {
-      setFiles(prev => prev.map((file) => file.id === item.id ? {...file, name: toName} : file))
+      setFiles(prev => prev.map((file) => file.id === item.id ? {...file, name: finalizedName} : file))
     }
 
     const res = await ApiFetch(path, {
       method: "PATCH",
       headers: {"Content-Type" : "application/json"},
-      body: JSON.stringify({name: toName})
+      body: JSON.stringify({name: finalizedName})
     }, notify, nav)
 
     if(!res){
