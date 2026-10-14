@@ -14,8 +14,10 @@ export default function ContextMenu({
   page,
   updatePinStatus,
   setIsCreatingItem,
-  setIsCreatingFolder
-
+  setIsCreatingFolder,
+  pasteItem,
+  copy,
+  setCopy
 }) {
   return (
     <div
@@ -26,63 +28,49 @@ export default function ContextMenu({
         top: y,
       }}
       onClick={(e) => {
-        e.stopPropagation()
-
-    
+        e.stopPropagation();
       }}
-        
-        
-        
-        >
-
-
-
-
-{type !== "FILE" &&
-<>
-                    <button onClick={(e) => {
-
-      
-setSelectedItem({
-  data: file,
-  type: type
-})
-            setIsCreatingFolder(false)
-                 setIsCreatingItem(prev => prev?.type === "FILE" ? false : {type: "FILE"})
-            setContextMenu(null)
-          }}>New file</button>
-        
-
-
-
+    >
+      {type !== "FILE" && (
+        <>
+          <button
+            onClick={(e) => {
+              setSelectedItem({
+                data: file,
+                type: type,
+              });
+              setIsCreatingFolder(false);
+              setIsCreatingItem((prev) =>
+                prev?.type === "FILE" ? false : { type: "FILE" },
+              );
+              setContextMenu(null);
+            }}
+          >
+            New file
+          </button>
 
           <button
-      
-        onClick={(e) => {setIsCreatingFolder(true)
+            onClick={(e) => {
+              setIsCreatingFolder(true);
 
-          setSelectedItem({
-  data: file,
-  type: type
-})
-              
-             setIsCreatingItem(prev => prev?.type === "FOLDER" ? false : {type: "FOLDER"})
-          setContextMenu(null)
-        }
+              setSelectedItem({
+                data: file,
+                type: type,
+              });
 
-        }>New folder</button>
+              setIsCreatingItem((prev) =>
+                prev?.type === "FOLDER" ? false : { type: "FOLDER" },
+              );
+              setContextMenu(null);
+            }}
+          >
+            New folder
+          </button>
         </>
-        }
+      )}
 
-
-
-
-
-
-
-
-   
-   {type !== "PANEL" &&
-    <>
+      {type !== "PANEL" && (
+        <>
           <button onClick={() => onOpen(file, type)}>Open</button>
 
           {page.itemActions.includes("pin") && (
@@ -134,20 +122,22 @@ setSelectedItem({
             </button>
           )}
 
+          {page.itemActions.includes("copy") && (
+            <button onClick={() => setCopy(file)}>Copy</button>
+          )}
+        </>
+      )}
 
-
-
-          {page.itemActions.includes("copy") && 
-          <button>Copy</button>}
-          </>
-          }
-      
-
-{/*allow it to appear in panel n folder, not file */}
-{page.itemActions.includes("paste") && 
-(type === "FOLDER" || type === "PANEL") && (
-  <button>Paste</button>
-)}
+      {/*allow it to appear in panel n folder, not file */}
+      {page.itemActions.includes("paste") &&
+        (type === "FOLDER" || type === "PANEL") && <button onClick={() =>{
+        console.log("ITEM: " + copy);
+        
+        pasteItem(copy, "FOLDER")
+        }
+        
+        
+        }>Paste</button>}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 package com.xhibril.snipr.service;
 
 import com.xhibril.snipr.dto.api.ApiResponse;
+import com.xhibril.snipr.dto.snippet.FolderCopyResponse;
 import com.xhibril.snipr.dto.snippet.FolderResponse;
 import com.xhibril.snipr.dto.snippet.SnippetRequest;
 import com.xhibril.snipr.dto.snippet.SnippetResponse;
@@ -455,6 +456,47 @@ public class SnippetService {
         folderRepo.save(folder);
         return ResponseEntity.ok().body(new ApiResponse("Folder successfully updated"));
    }
+
+
+
+   @Transactional
+   public ResponseEntity<ApiResponse> emptyRecycleBin(Long userId){
+        snippetRepo.deleteByUserIdAndIsDeletedTrue(userId);
+        folderRepo.deleteByUserIdAndIsDeletedTrue(userId);
+        return ResponseEntity.ok().body(new ApiResponse("Recycle bin successfully emptied"));
+   }
+
+
+
+   @Transactional
+    public ResponseEntity<FolderCopyResponse> copyFolder(Long userId, Long folderId){
+        Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, folderId);
+
+        if(folderOpt.isEmpty()){
+            return ResponseEntity.badRequest().body(new FolderCopyResponse("Invalid request"));
+        }
+
+        Folder copiedFolder = folderOpt.get();
+
+        List<Snippet> snippets = snippetRepo.findByUserIdAndFolderId(userId, folderId);
+
+        Folder savedFolder = folderRepo.save(copiedFolder);
+        
+        
+        List<Snippet> savedSnippets = List.of();
+        if(!snippets.isEmpty()){
+            savedSnippets = snippetRepo.saveAll(snippets);
+        }
+        
+        FolderCopyResponse folderCopyResponse = new FolderCopyResponse(savedFolder, savedSnippets);
+
+        return ResponseEntity.ok(folderCopyResponse);
+
+   }
+
+
+
+
 
 
 

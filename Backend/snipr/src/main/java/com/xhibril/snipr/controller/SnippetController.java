@@ -139,10 +139,22 @@ public class SnippetController {
 public ResponseEntity<ApiResponse> renameFolder(@PathVariable Long folderId, @RequestBody FolderRequest folderRequest){
         Long userId = 1L;
         return snippetService.renameFolder(userId, folderId, folderRequest.getName());
-
-
-
-
     }
+
+
+    @DeleteMapping("/bin")
+    public ResponseEntity<ApiResponse> emptyRecycleBin(){
+        Long userId = 1L;
+        return snippetService.emptyRecycleBin(userId);
+    }
+
+
+    @PostMapping("/folders/{folderId}/copy")
+    public ResponseEntity<FolderCopyResponse> copyFolder(@PathVariable Long folderId) {
+        Long userId = 1L;
+        return snippetService.copyFolder(userId, folderId);
+    }
+
+
 
 }

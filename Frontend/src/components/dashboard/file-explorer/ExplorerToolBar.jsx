@@ -18,6 +18,7 @@ export default function ExplorerToolBar({
   selectedItem,
   inputRef,
   page,
+  emptyRecycleBin
 }) {
 
   
@@ -58,9 +59,22 @@ export default function ExplorerToolBar({
           </>
         )}
 
-        {page.itemActions.includes("delete") && (
-          <FiTrash className={styles.snippetAction} onClick={deleteItem} />
-        )}
+        {page.itemActions.includes("delete") && 
+                    <FiTrash className={styles.snippetAction} onClick={deleteItem} />
+        }
+
+
+        {page.deleteMode === "permanent" &&
+        <div onClick={emptyRecycleBin}>
+           
+
+
+        <FiTrash className={styles.snippetAction}/>
+        Empty recycle bin
+        </div>
+
+       
+        }
 
         {page.itemActions.includes("pin") && (
           <FiStar

@@ -49,4 +49,6 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
             WHERE f.deletedAt < :time
             """)
     void deleteExpiredFolders(@Param("time") LocalDateTime time);
+
+    void deleteByUserIdAndIsDeletedTrue(Long userId);
 }

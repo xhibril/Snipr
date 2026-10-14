@@ -86,4 +86,6 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
             """)
     List<Snippet> findStarredSnippets(@Param("userId") Long userId);
 
+
+    void deleteByUserIdAndIsDeletedTrue(Long userId);
 }

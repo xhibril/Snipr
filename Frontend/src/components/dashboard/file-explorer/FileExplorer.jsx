@@ -40,28 +40,21 @@ export default function FileExplorer({
   const [contextMenu, setContextMenu] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [copy, setCopy] = useState([]);
 
-
-  const [toName, setToName] = useState(null)
+  const [toName, setToName] = useState(null);
 
   const page = PAGE_CONFIG[activePage] ?? PAGE_CONFIG.REGULAR;
 
-
-
-  useEffect(()=> {
-
-    setSelectedItem(null)
-    setOpenFolders([])
-
-
-
-  }, [page])
-
+  useEffect(() => {
+    setSelectedItem(null);
+    setOpenFolders([]);
+  }, [page]);
 
   function handleContextMenu(e, file, type) {
     e.preventDefault();
-       setIsCreatingItem(false)
-       setIsEditing(false)
+    setIsCreatingItem(false);
+    setIsEditing(false);
 
     setContextMenu({
       x: e.clientX,
@@ -71,23 +64,20 @@ export default function FileExplorer({
     });
   }
 
-
   // close context menu on click
   useEffect(() => {
-  const closeMenu = () => {
-    setContextMenu(null);
-        setIsEditing(false)
-    document.removeEventListener("click", closeMenu);
-  };
+    const closeMenu = () => {
+      setContextMenu(null);
+      setIsEditing(false);
+      document.removeEventListener("click", closeMenu);
+    };
 
-  document.addEventListener("click", closeMenu);
+    document.addEventListener("click", closeMenu);
 
-  return () => {
-    document.removeEventListener("click", closeMenu);
-  };
-}, [contextMenu]);
-
-
+    return () => {
+      document.removeEventListener("click", closeMenu);
+    };
+  }, [contextMenu]);
 
   async function searchItems() {
     const result = SearchFiles(sortedFiles, searchQuery, filterTags);
@@ -132,7 +122,7 @@ export default function FileExplorer({
   async function handleCreateItem(itemName) {
     const isFolder = isCreatingFolder;
     const items = isFolder ? folders : files;
-    const path = isCreatingFolder ? "/folders" : "/snippets"
+    const path = isCreatingFolder ? "/folders" : "/snippets";
 
     const inputRes = ValidateInput(itemName, "GENERAL");
 
@@ -141,7 +131,11 @@ export default function FileExplorer({
       return;
     }
 
-    itemName = getAvailableName(itemName, items, isCreatingFolder ? "FOLDER" : "FILE");
+    itemName = getAvailableName(
+      itemName,
+      items,
+      isCreatingFolder ? "FOLDER" : "FILE",
+    );
 
     if (!itemName) {
       notify(`This ${isFolder ? "folder" : "file"} already exists`);
@@ -203,7 +197,7 @@ export default function FileExplorer({
 
   async function updateItemPinStatus(item, type) {
     const isFolder = type === "FOLDER";
-    console.log(item)
+    console.log(item);
 
     const status = !item.isPinned;
 
@@ -258,11 +252,11 @@ export default function FileExplorer({
       type = selectedItem?.type;
     }
 
-     const isFolder = type === "FOLDER";
+    const isFolder = type === "FOLDER";
 
-     const isPermanent = page.deleteMode === "permanent";
+    const isPermanent = page.deleteMode === "permanent";
     const path = `/${isFolder ? "folders" : "snippets"}/${item.id} 
-    ${ isPermanent ? "/permanent" : ""}`;
+    ${isPermanent ? "/permanent" : ""}`;
 
     const previousFolders = structuredClone(folders);
     const previousFiles = structuredClone(files);
@@ -377,44 +371,191 @@ export default function FileExplorer({
     }
   }
 
-
-
-  async function renameFile(item, type, toName){
-
+  async function renameFile(item, type, toName) {
     const isFolder = type === "FOLDER";
     const path = `${isFolder ? "/folders" : "/snippets"}/${item.id}/rename`;
-        const finalizedName = getAvailableName(toName, isFolder ? folders : files, type)
+    const finalizedName = getAvailableName(
+      toName,
+      isFolder ? folders : files,
+      type,
+    );
 
-    const previous = isFolder ? structuredClone(folders) : structuredClone(files);
+    const previous = isFolder
+      ? structuredClone(folders)
+      : structuredClone(files);
 
     // opt update
-    if(isFolder){
-      setFolders(prev => prev.map((folder) => folder.id === item.id ? 
-      {...folder, name: finalizedName} : folder)) 
+    if (isFolder) {
+      setFolders((prev) =>
+        prev.map((folder) =>
+          folder.id === item.id ? { ...folder, name: finalizedName } : folder,
+        ),
+      );
     } else {
-      setFiles(prev => prev.map((file) => file.id === item.id ? {...file, name: finalizedName} : file))
+      setFiles((prev) =>
+        prev.map((file) =>
+          file.id === item.id ? { ...file, name: finalizedName } : file,
+        ),
+      );
     }
 
-    const res = await ApiFetch(path, {
-      method: "PATCH",
-      headers: {"Content-Type" : "application/json"},
-      body: JSON.stringify({name: finalizedName})
-    }, notify, nav)
+    const res = await ApiFetch(
+      path,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: finalizedName }),
+      },
+      notify,
+      nav,
+    );
 
-    if(!res){
+    if (!res) {
       rollBack(isFolder, previous);
       return;
     }
 
-    if(!res.ok){
+    if (!res.ok) {
       const data = await res.json();
-      notify(data.message || `Could not change name of ${isFolder ? "folder" : "file"}`, "ERROR");
+      notify(
+        data.message ||
+          `Could not change name of ${isFolder ? "folder" : "file"}`,
+        "ERROR",
+      );
       rollBack(isFolder, previous);
       return;
     }
-    setToName(null)
-    setEditingId(null)
+    setToName(null);
+    setEditingId(null);
+  }
 
+  async function emptyRecycleBin() {
+    const path = "/bin";
+
+    const previousFolders = structuredClone(folders);
+    const previousFiles = structuredClone(files);
+
+    setFolders([]);
+    setFiles([]);
+
+    const res = await ApiFetch(
+      path,
+      {
+        method: "DELETE",
+      },
+      notify,
+      nav,
+    );
+
+    if (!res) {
+      setFolders(previousFolders);
+      setFiles(previousFiles);
+      return;
+    }
+
+    if (!res.ok) {
+      const data = await res.json();
+      notify(data.message || "Could not empty recycle bin", "ERROR");
+      setFolders(previousFolders);
+      setFiles(previousFiles);
+      return;
+    }
+  }
+
+  async function pasteItem(item, type) {
+    const isFolder = type === "FOLDER" ? "/folders/" : "/snippets";
+
+    const path = `${isFolder ? "/folders" : "/snippets"}/${item.id}/copy`;
+    const items = isFolder ? folders : files;
+
+    const placeholderId = crypto.randomUUID();
+
+    let counter = 2;
+    let itemName = `${item.name} copy`;
+    while (items.some((item) => item.name === `${item.name} copy${counter}`)) {
+      counter++;
+      itemName = `${item.name} copy${counter}`;
+    }
+
+    const previousFolders = structuredClone(folders);
+    const previousFiles = structuredClone(files);
+
+    // opt update
+    if (isFolder) {
+      const optimisticFolder = {
+        id: placeholderId,
+        name: itemName,
+      };
+
+      setFolders((prev) => [...prev, optimisticFolder]);
+
+      // check if folder has files inside
+      const filesToPaste = files.filter((file) => file.folderId === item.id);
+
+   const finalizedFilesToPaste = filesToPaste.map(file => ({
+  ...file,
+  id: crypto.randomUUID(),
+  folderId: placeholderId
+}));
+
+      setFiles((prev) => [...prev, finalizedFilesToPaste]);
+    } else {
+
+      const optimisticFile = {
+        folderId: placeholderId,
+        name: itemName,
+      };
+
+      setFiles((prev) => [...prev, optimisticFile]);
+    }
+
+    const res = await ApiFetch(
+      path,
+      {
+        method: "POST",
+      },
+      notify,
+      nav,
+    );
+
+    if (!res) {
+      setFolders(previousFolders);
+      setFiles(previousFiles);
+      return;
+    }
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setFolders(previousFolders);
+      setFiles(previousFiles);
+      notify(data.message || `Could not copy${isFolder ? "folder" : "file"}`);
+      return;
+    }
+
+    // replace files
+    if (isFolder) {
+      setFolders( prev =>
+        prev.map((folder) =>
+          folder.id === placeholderId
+            ? { ...folder, folderId: data.folder.id }
+            : folder,
+        ),
+      );
+
+  setFiles(prev => [
+    ...prev.filter(file => file.folderId !== placeholderId),
+    ...data.snippets
+  ]);
+    } else {
+     setFiles(prev =>
+    prev.map(file =>
+      file.id === placeholderId
+        ? data.snippet
+        : file
+    )
+  );
+    }
   }
 
   function selectFile(file) {
@@ -437,23 +578,22 @@ export default function FileExplorer({
     isFolder ? setFolders(previous) : setFiles(previous);
   }
 
-
-  function onOpen(item, type){
+  function onOpen(item, type) {
     setSelectedItem({
-      data:item,
-      type:type
-    })
+      data: item,
+      type: type,
+    });
 
-
-    if(type === "FOLDER"){
+    if (type === "FOLDER") {
       const index = sortedFolders.findIndex((folder) => folder.id === item.id);
 
-      if(index !== -1){
-        setOpenFolders((prev) => prev.includes(index) ? prev : [...prev, index]);
+      if (index !== -1) {
+        setOpenFolders((prev) =>
+          prev.includes(index) ? prev : [...prev, index],
+        );
       }
-   
     }
-       setContextMenu(null);
+    setContextMenu(null);
   }
 
   // compare two folders at a time
@@ -471,55 +611,50 @@ export default function FileExplorer({
 
   const displayedFiles = isSearching ? searchResults : sortedFiles;
 
-
   return (
     <>
       <div className={styles.fileExplorer}>
+        {page.showExplorerToolBar && (
+          <ExplorerToolBar
+            setIsCreatingItem={setIsCreatingItem}
+            isCreatingItem={isCreatingItem}
+            setIsCreatingFolder={setIsCreatingFolder}
+            isCreatingFolder={isCreatingFolder}
+            deleteItem={deleteItem}
+            updateItemPinStatus={updateItemPinStatus}
+            handleCreateItem={handleCreateItem}
+            selectedItem={selectedItem}
+            emptyRecycleBin={emptyRecycleBin}
+            inputRef={inputRef}
+            page={page}
+          />
+        )}
 
-        {page.showExplorerToolBar &&
-        <ExplorerToolBar
-                setIsCreatingItem = {setIsCreatingItem}
-           isCreatingItem = {isCreatingItem}
-           setIsCreatingFolder = {setIsCreatingFolder}
-           isCreatingFolder = {isCreatingFolder}
+        {page.showSearch && (
+          <SearchBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            toggleSearchFilter={toggleSearchFilter}
+            setToggleSearchFilter={setToggleSearchFilter}
+            filterTags={filterTags}
+            setFilterTags={setFilterTags}
+            page={page}
+          />
+        )}
 
-          deleteItem={deleteItem}
-          updateItemPinStatus={updateItemPinStatus}
-          handleCreateItem={handleCreateItem}
-          selectedItem={selectedItem}
+        <div
+          onContextMenu={(e) => {
+            {
+              /*if file or folder is clicked instead of panel stop the handler */
+            }
+            if (e.target !== e.currentTarget) return;
 
-      
-          inputRef={inputRef}
-           page = {page}
-        />
-}
+            setSelectedItem(null);
+            setIsCreatingItem(false);
 
-{page.showSearch &&
-        <SearchBar
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          toggleSearchFilter={toggleSearchFilter}
-          setToggleSearchFilter={setToggleSearchFilter}
-          filterTags={filterTags}
-          setFilterTags={setFilterTags}
-           page = {page}
-   
-              
-        />
-}
-
-        <div onContextMenu={(e) => {
-          {/*if file or folder is clicked instead of panel stop the handler */}
-          if (e.target !== e.currentTarget) return;
-
-
-        
-          setSelectedItem(null)
-          setIsCreatingItem(false)
-
-  e.preventDefault();
-          handleContextMenu(e, null, "PANEL")
-        }}
+            e.preventDefault();
+            handleContextMenu(e, null, "PANEL");
+          }}
           className={styles.snippetFiles}
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => {
@@ -531,8 +666,8 @@ export default function FileExplorer({
             });
           }}
         >
-
-          {!isSearching && page.showFolders &&
+          {!isSearching &&
+            page.showFolders &&
             sortedFolders.map((folder, index) => {
               return (
                 <FolderItem
@@ -548,40 +683,38 @@ export default function FileExplorer({
                   updateItemPinStatus={updateItemPinStatus}
                   moveSnippet={moveSnippet}
                   handleContextMenu={handleContextMenu}
-                  page = {page}
-                     isEditing = {isEditing}
-            setIsEditing = {setIsEditing}
-            renameFile = {renameFile}
-            toName = {toName}
-            setToName = {setToName}
-            editingId = {editingId}
-              isCreatingItem = {isCreatingItem}
-  setIsCreatingItem = {setIsCreatingItem}
-  isCreatingFolder = {isCreatingFolder}
-  inputRef = {inputRef}
-  handleCreateItem={handleCreateItem}
-   
+                  page={page}
+                  isEditing={isEditing}
+                  setIsEditing={setIsEditing}
+                  renameFile={renameFile}
+                  toName={toName}
+                  setToName={setToName}
+                  editingId={editingId}
+                  isCreatingItem={isCreatingItem}
+                  setIsCreatingItem={setIsCreatingItem}
+                  isCreatingFolder={isCreatingFolder}
+                  inputRef={inputRef}
+                  handleCreateItem={handleCreateItem}
                 />
               );
             })}
-          
 
           {displayedFiles.map((file) => {
             return (
               <FileItem
+              key = {file.id}
                 file={file}
                 selectedItem={selectedItem}
                 selectFile={selectFile}
                 updateItemPinStatus={updateItemPinStatus}
                 handleContextMenu={handleContextMenu}
-                page = {page}
-                   isEditing = {isEditing}
-            setIsEditing = {setIsEditing}
-            renameFile = {renameFile}
-            toName = {toName}
-            setToName = {setToName}
-            editingId = {editingId}
-   
+                page={page}
+                isEditing={isEditing}
+                setIsEditing={setIsEditing}
+                renameFile={renameFile}
+                toName={toName}
+                setToName={setToName}
+                editingId={editingId}
               />
             );
           })}
@@ -597,44 +730,33 @@ export default function FileExplorer({
             onRecover={recoverFiles}
             setSelectedItem={setSelectedItem}
             setContextMenu={setContextMenu}
-            onOpen = {onOpen}
+            onOpen={onOpen}
             onRename={renameFile}
-            isEditing = {isEditing}
-            setIsEditing = {setIsEditing}
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
             setEditingId={setEditingId}
-            editingID = {editingId}
-            page = {page}
+            editingID={editingId}
+            page={page}
             updatePinStatus={updateItemPinStatus}
-            setIsCreatingFolder = {setIsCreatingFolder}
-            setIsCreatingItem = {setIsCreatingItem}
-  
-            
+            setIsCreatingFolder={setIsCreatingFolder}
+            setIsCreatingItem={setIsCreatingItem}
+            copy={copy}
+            pasteItem = {pasteItem}
+            setCopy={setCopy}
           />
         )}
-
-
 
         {isCreatingItem && selectedItem?.type !== "FOLDER" && (
           <NewItem
-
-
-              isCreatingItem = {isCreatingItem}
-    setIsCreatingItem = {setIsCreatingItem}
-    isCreatingFolder = {isCreatingFolder}
-    page = {page}
-    inputRef = {inputRef}
-    handleCreateItem = {handleCreateItem}
-            
-          
-          
-          
-          
+            isCreatingItem={isCreatingItem}
+            setIsCreatingItem={setIsCreatingItem}
+            isCreatingFolder={isCreatingFolder}
+            page={page}
+            inputRef={inputRef}
+            handleCreateItem={handleCreateItem}
           />
         )}
       </div>
-
-
-
     </>
   );
 }
