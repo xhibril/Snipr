@@ -470,13 +470,16 @@ export default function FileExplorer({
 
     const placeholderId = crypto.randomUUID();
 
-    let counter = 2;
-    let itemName = `${item.name} copy`;
-    while (items.some((item) => item.name === `${item.name} copy${counter}`)) {
-      counter++;
-      itemName = `${item.name} copy${counter}`;
-    }
 
+let counter = 2;
+let itemName = `${item.name} copy`;
+
+while (
+  items.some((existing) => existing.name === itemName)
+) {
+  itemName = `${item.name} copy (${counter})`;
+  counter++;
+}
     const previousFolders = structuredClone(folders);
     const previousFiles = structuredClone(files);
 
@@ -498,7 +501,7 @@ export default function FileExplorer({
   folderId: placeholderId
 }));
 
-      setFiles((prev) => [...prev, finalizedFilesToPaste]);
+    setFiles((prev) => [...prev, ...finalizedFilesToPaste]);
     } else {
 
       const optimisticFile = {
@@ -513,6 +516,8 @@ export default function FileExplorer({
       path,
       {
         method: "POST",
+          headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: itemName }),
       },
       notify,
       nav,
@@ -535,23 +540,27 @@ export default function FileExplorer({
 
     // replace files
     if (isFolder) {
-      setFolders( prev =>
-        prev.map((folder) =>
-          folder.id === placeholderId
-            ? { ...folder, folderId: data.folder.id }
-            : folder,
-        ),
-      );
+   setFolders(prev =>
+    prev.map(folder =>
+      folder.id === placeholderId ? data.folder : folder
+    )
+  );
 
-  setFiles(prev => [
-    ...prev.filter(file => file.folderId !== placeholderId),
-    ...data.snippets
-  ]);
+
+      setFiles(prev => [
+  ...prev.filter(file => file.folderId !== placeholderId),
+  ...data.snippets.map(snippet => ({
+    ...snippet,
+    folderId: data.folder.id
+  }))
+]);
+
+
     } else {
      setFiles(prev =>
     prev.map(file =>
       file.id === placeholderId
-        ? data.snippet
+        ? data.snippets
         : file
     )
   );
@@ -702,7 +711,7 @@ export default function FileExplorer({
           {displayedFiles.map((file) => {
             return (
               <FileItem
-              key = {file.id}
+                key = {file.id}
                 file={file}
                 selectedItem={selectedItem}
                 selectFile={selectFile}

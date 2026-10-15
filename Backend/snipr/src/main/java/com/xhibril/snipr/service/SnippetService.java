@@ -15,6 +15,7 @@ import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -469,26 +470,68 @@ public class SnippetService {
 
 
    @Transactional
-    public ResponseEntity<FolderCopyResponse> copyFolder(Long userId, Long folderId){
+    public ResponseEntity<FolderCopyResponse> copyFolder(Long userId, Long folderId,
+                                                         String itemName){
         Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, folderId);
 
         if(folderOpt.isEmpty()){
             return ResponseEntity.badRequest().body(new FolderCopyResponse("Invalid request"));
         }
 
-        Folder copiedFolder = folderOpt.get();
+       Folder originalFolder = folderOpt.get();
 
-        List<Snippet> snippets = snippetRepo.findByUserIdAndFolderId(userId, folderId);
+       Folder copiedFolder = new Folder();
+       copiedFolder.setName(itemName);
+       copiedFolder.setUser(originalFolder.getUser());
+       copiedFolder.setIsPinned(originalFolder.getIsPinned());
 
         Folder savedFolder = folderRepo.save(copiedFolder);
+
+
+       List<Snippet> originalSnippets =
+               snippetRepo.findByUserIdAndFolderId(userId, folderId);
+
+       List<Snippet> newSnippets = new ArrayList<>();
+       List<SnippetResponse> snippetResponses = new ArrayList<>();
+
+       for (Snippet original : originalSnippets) {
+           Snippet copy = new Snippet();
+
+           copy.setUser(original.getUser());
+           copy.setFolder(savedFolder);
+           copy.setFileName(original.getFileName());
+           copy.setTitle(original.getTitle());
+           copy.setBody(original.getBody());
+           copy.setTags(new ArrayList<>(original.getTags()));
+           copy.setTagAmount(original.getTagAmount());
+           copy.setIsPinned(original.getIsPinned());
+           newSnippets.add(copy);
+
+           SnippetResponse response = new SnippetResponse();
+
+           response.setId(original.getId());
+           response.setFolderId(savedFolder.getId());
+           response.setName(original.getFileName());
+           response.setTitle(original.getTitle());
+           response.setBody(original.getTitle());
+           response.setTags(original.getTags());
+           response.setTagAmount(original.getTagAmount());
+           response.setIsPinned(original.getIsPinned());
+           snippetResponses.add(response);
+       }
+
+       List<Snippet> savedSnippets =
+               snippetRepo.saveAll(newSnippets);
         
-        
-        List<Snippet> savedSnippets = List.of();
-        if(!snippets.isEmpty()){
-            savedSnippets = snippetRepo.saveAll(snippets);
-        }
-        
-        FolderCopyResponse folderCopyResponse = new FolderCopyResponse(savedFolder, savedSnippets);
+        FolderCopyResponse folderCopyResponse = new FolderCopyResponse(savedFolder, snippetResponses);
+
+
+       ObjectMapper mapper = new ObjectMapper();
+
+       System.out.println(
+               mapper.writerWithDefaultPrettyPrinter()
+                       .writeValueAsString(folderCopyResponse)
+       );
 
         return ResponseEntity.ok(folderCopyResponse);
 

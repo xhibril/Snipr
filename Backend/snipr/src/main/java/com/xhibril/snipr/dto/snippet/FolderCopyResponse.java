@@ -8,11 +8,11 @@ import java.util.List;
 public class FolderCopyResponse {
 
     private Folder folder;
-    private List<Snippet> snippets;
+    private List<SnippetResponse> snippets;
     private String message;
 
 
-    public FolderCopyResponse(Folder folder, List<Snippet> snippets) {
+    public FolderCopyResponse(Folder folder, List<SnippetResponse> snippets) {
         this.folder = folder;
         this.snippets = snippets;
     }
@@ -25,7 +25,7 @@ public class FolderCopyResponse {
         return folder;
     }
 
-    public List<Snippet> getSnippets() {
+    public List<SnippetResponse> getSnippets() {
         return snippets;
     }
 

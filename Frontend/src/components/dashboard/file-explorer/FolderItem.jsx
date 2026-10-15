@@ -146,6 +146,7 @@ useEffect(() => {
         <div className={`${styles.folderFiles} ${isOpen ? styles.show : ""}`}>
           {folderFiles.map((file) => (
             <FileItem
+                     key = {file.id}
                         file={file}
                 selectedItem={selectedItem}
                 selectFile={selectFile}
