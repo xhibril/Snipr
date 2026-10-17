@@ -51,9 +51,8 @@ export default function NewItem({
 
         handleCreateItem(value);
 
- 
-          inputRef.current.value = "";
-
+        inputRef.current.value = "";
+        
         setIsCreatingItem(false);
       }}
       onClick={(e) => e.stopPropagation()}

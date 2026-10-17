@@ -1,6 +1,6 @@
-import styles from "../../../pages/dashboard/Dashboard.module.css"
+import styles from "../../../pages/dashboard/Dashboard.module.css";
 
-import logo from "../../../assets/images/logo.svg"
+import logo from "../../../assets/images/logo.svg";
 
 import {
   FiFolder,
@@ -11,8 +11,12 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 
-export default function Sidebar({ toggleSettings, setToggleSettings, activePage, setActivePage }) {
-    
+export default function Sidebar({
+  toggleSettings,
+  setToggleSettings,
+  activePage,
+  setActivePage,
+}) {
   return (
     <div className={styles.sideBar}>
       <div className={styles.brandHeader}>
@@ -21,26 +25,34 @@ export default function Sidebar({ toggleSettings, setToggleSettings, activePage,
       </div>
 
       <div className={styles.options}>
-        <button className={styles.optionRow}
-        onClick={() => setActivePage("REGULAR")}>
+        <button
+          className={styles.optionRow}
+          onClick={() => setActivePage("REGULAR")}
+        >
           <FiFolder className={styles.optionIcon} />
           <p className={styles.optionText}>My Files</p>
         </button>
 
-        <button className={styles.optionRow}
-        onClick={() => setActivePage("SHARED")}>
+        <button
+          className={styles.optionRow}
+          onClick={() => setActivePage("SHARED")}
+        >
           <FiShare2 className={styles.optionIcon} />
           <p className={styles.optionText}>Shared Files</p>
         </button>
 
-        <button className={styles.optionRow}
-        onClick={() => setActivePage("STARRED")}>
+        <button
+          className={styles.optionRow}
+          onClick={() => setActivePage("STARRED")}
+        >
           <FiStar className={styles.optionIcon} />
           <p className={styles.optionText}>Starred</p>
         </button>
 
-        <button className={styles.optionRow}
-        onClick={() => setActivePage("DELETED")}>
+        <button
+          className={styles.optionRow}
+          onClick={() => setActivePage("DELETED")}
+        >
           <FiTrash className={styles.optionIcon} />
           <p className={styles.optionText}>Trash</p>
         </button>

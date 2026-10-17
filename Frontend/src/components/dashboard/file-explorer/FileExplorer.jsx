@@ -1,16 +1,16 @@
 import styles from "./FileExplorer.module.css";
-import { ValidateInput } from "../../utils/Validation.jsx";
+import {ValidateInput} from "../../utils/Validation.jsx";
 import SearchFiles from "../../utils/Search.jsx";
 import ExplorerToolBar from "./ExplorerToolBar";
 import SearchBar from "./SearchBar";
 import FolderItem from "./FolderItem.jsx";
 import FileItem from "./FileItem.jsx";
 import ContextMenu from "./ContextMenu.jsx";
-import { PAGE_CONFIG } from "../../../config/pageConfig.jsx";
+import {PAGE_CONFIG} from "../../../config/pageConfig.jsx";
 import NewItem from "../../ui/NewItemInput.jsx";
 
-import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import {useState, useRef, useEffect} from "react";
+import {useNavigate} from "react-router-dom";
 import ApiFetch from "../../utils/Api.jsx";
 
 export default function FileExplorer({
@@ -148,8 +148,8 @@ export default function FileExplorer({
     const previous = structuredClone(items);
 
     const newItem = isFolder
-      ? { name: itemName }
-      : { name: itemName, folderId: folderId };
+      ? {name: itemName}
+      : {name: itemName, folderId: folderId};
 
     if (isFolder) {
       setFolders((prev) => [...prev, newItem]);
@@ -161,7 +161,7 @@ export default function FileExplorer({
       path,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify(newItem),
       },
       notify,
@@ -231,7 +231,7 @@ export default function FileExplorer({
       );
     }
 
-    const res = await ApiFetch(path, { method: "PATCH" }, notify, nav);
+    const res = await ApiFetch(path, {method: "PATCH"}, notify, nav);
 
     if (!res) {
       rollBack(isFolder, previous);
@@ -270,7 +270,7 @@ export default function FileExplorer({
       setFiles(files.filter((file) => file.id !== item.id));
     }
 
-    const res = await ApiFetch(path, { method: "DELETE" }, notify, nav);
+    const res = await ApiFetch(path, {method: "DELETE"}, notify, nav);
 
     if (!res) {
       rollBack(isFolder, previous);
@@ -306,7 +306,7 @@ export default function FileExplorer({
       setFiles(files.filter((file) => file.id !== item.id));
     }
 
-    const res = await ApiFetch(path, { method: "PATCH" }, notify, nav);
+    const res = await ApiFetch(path, {method: "PATCH"}, notify, nav);
 
     if (!res) {
       setFolders(previousFolders);
@@ -339,7 +339,7 @@ export default function FileExplorer({
     // opt update
     setFiles((prev) =>
       prev.map((file) =>
-        file.id === snippet.id ? { ...file, folderId: snippet.folderId } : file,
+        file.id === snippet.id ? {...file, folderId: snippet.folderId} : file,
       ),
     );
 
@@ -347,8 +347,8 @@ export default function FileExplorer({
       path,
       {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ folderId: snippet.folderId }),
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({folderId: snippet.folderId}),
       },
       notify,
       nav,
@@ -388,13 +388,13 @@ export default function FileExplorer({
     if (isFolder) {
       setFolders((prev) =>
         prev.map((folder) =>
-          folder.id === item.id ? { ...folder, name: finalizedName } : folder,
+          folder.id === item.id ? {...folder, name: finalizedName} : folder,
         ),
       );
     } else {
       setFiles((prev) =>
         prev.map((file) =>
-          file.id === item.id ? { ...file, name: finalizedName } : file,
+          file.id === item.id ? {...file, name: finalizedName} : file,
         ),
       );
     }
@@ -403,8 +403,8 @@ export default function FileExplorer({
       path,
       {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: finalizedName }),
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({name: finalizedName}),
       },
       notify,
       nav,
@@ -468,24 +468,20 @@ export default function FileExplorer({
     const path = `${isFolder ? "/folders" : "/snippets"}/${item.id}/copy`;
 
     console.log("ITEM PASSED TO pasteItem:", item);
-console.log("ITEM ID:", item?.id);
-console.log("COPY STATE:", copy);
-
+    console.log("ITEM ID:", item?.id);
+    console.log("COPY STATE:", copy);
 
     const items = isFolder ? folders : files;
 
     const placeholderId = crypto.randomUUID();
 
+    let counter = 2;
+    let itemName = `${item.name} copy`;
 
-let counter = 2;
-let itemName = `${item.name} copy`;
-
-while (
-  items.some((existing) => existing.name === itemName)
-) {
-  itemName = `${item.name} copy (${counter})`;
-  counter++;
-}
+    while (items.some((existing) => existing.name === itemName)) {
+      itemName = `${item.name} copy (${counter})`;
+      counter++;
+    }
     const previousFolders = structuredClone(folders);
     const previousFiles = structuredClone(files);
 
@@ -501,19 +497,18 @@ while (
       // check if folder has files inside
       const filesToPaste = files.filter((file) => file.folderId === item.id);
 
-   const finalizedFilesToPaste = filesToPaste.map(file => ({
-  ...file,
-  id: crypto.randomUUID(),
-  folderId: placeholderId
-}));
+      const finalizedFilesToPaste = filesToPaste.map((file) => ({
+        ...file,
+        id: crypto.randomUUID(),
+        folderId: placeholderId,
+      }));
 
-    setFiles((prev) => [...prev, ...finalizedFilesToPaste]);
+      setFiles((prev) => [...prev, ...finalizedFilesToPaste]);
     } else {
-
       const optimisticFile = {
         folderId: placeholderId,
         name: itemName,
-          id: placeholderId
+        id: placeholderId,
       };
 
       setFiles((prev) => [...prev, optimisticFile]);
@@ -523,8 +518,8 @@ while (
       path,
       {
         method: "POST",
-          headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: itemName, folderId: folderId }),
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({name: itemName, folderId: folderId}),
       },
       notify,
       nav,
@@ -547,35 +542,25 @@ while (
 
     // replace files
     if (isFolder) {
-   setFolders(prev =>
-    prev.map(folder =>
-      folder.id === placeholderId ? data.folder : folder
-    )
-  );
+      setFolders((prev) =>
+        prev.map((folder) =>
+          folder.id === placeholderId ? data.folder : folder,
+        ),
+      );
 
-
-      setFiles(prev => [
-  ...prev.filter(file => file.folderId !== placeholderId),
-  ...data.snippets.map(snippet => ({
-    ...snippet,
-    folderId: data.folder.id
-  }))
-]);
-
-
+      setFiles((prev) => [
+        ...prev.filter((file) => file.folderId !== placeholderId),
+        ...data.snippets.map((snippet) => ({
+          ...snippet,
+          folderId: data.folder.id,
+        })),
+      ]);
     } else {
-
-      console.log(data)
-     setFiles(prev =>
-    prev.map(file =>
-      file.id === placeholderId
-        ? data
-        : file
-    )
-  );
+      console.log(data);
+      setFiles((prev) =>
+        prev.map((file) => (file.id === placeholderId ? data : file)),
+      );
     }
-
-
 
     console.log("hit");
   }
@@ -638,16 +623,16 @@ while (
       <div className={styles.fileExplorer}>
         {page.showExplorerToolBar && (
           <ExplorerToolBar
-            setIsCreatingItem={setIsCreatingItem}
             isCreatingItem={isCreatingItem}
-            setIsCreatingFolder={setIsCreatingFolder}
+            setIsCreatingItem={setIsCreatingItem}
             isCreatingFolder={isCreatingFolder}
-            deleteItem={deleteItem}
-            updateItemPinStatus={updateItemPinStatus}
+            setIsCreatingFolder={setIsCreatingFolder}
+            inputRef={inputRef}
             handleCreateItem={handleCreateItem}
             selectedItem={selectedItem}
+            deleteItem={deleteItem}
+            updateItemPinStatus={updateItemPinStatus}
             emptyRecycleBin={emptyRecycleBin}
-            inputRef={inputRef}
             page={page}
           />
         )}
@@ -666,9 +651,7 @@ while (
 
         <div
           onContextMenu={(e) => {
-            {
-              /*if file or folder is clicked instead of panel stop the handler */
-            }
+            /*if file is clicked instead of panel stop the handler */
             if (e.target !== e.currentTarget) return;
 
             setSelectedItem(null);
@@ -705,18 +688,18 @@ while (
                   updateItemPinStatus={updateItemPinStatus}
                   moveSnippet={moveSnippet}
                   handleContextMenu={handleContextMenu}
-                  page={page}
                   isEditing={isEditing}
                   setIsEditing={setIsEditing}
+                  editingId={editingId}
                   renameFile={renameFile}
                   toName={toName}
                   setToName={setToName}
-                  editingId={editingId}
                   isCreatingItem={isCreatingItem}
                   setIsCreatingItem={setIsCreatingItem}
                   isCreatingFolder={isCreatingFolder}
                   inputRef={inputRef}
                   handleCreateItem={handleCreateItem}
+                  page={page}
                 />
               );
             })}
@@ -724,19 +707,19 @@ while (
           {displayedFiles.map((file) => {
             return (
               <FileItem
-                key = {file.id}
+                key={file.id}
                 file={file}
                 selectedItem={selectedItem}
                 selectFile={selectFile}
                 updateItemPinStatus={updateItemPinStatus}
                 handleContextMenu={handleContextMenu}
-                page={page}
                 isEditing={isEditing}
                 setIsEditing={setIsEditing}
+                editingId={editingId}
                 renameFile={renameFile}
                 toName={toName}
                 setToName={setToName}
-                editingId={editingId}
+                page={page}
               />
             );
           })}
@@ -747,24 +730,24 @@ while (
             x={contextMenu.x}
             y={contextMenu.y}
             file={contextMenu.item}
+     type={contextMenu.type}
             onDelete={deleteItem}
-            type={contextMenu.type}
             onRecover={recoverFiles}
-            setSelectedItem={setSelectedItem}
-            setContextMenu={setContextMenu}
             onOpen={onOpen}
             onRename={renameFile}
+            updatePinStatus={updateItemPinStatus}
+            setSelectedItem={setSelectedItem}
+            setContextMenu={setContextMenu}
             isEditing={isEditing}
             setIsEditing={setIsEditing}
             setEditingId={setEditingId}
             editingID={editingId}
-            page={page}
-            updatePinStatus={updateItemPinStatus}
             setIsCreatingFolder={setIsCreatingFolder}
             setIsCreatingItem={setIsCreatingItem}
             copy={copy}
-            pasteItem = {pasteItem}
             setCopy={setCopy}
+            pasteItem={pasteItem}
+            page={page}
           />
         )}
 
@@ -773,9 +756,9 @@ while (
             isCreatingItem={isCreatingItem}
             setIsCreatingItem={setIsCreatingItem}
             isCreatingFolder={isCreatingFolder}
-            page={page}
             inputRef={inputRef}
             handleCreateItem={handleCreateItem}
+            page={page}
           />
         )}
       </div>

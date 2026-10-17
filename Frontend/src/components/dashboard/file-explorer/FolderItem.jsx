@@ -1,12 +1,8 @@
 import styles from "./FileExplorer.module.css";
-import { useState, useEffect, useRef } from "react";
-
+import {  useEffect, useRef } from "react";
 import { FiChevronUp, FiChevronDown } from "react-icons/fi";
-
 import { RiFolderFill, RiPushpinFill } from "react-icons/ri";
-
 import FileItem from "./FileItem";
-
 import NewItem from "../../ui/NewItemInput";
 export default function FolderItem({
   folder,
@@ -14,16 +10,19 @@ export default function FolderItem({
   index,
   isOpen,
   setOpenFolders,
+  page,
+
   selectedItem,
   setSelectedItem,
   selectFile,
+
   updateItemPinStatus,
   moveSnippet,
   handleContextMenu,
-  page,
 
   isEditing,
   setIsEditing,
+  editingId,
   renameFile,
   toName,
   setToName,
@@ -33,21 +32,17 @@ export default function FolderItem({
   isCreatingFolder,
   inputRef,
   handleCreateItem,
-  
-  editingId
 }) {
+
   const folderFiles = files.filter((file) => file.folderId === folder.id);
 
+  const editingInputRef = useRef(null);
 
-
-  const editingInputRef = useRef(null)
-
-useEffect(() => {
-  if (isEditing && editingId === folder.id) {
-    editingInputRef.current?.focus();
-  }
-}, [isEditing, editingId, folder.id]);
-
+  useEffect(() => {
+    if (isEditing && editingId === folder.id) {
+      editingInputRef.current?.focus();
+    }
+  }, [isEditing, editingId, folder.id]);
 
   return (
     <div
@@ -84,8 +79,6 @@ useEffect(() => {
               type: "FOLDER",
               data: folder,
             });
-
-
           }
 
           setOpenFolders((prev) =>
@@ -112,24 +105,23 @@ useEffect(() => {
         )}
 
         {isEditing && editingId === folder.id ? (
-      
           <form
             onSubmit={(e) => {
               e.preventDefault();
-                e.stopPropagation();
+              e.stopPropagation();
               renameFile(folder, "FOLDER", toName);
-              setIsEditing(false)
+              setIsEditing(false);
             }}
           >
-            <input value={toName} onChange={(e) => setToName(e.target.value)} 
-            ref = {editingInputRef}/>
+            <input
+              value={toName}
+              onChange={(e) => setToName(e.target.value)}
+              ref={editingInputRef}
+            />
           </form>
         ) : (
           <p className={styles.folderName}>{folder.name}</p>
         )}
-
-
-
 
         {page.itemActions.includes("openFolders") && (
           <>
@@ -146,37 +138,36 @@ useEffect(() => {
         <div className={`${styles.folderFiles} ${isOpen ? styles.show : ""}`}>
           {folderFiles.map((file) => (
             <FileItem
-                     key = {file.id}
-                        file={file}
-                selectedItem={selectedItem}
-                selectFile={selectFile}
-                updateItemPinStatus={updateItemPinStatus}
-                handleContextMenu={handleContextMenu}
-                page = {page}
-                   isEditing = {isEditing}
-            setIsEditing = {setIsEditing}
-            renameFile = {renameFile}
-            toName = {toName}
-            setToName = {setToName}
-            editingId = {editingId}
+              key={file.id}
+              file={file}
+              selectedItem={selectedItem}
+              selectFile={selectFile}
+              updateItemPinStatus={updateItemPinStatus}
+              handleContextMenu={handleContextMenu}
+              page={page}
+              isEditing={isEditing}
+              setIsEditing={setIsEditing}
+              renameFile={renameFile}
+              toName={toName}
+              setToName={setToName}
+              editingId={editingId}
             />
           ))}
         </div>
       )}
 
-
-  {isCreatingItem &&
-  selectedItem?.type === "FOLDER" &&
-   selectedItem?.data?.id === folder.id && (
-    <NewItem
-      isCreatingItem={isCreatingItem}
-      setIsCreatingItem={setIsCreatingItem}
-      isCreatingFolder={isCreatingFolder}
-      page={page}
-      inputRef={inputRef}
-      handleCreateItem = {handleCreateItem}
-    />
-  )}
+      {isCreatingItem &&
+        selectedItem?.type === "FOLDER" &&
+        selectedItem?.data?.id === folder.id && (
+          <NewItem
+            isCreatingItem={isCreatingItem}
+            setIsCreatingItem={setIsCreatingItem}
+            isCreatingFolder={isCreatingFolder}
+            page={page}
+            inputRef={inputRef}
+            handleCreateItem={handleCreateItem}
+          />
+        )}
     </div>
   );
 }
