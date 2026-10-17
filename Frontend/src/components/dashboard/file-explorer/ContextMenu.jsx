@@ -123,7 +123,10 @@ export default function ContextMenu({
           )}
 
           {page.itemActions.includes("copy") && (
-            <button onClick={() => setCopy(file)}>Copy</button>
+            <button onClick={() => setCopy({
+              data: file,
+              type: type
+            })}>Copy</button>
           )}
         </>
       )}
@@ -131,12 +134,25 @@ export default function ContextMenu({
       {/*allow it to appear in panel n folder, not file */}
       {page.itemActions.includes("paste") &&
         (type === "FOLDER" || type === "PANEL") && <button onClick={() =>{
-        console.log("ITEM: " + copy);
-        
-        pasteItem(copy, "FOLDER")
+
+
+
+
+          console.log(copy.type)
+          console.log(type)
+
+          if(copy?.type === "FOLDER"){
+            pasteItem(copy?.data, "FOLDER")
+          } 
+
+          if(copy?.type === "FILE" && type === "PANEL"){
+            pasteItem(copy?.data, "FILE");
+          }
+
+          if(copy?.type === "FILE" && type === "FOLDER"){
+            pasteItem(copy?.data, "FILE", item?.id)
+          }
         }
-        
-        
         }>Paste</button>}
     </div>
   );

@@ -462,10 +462,16 @@ export default function FileExplorer({
     }
   }
 
-  async function pasteItem(item, type) {
-    const isFolder = type === "FOLDER" ? "/folders/" : "/snippets";
+  async function pasteItem(item, type, folderId) {
+    const isFolder = type === "FOLDER" ? true : false;
 
     const path = `${isFolder ? "/folders" : "/snippets"}/${item.id}/copy`;
+
+    console.log("ITEM PASSED TO pasteItem:", item);
+console.log("ITEM ID:", item?.id);
+console.log("COPY STATE:", copy);
+
+
     const items = isFolder ? folders : files;
 
     const placeholderId = crypto.randomUUID();
@@ -507,6 +513,7 @@ while (
       const optimisticFile = {
         folderId: placeholderId,
         name: itemName,
+          id: placeholderId
       };
 
       setFiles((prev) => [...prev, optimisticFile]);
@@ -517,7 +524,7 @@ while (
       {
         method: "POST",
           headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: itemName }),
+        body: JSON.stringify({ name: itemName, folderId: folderId }),
       },
       notify,
       nav,
@@ -557,14 +564,20 @@ while (
 
 
     } else {
+
+      console.log(data)
      setFiles(prev =>
     prev.map(file =>
       file.id === placeholderId
-        ? data.snippets
+        ? data
         : file
     )
   );
     }
+
+
+
+    console.log("hit");
   }
 
   function selectFile(file) {

@@ -155,6 +155,13 @@ public ResponseEntity<ApiResponse> renameFolder(@PathVariable Long folderId, @Re
         return snippetService.copyFolder(userId, folderId, request.getName());
     }
 
-
+    @PostMapping("/snippets/{snippetId}/copy")
+    public ResponseEntity<SnippetResponse> copySnippet(@PathVariable Long snippetId, @RequestBody SnippetRequest request){
+        Long userId = 1L;
+        return snippetService.copySnippet(userId,
+                snippetId,
+                request.getFolderId(),
+                request.getName());
+    }
 
 }
