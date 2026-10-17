@@ -10,7 +10,6 @@ export default function ContextMenu({
   onOpen,
   setIsEditing,
   setEditingId,
-  editingId,
   page,
   updatePinStatus,
   setIsCreatingItem,
