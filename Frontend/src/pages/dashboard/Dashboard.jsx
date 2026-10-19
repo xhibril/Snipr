@@ -16,21 +16,22 @@ export default function Dashboard({ notify }) {
   const [folders, setFolders] = useState([]);
   const [files, setFiles] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [unsavedChanges, setUnsavedChanges] = useState("");
+  const [newTag, setNewTag] = useState("");
   const nav = useNavigate();
 
- const [activePage, setActivePage] = useState("REGULAR");
+  const [activePage, setActivePage] = useState("REGULAR");
 
-const endpoint = {
-  REGULAR: "",
-  SHARED: "?shared=true",
-  STARRED: "?starred=true",
-  DELETED: "?deleted=true",
-};
+  const endpoint = {
+    REGULAR: "",
+    SHARED: "?shared=true",
+    STARRED: "?starred=true",
+    DELETED: "?deleted=true",
+  };
 
-const endpointSuffix = endpoint[activePage];
-
-const endpointSnippet = `/snippets${endpointSuffix}`;
-const endpointFolders = `/folders${endpointSuffix}`;
+  const endpointSuffix = endpoint[activePage];
+  const endpointSnippet = `/snippets${endpointSuffix}`;
+  const endpointFolders = `/folders${endpointSuffix}`;
 
   const [draft, setDraft] = useState({
     title: "",
@@ -44,29 +45,28 @@ const endpointFolders = `/folders${endpointSuffix}`;
     tags: [],
   });
 
-  const [unsavedChanges, setUnsavedChanges] = useState("");
-  const [newTag, setNewTag] = useState("");
-
   useEffect(() => {
     if (
       draft.body !== original.body ||
       draft.title !== original.title ||
-      (original.tags || []).join() !== draft.tags.join()
+      (original.tags || []).join() !== draft.tags.join() // conv into string n compare
     ) {
       setUnsavedChanges("Unsaved Changes");
     } else {
       setUnsavedChanges("");
     }
-
-
   }, [draft, original]);
-
 
   useEffect(() => {
     if (selectedItem?.type !== "FILE") return;
     setIsViewingFile(true);
     syncDraft();
   }, [selectedItem]);
+
+  useEffect(() => {
+    fetchFolders();
+    fetchFiles();
+  }, [activePage]);
 
   async function fetchFolders() {
     const res = await ApiFetch(endpointFolders, { method: "GET" }, notify, nav);
@@ -81,11 +81,6 @@ const endpointFolders = `/folders${endpointSuffix}`;
     const data = await res.json();
     setFolders(data);
   }
-
-  useEffect(() => {
-    fetchFolders();
-    fetchFiles();
-  }, [activePage]);
 
   async function fetchFiles() {
     const res = await ApiFetch(endpointSnippet, { method: "GET" }, notify, nav);
@@ -103,7 +98,6 @@ const endpointFolders = `/folders${endpointSuffix}`;
 
   async function updateSnippet(snippet) {
     const previousSnippet = structuredClone(selectedItem?.data);
-    const previousFiles = structuredClone(files);
     setUnsavedChanges("Saving...");
 
     // opt update
@@ -128,13 +122,12 @@ const endpointFolders = `/folders${endpointSuffix}`;
 
     if (!res.ok) {
       notify(data.message || "Could not update snippet", "ERROR");
-      setFiles(previousFiles);
       syncSelected(previousSnippet);
       return;
     }
 
-  syncSelected(data);
-  syncDraft();
+    syncSelected(data)
+    syncDraft();
   }
 
   function syncDraft() {
@@ -167,13 +160,13 @@ const endpointFolders = `/folders${endpointSuffix}`;
           if (e.ctrlKey && e.key === "s") {
             e.preventDefault();
 
-            if(unsavedChanges){
-            const snippet = {
-              ...selectedItem?.data,
-              ...draft
-            };
-            updateSnippet(snippet);
-          }
+            if (unsavedChanges) {
+              const snippet = {
+                ...selectedItem?.data,
+                ...draft,
+              };
+              updateSnippet(snippet);
+            }
           }
         }}
       >
@@ -181,7 +174,7 @@ const endpointFolders = `/folders${endpointSuffix}`;
           toggleSettings={toggleSettings}
           setToggleSettings={setToggleSettings}
           activePage={activePage}
-          setActivePage = {setActivePage}
+          setActivePage={setActivePage}
         />
 
         <FileExplorer
@@ -196,15 +189,14 @@ const endpointFolders = `/folders${endpointSuffix}`;
           notify={notify}
           setSelectedItem={setSelectedItem}
           selectedItem={selectedItem}
-      
           original={original}
           setOriginal={setOriginal}
           draft={draft}
           setDraft={setDraft}
           updateSnippet={updateSnippet}
           setIsViewingFile={setIsViewingFile}
-                   activePage={activePage}
-          setActivePage = {setActivePage}
+          activePage={activePage}
+          setActivePage={setActivePage}
         />
 
         <FileEditor
@@ -223,8 +215,8 @@ const endpointFolders = `/folders${endpointSuffix}`;
           setNewTag={setNewTag}
           newTag={newTag}
           updateSnippet={updateSnippet}
-                   activePage={activePage}
-          setActivePage = {setActivePage}
+          activePage={activePage}
+          setActivePage={setActivePage}
         />
       </div>
     </div>

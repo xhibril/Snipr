@@ -78,7 +78,6 @@ public class SnippetService {
             snippet.setUser(user);
             snippet.setFileName(fileName);
             snippet.setTitle("Untitled");
-            snippet.setTagAmount(0);
 
             if (folderId != null) {
                 Optional<Folder> folderOpt = folderRepo.findById(folderId);
@@ -287,7 +286,6 @@ public class SnippetService {
         snippetResponse.setTitle(snippet.getTitle());
         snippetResponse.setIsPinned(snippet.getIsPinned());
         snippetResponse.setTags(snippet.getTags());
-        snippetResponse.setTagAmount(snippet.getTagAmount());
         snippetResponse.setIsDeleted(snippet.getIsDeleted());
 
 
@@ -365,10 +363,6 @@ public class SnippetService {
 
             snippet.setTags(tags);
 
-            if (snippet.getTags().size() != snippet.getTagAmount()) {
-                snippet.setTagAmount(snippet.getTags().size());
-            }
-
             snippetRepo.save(snippet);
             SnippetResponse snippetRes = new SnippetResponse();
             snippetRes.setId(snippet.getId());
@@ -381,7 +375,7 @@ public class SnippetService {
             snippetRes.setTitle(snippet.getTitle());
             snippetRes.setBody(snippet.getBody());
             snippetRes.setTags(snippet.getTags());
-            snippetRes.setTagAmount(snippet.getTagAmount());
+
             snippetRes.setMessage("Snippet updated");
 
             return ResponseEntity.ok().body(snippetRes);
@@ -497,7 +491,7 @@ public class SnippetService {
             copy.setTitle(original.getTitle());
             copy.setBody(original.getBody());
             copy.setTags(new ArrayList<>(original.getTags()));
-            copy.setTagAmount(original.getTagAmount());
+
             copy.setIsPinned(original.getIsPinned());
             newSnippets.add(copy);
 
@@ -509,7 +503,7 @@ public class SnippetService {
             response.setTitle(original.getTitle());
             response.setBody(original.getTitle());
             response.setTags(original.getTags());
-            response.setTagAmount(original.getTagAmount());
+
             response.setIsPinned(original.getIsPinned());
             snippetResponses.add(response);
         }
@@ -566,7 +560,7 @@ public class SnippetService {
         response.setTitle(savedSnippet.getTitle());
         response.setBody(savedSnippet.getBody());
         response.setTags(savedSnippet.getTags());
-        response.setTagAmount(savedSnippet.getTagAmount());
+
 
         if (folderId != null) {
             Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, folderId);

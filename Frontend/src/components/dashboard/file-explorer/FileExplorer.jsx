@@ -10,9 +10,8 @@ import {PAGE_CONFIG} from "../../../config/pageConfig.jsx";
 import NewItem from "../../ui/NewItemInput.jsx";
 import useFileExplorerActions from "./useFileExplorerActions";
 
-import {useState, useRef, useEffect} from "react";
+import {useState, useRef, useEffect, useMemo} from "react";
 import {useNavigate} from "react-router-dom";
-import ApiFetch from "../../utils/Api.jsx";
 
 export default function FileExplorer({
   folders,
@@ -22,61 +21,100 @@ export default function FileExplorer({
   notify,
   selectedItem,
   setSelectedItem,
-  updateSnippet,
   setIsViewingFile,
   setDraft,
   setOriginal,
   activePage,
-  setActivePage,
 }) {
+
   const [toggleSearchFilter, setToggleSearchFilter] = useState(false);
-  const inputRef = useRef(null);
+  const [filterTags, setFilterTags] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
   const [openFolders, setOpenFolders] = useState([]);
   const [isCreatingItem, setIsCreatingItem] = useState(false);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
-  const [filterTags, setFilterTags] = useState([]);
-  const nav = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [contextMenu, setContextMenu] = useState(null);
+  const [copy, setCopy] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [copy, setCopy] = useState([]);
-
   const [toName, setToName] = useState(null);
+  const [contextMenu, setContextMenu] = useState(null);
+  const inputRef = useRef(null);
 
+  const nav = useNavigate();
   const page = PAGE_CONFIG[activePage] ?? PAGE_CONFIG.REGULAR;
 
+  // compare two folders/files at a time
+  // pinned = 1 gets placed before unpinned = 0
+
+  const sortedFolders = useMemo(
+    () => [...folders].sort((a, b) => b.isPinned - a.isPinned),
+    [folders],
+  );
+
+  const sortedFiles = useMemo(
+    () =>
+      [...files]
+        .sort((a, b) => b.isPinned - a.isPinned)
+        .filter(
+          (file) =>
+            file.folderId === null ||
+            !folders.some((folder) => folder.id === file.folderId),
+        ),
+    [files, folders],
+  );
+
+  const isSearching = searchQuery.trim() !== "" || filterTags.length > 0;
+  const displayedFiles = isSearching ? searchResults : sortedFiles;
+
+
   const {
-  updateItemPinStatus,
-  deleteItem,
-  recoverFiles,
-  moveSnippet,
-  renameFile,
-  emptyRecycleBin,
-  pasteItem,
-} = useFileExplorerActions({
-  folders,
-  setFolders,
-  files,
-  setFiles,
-  notify,
-  nav,
-  page,
-  selectedItem,
-  setSelectedItem,
-  setIsViewingFile,
-  setToName,
-  setEditingId,
-  getAvailableName,
-});
+    updateItemPinStatus,
+    deleteItem,
+    recoverFiles,
+    moveSnippet,
+    renameFile,
+    emptyRecycleBin,
+    pasteItem,
+    createItem,
+  } = useFileExplorerActions({
+    folders,
+    setFolders,
+    files,
+    setFiles,
+    notify,
+    nav,
+    page,
+    selectedItem,
+    setSelectedItem,
+    setIsViewingFile,
+    setToName,
+    setEditingId,
+    getAvailableName,
+  });
+
 
   useEffect(() => {
     setSelectedItem(null);
     setOpenFolders([]);
   }, [page]);
 
-  function handleContextMenu(e, file, type) {
+  // close context menu
+  useEffect(() => {
+    const closeMenu = () => {
+      setIsEditing(false);
+      setContextMenu(null);
+      document.removeEventListener("click", closeMenu);
+    };
+
+    document.addEventListener("click", closeMenu);
+
+    return () => {
+      document.removeEventListener("click", closeMenu);
+    };
+  }, [contextMenu]);
+
+    function handleContextMenu(e, file, type) {
     e.preventDefault();
     setIsCreatingItem(false);
     setIsEditing(false);
@@ -89,27 +127,6 @@ export default function FileExplorer({
     });
   }
 
-    // close context menu on click
-    useEffect(() => {
-      const closeMenu = () => {
-             setIsEditing(false);
-        setContextMenu(null);
-   
-        document.removeEventListener("click", closeMenu);
-      };
-  
-      document.addEventListener("click", closeMenu);
-  
-      return () => {
-        document.removeEventListener("click", closeMenu);
-      };
-    }, [contextMenu]);
-
-  async function searchItems() {
-    const result = SearchFiles(sortedFiles, searchQuery, filterTags);
-    setSearchResults(result);
-  }
-
   useEffect(() => {
     const timer = setTimeout(() => {
       searchItems();
@@ -118,8 +135,12 @@ export default function FileExplorer({
     return () => clearTimeout(timer);
   }, [searchQuery, filterTags]);
 
+  async function searchItems() {
+    const result = SearchFiles(sortedFiles, searchQuery, filterTags);
+    setSearchResults(result);
+  }
+
   function getAvailableName(name, items, type) {
-    // name exists
     if (items.some((item) => item.name === name)) {
       return null;
     }
@@ -132,7 +153,6 @@ export default function FileExplorer({
       name = trimmedName;
     }
 
-    // name doesnt exist
     if (!items.some((item) => item.name === name)) {
       return name;
     }
@@ -142,86 +162,9 @@ export default function FileExplorer({
     while (items.some((item) => item.name === `${name} (${counter})`)) {
       counter++;
     }
+
     return `${name} (${counter})`;
   }
-
-  async function handleCreateItem(itemName) {
-    const isFolder = isCreatingFolder;
-    const items = isFolder ? folders : files;
-    const path = isCreatingFolder ? "/folders" : "/snippets";
-
-    const inputRes = ValidateInput(itemName, "GENERAL");
-
-    if (inputRes !== "VALID") {
-      notify(`Invalid ${isFolder ? "folder" : "file"} name`, "ERROR");
-      return;
-    }
-
-    itemName = getAvailableName(
-      itemName,
-      items,
-      isCreatingFolder ? "FOLDER" : "FILE",
-    );
-
-    if (!itemName) {
-      notify(`This ${isFolder ? "folder" : "file"} already exists`);
-      return;
-    }
-
-    const folderId =
-      selectedItem?.type === "FOLDER" ? selectedItem.data.id : null;
-
-    const previous = structuredClone(items);
-
-    const newItem = isFolder
-      ? {name: itemName}
-      : {name: itemName, folderId: folderId};
-
-    if (isFolder) {
-      setFolders((prev) => [...prev, newItem]);
-    } else {
-      setFiles((prev) => [...prev, newItem]);
-    }
-
-    const res = await ApiFetch(
-      path,
-      {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(newItem),
-      },
-      notify,
-      nav,
-    );
-
-    if (!res) {
-      rollBack(isFolder, previous);
-      return;
-    }
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      notify(
-        data.message ||
-          `Something went wrong while creating ${isFolder ? "folder" : "file"}`,
-        "ERROR",
-      );
-
-      rollBack(isFolder, previous);
-      return;
-    }
-
-    if (isFolder) {
-      setFolders((prev) =>
-        prev.map((folder) => (folder === newItem ? data : folder)),
-      );
-    } else {
-      setFiles((prev) => prev.map((file) => (file === newItem ? data : file)));
-    }
-  }
-
-
 
   function selectFile(file) {
     setSelectedItem({
@@ -239,10 +182,6 @@ export default function FileExplorer({
     setOriginal(data);
   }
 
-  function rollBack(isFolder, previous) {
-    isFolder ? setFolders(previous) : setFiles(previous);
-  }
-
   function onOpen(item, type) {
     setSelectedItem({
       data: item,
@@ -252,29 +191,16 @@ export default function FileExplorer({
     if (type === "FOLDER") {
       const index = sortedFolders.findIndex((folder) => folder.id === item.id);
 
+      // open folder if found
       if (index !== -1) {
         setOpenFolders((prev) =>
           prev.includes(index) ? prev : [...prev, index],
         );
       }
     }
+
     setContextMenu(null);
   }
-
-  // compare two folders at a time
-  // pinned = 1 gets placed before unpinned = 0
-  const sortedFolders = [...folders].sort((a, b) => b.isPinned - a.isPinned);
-  const sortedFiles = [...files]
-    .sort((a, b) => b.isPinned - a.isPinned)
-    .filter(
-      (file) =>
-        file.folderId === null ||
-        !folders.some((folder) => folder.id === file.folderId),
-    );
-
-  const isSearching = searchQuery.trim() !== "" || filterTags.length > 0;
-
-  const displayedFiles = isSearching ? searchResults : sortedFiles;
 
   return (
     <>
@@ -286,7 +212,7 @@ export default function FileExplorer({
             isCreatingFolder={isCreatingFolder}
             setIsCreatingFolder={setIsCreatingFolder}
             inputRef={inputRef}
-            handleCreateItem={handleCreateItem}
+            createItem={createItem}
             selectedItem={selectedItem}
             deleteItem={deleteItem}
             updateItemPinStatus={updateItemPinStatus}
@@ -356,7 +282,7 @@ export default function FileExplorer({
                   setIsCreatingItem={setIsCreatingItem}
                   isCreatingFolder={isCreatingFolder}
                   inputRef={inputRef}
-                  handleCreateItem={handleCreateItem}
+                  createItem={createItem}
                   page={page}
                 />
               );
@@ -416,7 +342,7 @@ export default function FileExplorer({
             setIsCreatingItem={setIsCreatingItem}
             isCreatingFolder={isCreatingFolder}
             inputRef={inputRef}
-            handleCreateItem={handleCreateItem}
+            createItem={createItem}
             page={page}
           />
         )}

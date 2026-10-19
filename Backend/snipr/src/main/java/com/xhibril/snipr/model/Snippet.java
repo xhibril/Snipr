@@ -26,9 +26,6 @@ public class Snippet {
     private String title;
     private Boolean isPinned = false;
 
-    @Column(name = "tag_amount")
-    private Integer tagAmount;
-
     private Boolean isDeleted = false;
 
 
@@ -115,14 +112,6 @@ public class Snippet {
 
     public void setIsDeleted(Boolean isDeleted){
         this.isDeleted = isDeleted;
-    }
-
-    public void setTagAmount(Integer tagAmount){
-        this.tagAmount = tagAmount;
-    }
-
-    public Integer getTagAmount(){
-        return tagAmount;
     }
 
 

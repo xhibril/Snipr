@@ -1,4 +1,5 @@
 import ApiFetch from "../../utils/Api.jsx";
+import { ValidateInput } from "../../utils/Validation.jsx";
 
 export default function useFileExplorerActions({
   folders,
@@ -16,17 +17,16 @@ export default function useFileExplorerActions({
   getAvailableName,
 }) {
 
-    function rollBack(isFolder, previous) {
-  if (isFolder) {
-    setFolders(previous);
-  } else {
-    setFiles(previous);
+  function rollBack(isFolder, previous) {
+    if (isFolder) {
+      setFolders(previous);
+    } else {
+      setFiles(previous);
+    }
   }
-}
 
   async function updateItemPinStatus(item, type) {
     const isFolder = type === "FOLDER";
-    console.log(item);
 
     const status = !item.isPinned;
 
@@ -76,6 +76,7 @@ export default function useFileExplorerActions({
   }
 
   async function deleteItem(item, type) {
+    // if no item passed from context menu delete selected item
     if (!item || !type) {
       item = selectedItem?.data;
       type = selectedItem?.type;
@@ -84,9 +85,9 @@ export default function useFileExplorerActions({
     const isFolder = type === "FOLDER";
 
     const isPermanent = page.deleteMode === "permanent";
-   const path = `/${isFolder ? "folders" : "snippets"}/${item.id}${
-  isPermanent ? "/permanent" : ""
-}`;
+    const path = `/${isFolder ? "folders" : "snippets"}/${item.id}${
+      isPermanent ? "/permanent" : ""
+    }`;
 
     const previousFolders = structuredClone(folders);
     const previousFiles = structuredClone(files);
@@ -103,7 +104,8 @@ export default function useFileExplorerActions({
     const res = await ApiFetch(path, { method: "DELETE" }, notify, nav);
 
     if (!res) {
-      rollBack(isFolder, previous);
+      setFolders(previousFolders)
+      setFiles(previousFiles)
       return;
     }
 
@@ -161,15 +163,15 @@ export default function useFileExplorerActions({
     }
   }
 
-  async function moveSnippet(snippet) {
-    const path = `/snippets/${snippet.id}`;
+  async function moveSnippet(item) {
+    const path = `/snippets/${item.id}`;
 
     const previousFiles = structuredClone(files);
 
     // opt update
     setFiles((prev) =>
       prev.map((file) =>
-        file.id === snippet.id ? { ...file, folderId: snippet.folderId } : file,
+        file.id === item.id ? { ...file, folderId: item.folderId } : file,
       ),
     );
 
@@ -178,7 +180,7 @@ export default function useFileExplorerActions({
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ folderId: snippet.folderId }),
+        body: JSON.stringify({ folderId: item.folderId }),
       },
       notify,
       nav,
@@ -189,9 +191,8 @@ export default function useFileExplorerActions({
       return;
     }
 
-    const data = await res.json();
-
     if (!res.ok) {
+       const data = await res.json();
       notify(
         data.message || "Could not move snippet, pleasey try again",
         "ERROR",
@@ -204,6 +205,7 @@ export default function useFileExplorerActions({
   async function renameFile(item, type, toName) {
     const isFolder = type === "FOLDER";
     const path = `${isFolder ? "/folders" : "/snippets"}/${item.id}/rename`;
+
     const finalizedName = getAvailableName(
       toName,
       isFolder ? folders : files,
@@ -265,6 +267,7 @@ export default function useFileExplorerActions({
     const previousFolders = structuredClone(folders);
     const previousFiles = structuredClone(files);
 
+    // opt update
     setFolders([]);
     setFiles([]);
 
@@ -362,7 +365,7 @@ export default function useFileExplorerActions({
     if (!res.ok) {
       setFolders(previousFolders);
       setFiles(previousFiles);
-      notify(data.message || `Could not copy${isFolder ? "folder" : "file"}`);
+      notify(data.message || `Could not copy ${isFolder ? "folder" : "file"}`);
       return;
     }
 
@@ -382,20 +385,99 @@ export default function useFileExplorerActions({
         })),
       ]);
     } else {
-      console.log(data);
       setFiles((prev) =>
         prev.map((file) => (file.id === placeholderId ? data : file)),
       );
     }
   }
 
-return {
-  updateItemPinStatus,
-  deleteItem,
-  recoverFiles,
-  moveSnippet,
-  renameFile,
-  emptyRecycleBin,
-  pasteItem,
-};
+
+  
+    async function createItem(itemName) {
+      const isFolder = isCreatingFolder;
+      const items = isFolder ? folders : files;
+      const path = isCreatingFolder ? "/folders" : "/snippets";
+  
+      const inputRes = ValidateInput(itemName, "GENERAL");
+  
+      if (inputRes !== "VALID") {
+        notify(`Invalid ${isFolder ? "folder" : "file"} name`, "ERROR");
+        return;
+      }
+  
+      itemName = getAvailableName(
+        itemName,
+        items,
+        isCreatingFolder ? "FOLDER" : "FILE",
+      );
+  
+      if (!itemName) {
+        notify(`This ${isFolder ? "folder" : "file"} already exists`);
+        return;
+      }
+  
+      const folderId =
+        selectedItem?.type === "FOLDER" ? selectedItem.data.id : null;
+  
+      const previous = structuredClone(items);
+  
+      const newItem = isFolder
+        ? {name: itemName}
+        : {name: itemName, folderId: folderId};
+  
+      if (isFolder) {
+        setFolders((prev) => [...prev, newItem]);
+      } else {
+        setFiles((prev) => [...prev, newItem]);
+      }
+  
+      const res = await ApiFetch(
+        path,
+        {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(newItem),
+        },
+        notify,
+        nav,
+      );
+  
+      if (!res) {
+        rollBack(isFolder, previous);
+        return;
+      }
+  
+      const data = await res.json();
+  
+      if (!res.ok) {
+        notify(
+          data.message ||
+            `Something went wrong while creating ${isFolder ? "folder" : "file"}`,
+          "ERROR",
+        );
+  
+        rollBack(isFolder, previous);
+        return;
+      }
+  
+      if (isFolder) {
+        setFolders((prev) =>
+          prev.map((folder) => (folder === newItem ? data : folder)),
+        );
+      } else {
+        setFiles((prev) => prev.map((file) => (file === newItem ? data : file)));
+      }
+    }
+
+
+  return {
+    updateItemPinStatus,
+    deleteItem,
+    recoverFiles,
+    moveSnippet,
+    renameFile,
+    emptyRecycleBin,
+    pasteItem,
+    createItem
+  };
 }
