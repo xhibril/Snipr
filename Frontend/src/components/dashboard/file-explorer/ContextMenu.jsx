@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 export default function ContextMenu({
   x,
   y,
@@ -16,7 +18,7 @@ export default function ContextMenu({
   setIsCreatingFolder,
   pasteItem,
   copy,
-  setCopy
+  setCopy,
 }) {
   return (
     <div
@@ -25,10 +27,11 @@ export default function ContextMenu({
         position: "fixed",
         left: x,
         top: y,
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
+      }
+    }
+
+
+    onClick={(e) => e.stopPropagation()}
     >
       {type !== "FILE" && (
         <>
@@ -134,12 +137,6 @@ export default function ContextMenu({
       {page.itemActions.includes("paste") &&
         (type === "FOLDER" || type === "PANEL") && <button onClick={() =>{
 
-
-
-
-          console.log(copy.type)
-          console.log(type)
-
           if(copy?.type === "FOLDER"){
             pasteItem(copy?.data, "FOLDER")
           } 
@@ -149,7 +146,7 @@ export default function ContextMenu({
           }
 
           if(copy?.type === "FILE" && type === "FOLDER"){
-            pasteItem(copy?.data, "FILE", item?.id)
+            pasteItem(copy?.data, "FILE", file?.id)
           }
         }
         }>Paste</button>}

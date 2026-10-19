@@ -28,10 +28,10 @@ export default function NewItem({
       setIsCreatingItem(false);
     };
 
-    document.addEventListener("click", closeField);
+    document.addEventListener("mousedown", closeField);
 
     return () => {
-      document.removeEventListener("click", closeField);
+      document.removeEventListener("mousedown", closeField);
     };
   }, [isCreatingItem, setIsCreatingItem]);
 

@@ -9,13 +9,13 @@ import { useEffect } from "react";
 export default function ExplorerToolBar({
   isCreatingItem,
   setIsCreatingItem,
-  isCreatingFolder,
+
   setIsCreatingFolder,
   deleteItem,
   updateItemPinStatus,
-  handleCreateItem,
+
   selectedItem,
-  inputRef,
+
   page,
   emptyRecycleBin,
 }) {
