@@ -14,6 +14,20 @@ import PasswordReset from './pages/auth/password-reset/PasswordReset.jsx'
 
 function App() {
 
+
+  useEffect(() => {
+  const handler = (e) => {
+    if (e.ctrlKey && e.key.toLowerCase() === "s") {
+      e.preventDefault();
+    }
+  };
+
+  window.addEventListener("keydown", handler);
+
+  return () => window.removeEventListener("keydown", handler);
+}, []);
+
+
   const [message, setMessage] = useState(null)
   const [type, setType] = useState(null)
   const [id, setId] = useState(null)

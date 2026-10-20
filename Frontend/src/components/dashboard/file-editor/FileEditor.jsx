@@ -16,97 +16,114 @@ export default function FileEditor({
   setOriginal,
   setFiles,
   files,
-    setIsCreatingItem,
-  isCreatingItem,
+  setIsCreatingItem,
   setIsCreatingFolder,
-  isCreatingFolder
+  notify,
 }) {
+  const [unsavedChanges, setUnsavedChanges] = useState("");
+  const [newTag, setNewTag] = useState("");
+  const [isAddingTag, setIsAddingTag] = useState(false);
 
-    const [unsavedChanges, setUnsavedChanges] = useState("");
-    const [newTag, setNewTag] = useState("");
-    const [isAddingTag, setIsAddingTag] = useState(false);
-  
-    useEffect(() => {
-      if (
-        draft.body !== original.body ||
-        draft.title !== original.title ||
-       JSON.stringify(original.tags ?? []) !==
-       JSON.stringify(draft.tags ?? [])  // compare by content n order
-      ) {
-        setUnsavedChanges("Unsaved Changes");
-      } else {
-        setUnsavedChanges("");
-      }
-    }, [draft, original]);
-  
-    useEffect(() => {
-      if (selectedItem?.type !== "FILE") return;
-      setIsViewingFile(true);
-      syncDraft();
-    }, [selectedItem]);
-  
+  useEffect(() => {
+    if (!selectedItem?.data || !isViewingFile) return;
 
+    const hasChanges =
+      draft.body !== original.body ||
+      draft.title !== original.title ||
+      JSON.stringify(draft.tags ?? []) !== JSON.stringify(original.tags ?? []);
 
-      async function updateSnippet(snippet) {
-        const previousSnippet = structuredClone(selectedItem?.data);
-        setUnsavedChanges("Saving...");
-    
-        // opt update
-        setFiles(files.map((file) => (file.id === snippet.id ? snippet : file)));
-    
-        const res = await ApiFetch("/snippets", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: snippet.id,
-            name: snippet.name,
-            body: snippet.body,
-            title: snippet.title,
-            isPinned: snippet.isPinned,
-            tags: snippet.tags,
-            folderId: snippet.folderId,
-          }),
-        });
-    
-        if (!res) return;
-        const data = await res.json();
-    
-        if (!res.ok) {
-          notify(data.message || "Could not update snippet", "ERROR");
-          syncSelected(previousSnippet);
-          return;
-        }
-    
-        syncSelected(data)
-        syncDraft();
-      }
-    
-      function syncDraft() {
-      if (!selectedItem?.data) return;
-    
-      const { title, body, tags } = selectedItem.data;
-    
-      const data = {
-        title: title || "",
-        body: body || "",
-        tags: tags || [],
+    if (!hasChanges) return;
+
+    const timer = setTimeout(() => {
+      const snippet = {
+        ...selectedItem?.data,
+        ...draft,
       };
-    
-      setOriginal(data);
-      setDraft(data);
+      updateSnippet(snippet);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [draft, original, selectedItem?.data?.id, isViewingFile]);
+
+  useEffect(() => {
+    if (
+      draft.body !== original.body ||
+      draft.title !== original.title ||
+      JSON.stringify(original.tags ?? []) !== JSON.stringify(draft.tags ?? []) // compare by content n order
+    ) {
+      setUnsavedChanges(true);
+    } else {
+      setUnsavedChanges(false);
     }
-    
-      function syncSelected(data) {
-        setSelectedItem((prev) => ({
-          ...prev,
-          data,
-        }));
-      }
+  }, [draft, original]);
+
+  useEffect(() => {
+    if (selectedItem?.type !== "FILE") return;
+    setIsViewingFile(true);
+    syncDraft();
+  }, [selectedItem]);
+
+  async function updateSnippet(snippet) {
+    const previousSnippet = structuredClone(selectedItem?.data);
+    setUnsavedChanges("Saving...");
+
+    // opt update
+    setFiles(files.map((file) => (file.id === snippet.id ? snippet : file)));
+
+    const res = await ApiFetch("/snippets", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: snippet.id,
+        name: snippet.name,
+        body: snippet.body,
+        title: snippet.title,
+        isPinned: snippet.isPinned,
+        tags: snippet.tags,
+        folderId: snippet.folderId,
+      }),
+    });
+
+    if (!res) return;
+    const data = await res.json();
+
+    if (!res.ok) {
+      notify(data.message || "Could not update snippet", "ERROR");
+      syncSelected(previousSnippet);
+      return;
+    }
+
+    syncSelected(data);
+    syncDraft();
+  }
+
+  function syncDraft() {
+    if (!selectedItem?.data) return;
+
+    const { title, body, tags } = selectedItem.data;
+
+    const data = {
+      title: title || "",
+      body: body || "",
+      tags: tags || [],
+    };
+
+    setOriginal(data);
+    setDraft(data);
+  }
+
+  function syncSelected(data) {
+    setSelectedItem((prev) => ({
+      ...prev,
+      data,
+    }));
+  }
 
   return (
     <>
-      <div className={styles.fileBody}
-       onKeyDown={(e) => {
+      <div
+        className={styles.fileBody}
+        onKeyDown={(e) => {
           if (e.ctrlKey && e.key === "s") {
             e.preventDefault();
 
@@ -118,7 +135,8 @@ export default function FileEditor({
               updateSnippet(snippet);
             }
           }
-        }}>
+        }}
+      >
         {isViewingFile ? (
           <>
             <div className={styles.fileInfo}>
@@ -126,7 +144,7 @@ export default function FileEditor({
                 type="text"
                 className={styles.fileTitle}
                 value={draft.title}
-                onChange={(e) => setDraft({...draft, title: e.target.value})}
+                onChange={(e) => setDraft({ ...draft, title: e.target.value })}
               />
 
               <div className={styles.tagsWrapper}>
@@ -151,11 +169,11 @@ export default function FileEditor({
                         e.preventDefault();
 
                         setDraft({
-                          ...draft, 
+                          ...draft,
                           title: draft.title,
                           body: draft.body,
-                          tags: [...(draft.tags ?? []), newTag]
-                        })
+                          tags: [...(draft.tags ?? []), newTag],
+                        });
 
                         setNewTag("");
                       }}
@@ -177,7 +195,7 @@ export default function FileEditor({
                     <>
                       <p key={index}>{tag}</p>
                       <FiX
-                      // remove tag
+                        // remove tag
                         onClick={() => {
                           const newTags = draft.tags.filter(
                             (_, i) => i !== index,
@@ -185,8 +203,8 @@ export default function FileEditor({
 
                           setDraft({
                             ...draft,
-                            tags: newTags ?? []
-                          })
+                            tags: newTags ?? [],
+                          });
                         }}
                       />
                     </>
@@ -198,7 +216,7 @@ export default function FileEditor({
             <textarea
               className={styles.fileContent}
               value={draft.body}
-              onChange={(e) => setDraft({...draft, body: e.target.value})}
+              onChange={(e) => setDraft({ ...draft, body: e.target.value })}
             >
               {draft.body}
             </textarea>
@@ -212,9 +230,10 @@ export default function FileEditor({
               <div
                 className={styles.newFile}
                 onClick={() => {
-
-                  setIsCreatingItem(prev => prev?.type === "FILE" ? false : {type : "FILE"})
-                  setIsCreatingFolder(false)
+                  setIsCreatingItem((prev) =>
+                    prev?.type === "FILE" ? false : { type: "FILE" },
+                  );
+                  setIsCreatingFolder(false);
                 }}
               >
                 <RiFileAddLine /> <a>New File</a>
@@ -223,8 +242,10 @@ export default function FileEditor({
               <div
                 className={styles.newFolder}
                 onClick={() => {
-                  setIsCreatingItem(prev => prev?.type === "FOLDER" ? false : {type : "FOLDER"})
-                  setIsCreatingFolder(true)
+                  setIsCreatingItem((prev) =>
+                    prev?.type === "FOLDER" ? false : { type: "FOLDER" },
+                  );
+                  setIsCreatingFolder(true);
                 }}
               >
                 <RiFolderAddLine />
@@ -236,12 +257,14 @@ export default function FileEditor({
 
         {isViewingFile && unsavedChanges && (
           <div className={styles.saveContainer}>
-            <p className={styles.saveStatus}>{unsavedChanges}</p>
+            <p className={styles.saveStatus}>
+              {unsavedChanges ? "Unsaved changes" : ""}
+            </p>
             <button
               className={styles.saveBtn}
               onClick={() => {
                 const snippet = {
-                          ...selectedItem?.data,
+                  ...selectedItem?.data,
                   ...draft,
                 };
                 updateSnippet(snippet);

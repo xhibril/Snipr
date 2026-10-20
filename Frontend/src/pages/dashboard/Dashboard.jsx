@@ -107,12 +107,11 @@ export default function Dashboard({ notify }) {
           setDraft={setDraft}
           setOriginal={setOriginal}
           setSelectedItem={setSelectedItem}
-          files = {files}
+          files={files}
           setFiles={setFiles}
-              isCreatingFolder={isCreatingFolder}
           setIsCreatingFolder={setIsCreatingFolder}
-          isCreatingItem={isCreatingItem}
           setIsCreatingItem={setIsCreatingItem}
+          notify={notify}
         />
       </div>
     </div>

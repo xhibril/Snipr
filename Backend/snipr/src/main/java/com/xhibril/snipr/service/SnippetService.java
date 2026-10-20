@@ -226,9 +226,9 @@ public class SnippetService {
         List<Folder> folders;
 
         if (Boolean.TRUE.equals(starred)) {
-            folders = folderRepo.findByUserIdAndIsPinned(userId, true);
+            folders = folderRepo.findByUserIdAndIsPinnedTrueAndIsDeletedFalse(userId);
         } else if (Boolean.TRUE.equals(shared)) {
-            folders = folderRepo.findByUserIdAndIsShared(userId, true);
+            folders = folderRepo.findByUserIdAndIsSharedTrueAndIsDeletedFalse(userId);
         } else if (Boolean.TRUE.equals(deleted)) {
             folders = folderRepo.getDeletedFolders(userId, LocalDateTime.now().minusDays(30));
         } else {
@@ -258,7 +258,7 @@ public class SnippetService {
             snippets = snippetRepo.findStarredSnippets(userId);
 
         } else if (Boolean.TRUE.equals(shared)) {
-            snippets = snippetRepo.findByUserIdAndIsShared(userId, true);
+            snippets = snippetRepo.findByUserIdAndIsSharedTrueAndIsDeletedFalse(userId);
         } else if (Boolean.TRUE.equals(deleted)) {
             snippets = snippetRepo.getDeletedSnippets(userId, LocalDateTime.now().minusDays(30));
         } else {

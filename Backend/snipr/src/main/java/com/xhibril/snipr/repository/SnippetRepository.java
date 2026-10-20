@@ -52,7 +52,7 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
 
     List<Snippet> findByUserIdAndIsPinned(Long userId, Boolean isPinned);
 
-    List<Snippet> findByUserIdAndIsShared(Long userId, Boolean isShared);
+    List<Snippet> findByUserIdAndIsSharedTrueAndIsDeletedFalse(Long userId);
 
     List<Snippet> findByUserIdAndIsDeleted(Long userId, Boolean isDeleted);
 

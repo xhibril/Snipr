@@ -1,17 +1,17 @@
 import styles from "./FileExplorer.module.css";
-import {ValidateInput} from "../../utils/Validation.jsx";
+import { ValidateInput } from "../../utils/Validation.jsx";
 import SearchFiles from "../../utils/Search.jsx";
 import ExplorerToolBar from "./ExplorerToolBar";
 import SearchBar from "./SearchBar";
 import FolderItem from "./FolderItem.jsx";
 import FileItem from "./FileItem.jsx";
 import ContextMenu from "./ContextMenu.jsx";
-import {PAGE_CONFIG} from "../../../config/pageConfig.jsx";
+import { PAGE_CONFIG } from "../../../config/pageConfig.jsx";
 import NewItem from "../../ui/NewItemInput.jsx";
 import useFileExplorerActions from "./useFileExplorerActions";
 
-import {useState, useRef, useEffect, useMemo} from "react";
-import {useNavigate} from "react-router-dom";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function FileExplorer({
   folders,
@@ -28,9 +28,8 @@ export default function FileExplorer({
   setIsCreatingItem,
   isCreatingItem,
   setIsCreatingFolder,
-  isCreatingFolder
+  isCreatingFolder,
 }) {
-
   const [toggleSearchFilter, setToggleSearchFilter] = useState(false);
   const [filterTags, setFilterTags] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -69,7 +68,6 @@ export default function FileExplorer({
   const isSearching = searchQuery.trim() !== "" || filterTags.length > 0;
   const displayedFiles = isSearching ? searchResults : sortedFiles;
 
-
   const {
     updateItemPinStatus,
     deleteItem,
@@ -93,14 +91,14 @@ export default function FileExplorer({
     setToName,
     setEditingId,
     getAvailableName,
-    isCreatingFolder
+    isCreatingFolder,
   });
-
 
   useEffect(() => {
     setSelectedItem(null);
     setOpenFolders([]);
-  }, [page]);
+    setIsViewingFile(false);
+  }, [activePage]);
 
   // close context menu
   useEffect(() => {
@@ -117,7 +115,7 @@ export default function FileExplorer({
     };
   }, [contextMenu]);
 
-    function handleContextMenu(e, file, type) {
+  function handleContextMenu(e, file, type) {
     e.preventDefault();
     setIsCreatingItem(false);
     setIsEditing(false);
@@ -133,7 +131,7 @@ export default function FileExplorer({
   useEffect(() => {
     const timer = setTimeout(() => {
       searchItems();
-    }, 300);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, [searchQuery, filterTags]);
@@ -317,8 +315,8 @@ export default function FileExplorer({
             x={contextMenu.x}
             y={contextMenu.y}
             file={contextMenu.item}
-     type={contextMenu.type}
-     contextMenu={contextMenu}
+            type={contextMenu.type}
+            contextMenu={contextMenu}
             onDelete={deleteItem}
             onRecover={recoverFiles}
             onOpen={onOpen}

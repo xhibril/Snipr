@@ -26,9 +26,9 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
                          @Param("folderId") Long folderId);
 
 
-    List<Folder> findByUserIdAndIsPinned(Long userId, Boolean isPinned);
+    List<Folder> findByUserIdAndIsPinnedTrueAndIsDeletedFalse(Long userId);
 
-    List<Folder> findByUserIdAndIsShared(Long userId, Boolean isShared);
+    List<Folder> findByUserIdAndIsSharedTrueAndIsDeletedFalse(Long userId);
 
     List<Folder> findByUserIdAndIsDeleted(Long userId, Boolean isDeleted);
 
