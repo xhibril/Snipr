@@ -109,10 +109,6 @@ export default function ContextMenu({
             </button>
           )}
 
-          {page.itemActions.includes("share") && (
-            <button onClick={() => setContextMenu(null)}>Share</button>
-          )}
-
           {page.itemActions.includes("recover") && (
             <button
               onClick={() => {

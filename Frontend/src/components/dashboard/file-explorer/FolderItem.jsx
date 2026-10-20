@@ -31,7 +31,7 @@ export default function FolderItem({
   setIsCreatingItem,
   isCreatingFolder,
   inputRef,
-  handleCreateItem,
+  createItem,
 }) {
 
   const folderFiles = files.filter((file) => file.folderId === folder.id);
@@ -165,7 +165,7 @@ export default function FolderItem({
             isCreatingFolder={isCreatingFolder}
             page={page}
             inputRef={inputRef}
-            handleCreateItem={handleCreateItem}
+            createItem={createItem}
           />
         )}
     </div>

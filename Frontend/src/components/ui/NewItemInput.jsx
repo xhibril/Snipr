@@ -6,7 +6,7 @@ export default function NewItem({
   isCreatingItem,
   setIsCreatingItem,
   isCreatingFolder,
-  handleCreateItem,
+  createItem,
   page,
   inputRef,
 }) {
@@ -49,7 +49,7 @@ export default function NewItem({
 
         const value = inputRef.current?.value || "";
 
-        handleCreateItem(value);
+        createItem(value);
 
         inputRef.current.value = "";
         

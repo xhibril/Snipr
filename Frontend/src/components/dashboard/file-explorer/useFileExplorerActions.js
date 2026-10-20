@@ -15,6 +15,7 @@ export default function useFileExplorerActions({
   setToName,
   setEditingId,
   getAvailableName,
+  isCreatingFolder
 }) {
 
   function rollBack(isFolder, previous) {

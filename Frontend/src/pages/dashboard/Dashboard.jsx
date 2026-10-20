@@ -10,28 +10,12 @@ import Sidebar from "../../components/dashboard/sidebar/Sidebar.jsx";
 
 export default function Dashboard({ notify }) {
   const [isViewingFile, setIsViewingFile] = useState(false);
-  const [isAddingTag, setIsAddingTag] = useState(false);
-  const [toggleSettings, setToggleSettings] = useState(false);
-  const [toggleFolder, setToggleFolder] = useState(false);
   const [folders, setFolders] = useState([]);
   const [files, setFiles] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [unsavedChanges, setUnsavedChanges] = useState("");
-  const [newTag, setNewTag] = useState("");
+  const [isCreatingItem, setIsCreatingItem] = useState(false);
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const nav = useNavigate();
-
-  const [activePage, setActivePage] = useState("REGULAR");
-
-  const endpoint = {
-    REGULAR: "",
-    SHARED: "?shared=true",
-    STARRED: "?starred=true",
-    DELETED: "?deleted=true",
-  };
-
-  const endpointSuffix = endpoint[activePage];
-  const endpointSnippet = `/snippets${endpointSuffix}`;
-  const endpointFolders = `/folders${endpointSuffix}`;
 
   const [draft, setDraft] = useState({
     title: "",
@@ -45,23 +29,18 @@ export default function Dashboard({ notify }) {
     tags: [],
   });
 
-  useEffect(() => {
-    if (
-      draft.body !== original.body ||
-      draft.title !== original.title ||
-      (original.tags || []).join() !== draft.tags.join() // conv into string n compare
-    ) {
-      setUnsavedChanges("Unsaved Changes");
-    } else {
-      setUnsavedChanges("");
-    }
-  }, [draft, original]);
+  const [activePage, setActivePage] = useState("REGULAR");
 
-  useEffect(() => {
-    if (selectedItem?.type !== "FILE") return;
-    setIsViewingFile(true);
-    syncDraft();
-  }, [selectedItem]);
+  const endpoint = {
+    REGULAR: "",
+    SHARED: "?shared=true",
+    STARRED: "?starred=true",
+    DELETED: "?deleted=true",
+  };
+
+  const endpointSuffix = endpoint[activePage];
+  const endpointSnippet = `/snippets${endpointSuffix}`;
+  const endpointFolders = `/folders${endpointSuffix}`;
 
   useEffect(() => {
     fetchFolders();
@@ -96,127 +75,44 @@ export default function Dashboard({ notify }) {
     setFiles(data);
   }
 
-  async function updateSnippet(snippet) {
-    const previousSnippet = structuredClone(selectedItem?.data);
-    setUnsavedChanges("Saving...");
-
-    // opt update
-    setFiles(files.map((file) => (file.id === snippet.id ? snippet : file)));
-
-    const res = await ApiFetch("/snippets", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: snippet.id,
-        name: snippet.name,
-        body: snippet.body,
-        title: snippet.title,
-        isPinned: snippet.isPinned,
-        tags: snippet.tags,
-        folderId: snippet.folderId,
-      }),
-    });
-
-    if (!res) return;
-    const data = await res.json();
-
-    if (!res.ok) {
-      notify(data.message || "Could not update snippet", "ERROR");
-      syncSelected(previousSnippet);
-      return;
-    }
-
-    syncSelected(data)
-    syncDraft();
-  }
-
-  function syncDraft() {
-  if (!selectedItem?.data) return;
-
-  const { title, body, tags } = selectedItem.data;
-
-  const data = {
-    title: title || "",
-    body: body || "",
-    tags: tags || [],
-  };
-
-  setOriginal(data);
-  setDraft(data);
-}
-
-  function syncSelected(data) {
-    setSelectedItem((prev) => ({
-      ...prev,
-      data,
-    }));
-  }
-
   return (
     <div className={styles.mainContainer}>
-      <div
-        className={styles.mainContent}
-        onKeyDown={(e) => {
-          if (e.ctrlKey && e.key === "s") {
-            e.preventDefault();
-
-            if (unsavedChanges) {
-              const snippet = {
-                ...selectedItem?.data,
-                ...draft,
-              };
-              updateSnippet(snippet);
-            }
-          }
-        }}
-      >
-        <Sidebar
-          toggleSettings={toggleSettings}
-          setToggleSettings={setToggleSettings}
-          activePage={activePage}
-          setActivePage={setActivePage}
-        />
+      <div className={styles.mainContent}>
+        <Sidebar setActivePage={setActivePage} />
 
         <FileExplorer
-          toggleSettings={toggleSettings}
-          setToggleSettings={setToggleSettings}
-          toggleFolder={toggleFolder}
-          setToggleFolder={setToggleFolder}
           folders={folders}
           setFolders={setFolders}
           files={files}
           setFiles={setFiles}
           notify={notify}
-          setSelectedItem={setSelectedItem}
           selectedItem={selectedItem}
-          original={original}
-          setOriginal={setOriginal}
-          draft={draft}
-          setDraft={setDraft}
-          updateSnippet={updateSnippet}
+          setSelectedItem={setSelectedItem}
           setIsViewingFile={setIsViewingFile}
+          setDraft={setDraft}
+          setOriginal={setOriginal}
           activePage={activePage}
-          setActivePage={setActivePage}
+          isCreatingFolder={isCreatingFolder}
+          setIsCreatingFolder={setIsCreatingFolder}
+          isCreatingItem={isCreatingItem}
+          setIsCreatingItem={setIsCreatingItem}
         />
 
         <FileEditor
-          setIsViewingFile={setIsViewingFile}
           isViewingFile={isViewingFile}
-          original={original}
-          setOriginal={setOriginal}
-          draft={draft}
-          setDraft={setDraft}
-          isAddingTag={isAddingTag}
-          setIsAddingTag={setIsAddingTag}
-          setSelectedItem={setSelectedItem}
+          setIsViewingFile={setIsViewingFile}
           selectedItem={selectedItem}
-          setUnsavedChanges={setUnsavedChanges}
-          unsavedChanges={unsavedChanges}
-          setNewTag={setNewTag}
-          newTag={newTag}
-          updateSnippet={updateSnippet}
-          activePage={activePage}
-          setActivePage={setActivePage}
+          draft={draft}
+          original={original}
+          setDraft={setDraft}
+          setOriginal={setOriginal}
+          setSelectedItem={setSelectedItem}
+          files = {files}
+          setFiles={setFiles}
+              isCreatingFolder={isCreatingFolder}
+          setIsCreatingFolder={setIsCreatingFolder}
+          isCreatingItem={isCreatingItem}
+          setIsCreatingItem={setIsCreatingItem}
         />
       </div>
     </div>

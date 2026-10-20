@@ -1,6 +1,7 @@
 import styles from "../../../pages/dashboard/Dashboard.module.css";
 
 import logo from "../../../assets/images/logo.svg";
+import { useState } from "react";
 
 import {
   FiFolder,
@@ -12,11 +13,13 @@ import {
 } from "react-icons/fi";
 
 export default function Sidebar({
-  toggleSettings,
-  setToggleSettings,
-  activePage,
   setActivePage,
 }) {
+
+
+    const [toggleSettings, setToggleSettings] = useState(false);
+
+
   return (
     <div className={styles.sideBar}>
       <div className={styles.brandHeader}>

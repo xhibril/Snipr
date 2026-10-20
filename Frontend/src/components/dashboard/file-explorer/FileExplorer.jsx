@@ -25,6 +25,10 @@ export default function FileExplorer({
   setDraft,
   setOriginal,
   activePage,
+  setIsCreatingItem,
+  isCreatingItem,
+  setIsCreatingFolder,
+  isCreatingFolder
 }) {
 
   const [toggleSearchFilter, setToggleSearchFilter] = useState(false);
@@ -32,8 +36,6 @@ export default function FileExplorer({
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [openFolders, setOpenFolders] = useState([]);
-  const [isCreatingItem, setIsCreatingItem] = useState(false);
-  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [copy, setCopy] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -91,6 +93,7 @@ export default function FileExplorer({
     setToName,
     setEditingId,
     getAvailableName,
+    isCreatingFolder
   });
 
 
