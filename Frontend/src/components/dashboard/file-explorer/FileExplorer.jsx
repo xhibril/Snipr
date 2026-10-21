@@ -23,12 +23,15 @@ export default function FileExplorer({
   setSelectedItem,
   setIsViewingFile,
   setDraft,
+  draft,
   setOriginal,
   activePage,
   setIsCreatingItem,
   isCreatingItem,
   setIsCreatingFolder,
   isCreatingFolder,
+  unsavedChanges,
+  editorRef
 }) {
   const [toggleSearchFilter, setToggleSearchFilter] = useState(false);
   const [filterTags, setFilterTags] = useState([]);
@@ -168,6 +171,15 @@ export default function FileExplorer({
   }
 
   function selectFile(file) {
+
+    if(unsavedChanges){
+      const snippet = {
+        ...selectedItem?.data,
+        ...draft
+      }
+     editorRef.current?.updateSnippet(snippet);
+    }
+
     setSelectedItem({
       type: "FILE",
       data: file,

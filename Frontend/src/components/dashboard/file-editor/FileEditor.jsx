@@ -2,8 +2,9 @@ import styles from "../../../pages/dashboard/Dashboard.module.css";
 
 import { RiFileAddLine, RiFolderAddLine } from "react-icons/ri";
 import { FiPlus, FiX } from "react-icons/fi";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useImperativeHandle } from "react";
 import ApiFetch from "../../utils/Api";
+import { useRef } from "react";
 
 export default function FileEditor({
   isViewingFile,
@@ -19,11 +20,20 @@ export default function FileEditor({
   setIsCreatingItem,
   setIsCreatingFolder,
   notify,
+  editorRef,
+  unsavedChanges,
+  setUnsavedChanges
 }) {
-  const [unsavedChanges, setUnsavedChanges] = useState("");
+
   const [newTag, setNewTag] = useState("");
   const [isAddingTag, setIsAddingTag] = useState(false);
+  const selectedIdRef = useRef(selectedItem?.data?.id);
 
+  useImperativeHandle(editorRef, () => ({
+    updateSnippet
+  }));
+
+  // auto save
   useEffect(() => {
     if (!selectedItem?.data || !isViewingFile) return;
 
@@ -45,6 +55,8 @@ export default function FileEditor({
     return () => clearTimeout(timer);
   }, [draft, original, selectedItem?.data?.id, isViewingFile]);
 
+
+  // unsaved changes
   useEffect(() => {
     if (
       draft.body !== original.body ||
@@ -57,15 +69,19 @@ export default function FileEditor({
     }
   }, [draft, original]);
 
+
   useEffect(() => {
     if (selectedItem?.type !== "FILE") return;
     setIsViewingFile(true);
     syncDraft();
   }, [selectedItem]);
 
+    useEffect(() => {
+     selectedIdRef.current = selectedItem?.data?.id;
+  }, [selectedItem])
+
   async function updateSnippet(snippet) {
     const previousSnippet = structuredClone(selectedItem?.data);
-    setUnsavedChanges("Saving...");
 
     // opt update
     setFiles(files.map((file) => (file.id === snippet.id ? snippet : file)));
@@ -90,11 +106,19 @@ export default function FileEditor({
     if (!res.ok) {
       notify(data.message || "Could not update snippet", "ERROR");
       syncSelected(previousSnippet);
+      syncDraft();
       return;
     }
 
-    syncSelected(data);
-    syncDraft();
+
+
+
+    if(selectedIdRef === snippet.id){
+      syncSelected(data);
+      syncDraft();
+    }
+
+
   }
 
   function syncDraft() {

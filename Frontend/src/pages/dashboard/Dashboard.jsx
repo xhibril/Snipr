@@ -7,6 +7,7 @@ import ApiFetch from "../../components/utils/Api.jsx";
 import FileExplorer from "../../components/dashboard/file-explorer/FileExplorer.jsx";
 import FileEditor from "../../components/dashboard/file-editor/FileEditor.jsx";
 import Sidebar from "../../components/dashboard/sidebar/Sidebar.jsx";
+import { useRef } from "react";
 
 export default function Dashboard({ notify }) {
   const [isViewingFile, setIsViewingFile] = useState(false);
@@ -15,6 +16,8 @@ export default function Dashboard({ notify }) {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isCreatingItem, setIsCreatingItem] = useState(false);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const editorRef = useRef(null);
   const nav = useNavigate();
 
   const [draft, setDraft] = useState({
@@ -96,6 +99,9 @@ export default function Dashboard({ notify }) {
           setIsCreatingFolder={setIsCreatingFolder}
           isCreatingItem={isCreatingItem}
           setIsCreatingItem={setIsCreatingItem}
+          editorRef = {editorRef}
+          unsavedChanges={unsavedChanges}
+          draft = {draft}
         />
 
         <FileEditor
@@ -112,6 +118,9 @@ export default function Dashboard({ notify }) {
           setIsCreatingFolder={setIsCreatingFolder}
           setIsCreatingItem={setIsCreatingItem}
           notify={notify}
+          unsavedChanges={unsavedChanges}
+          setUnsavedChanges={setUnsavedChanges}
+          editorRef={editorRef}
         />
       </div>
     </div>
