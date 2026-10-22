@@ -163,6 +163,21 @@ export default function useFileExplorerActions({
   }
 
   async function moveSnippet(item) {
+    const folderId = item?.folderId;
+
+
+
+    const itemsInSameSpace = files.filter((file) => (file?.folderId ?? null) === folderId);
+
+
+    const nameRes = ValidateFileName(item?.name, itemsInSameSpace, "FILE");
+
+   if (!nameRes) {
+      notify("This file already exists", "ERROR");
+      return;
+    }
+
+
     const path = `/snippets/${item.id}`;
 
     const previousFiles = structuredClone(files);
@@ -202,6 +217,12 @@ export default function useFileExplorerActions({
   }
 
   async function renameFile(item, type, toName) {
+
+    // same name
+    if(item?.name === toName){
+      return;
+    }
+
     const isFolder = type === "FOLDER";
     const path = `${isFolder ? "/folders" : "/snippets"}/${item.id}/rename`;
     let filesInSameSpace;
@@ -219,7 +240,7 @@ export default function useFileExplorerActions({
     const nameRes = ValidateFileName(toName, filesInSameSpace, type);
 
     if (!nameRes) {
-      notify(`${isFolder ? "Folder" : "File"} already exists`, "ERROR");
+      notify(`This ${isFolder ? "folder" : "file"} already exists`, "ERROR");
       return;
     }
 
@@ -311,14 +332,21 @@ export default function useFileExplorerActions({
 
     const path = `${isFolder ? "/folders" : "/snippets"}/${item.id}/copy`;
 
-    const items = isFolder ? folders : files;
+    let itemsInSameSpace;
+
+    if(!isFolder){
+      itemsInSameSpace = files.filter((file) => (file?.folderId ?? null) === folderId);
+
+    } else {
+      itemsInSameSpace = [...folders]
+    }
 
     const placeholderId = crypto.randomUUID();
 
     let counter = 2;
     let itemName = `${item.name} - Copy`;
 
-    while (items.some((existing) => existing.name === itemName)) {
+    while (itemsInSameSpace.some((existing) => existing.name === itemName)) {
       itemName = `${item.name} - Copy (${counter})`;
       counter++;
     }
@@ -430,7 +458,7 @@ export default function useFileExplorerActions({
     }
 
     const nameRes = ValidateFileName(itemName, filesInSameSpace, isFolder ? "FOLDER" : "FILE");
-    
+
        if (!nameRes) {
       notify(`This ${isFolder ? "folder" : "file"} already exists`);
       return;
