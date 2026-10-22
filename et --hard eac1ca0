@@ -1,0 +1,59 @@
+[33meac1ca0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m fixed auto save when switching files
+[33mdae24fe[m added auto save / fix some bugs
+[33mafe0070[m optimized code v4
+[33mb895df5[m optimized code v3
+[33m5053681[m optimized code v2
+[33m2b0c21e[m optimized code v2
+[33mb6cd2bb[m optimized code v1
+[33m1d9921c[m fixed copying a pasted snippet bug
+[33mfc6ddd1[m  fixed co[pying and pasting for folders
+[33m328e869[m added copy/paste files prototype
+[33ma9f3b36[m fixed creating items issue
+[33m838291d[m fixed weird ux behaviour
+[33m45a54a9[m finished: changing how files/folders field appears when creating
+[33mb21770b[m changed creating item flow, to do: copy / paste files
+[33m9d9bf95[m added more functionality to context menu
+[33m96b6022[m half done: renaming files
+[33ma99a55d[m added functionality to context menu buttons
+[33m29e5151[m added page actions
+[33me750931[m fixed file and folder fetching n rendering
+[33m8896811[m added recovery for deleted files, context menu and more
+[33mbe223f7[m small fixes
+[33m748429a[m added auto clean up for files
+[33m61c8608[m added perm deletion, and recoverable timeline for files
+[33m157aff8[m fixed files rendered in different pages
+[33mbffdc43[m updated deleting handling, added new fetching methods and more
+[33md550551[m moved search to frontend, improved it and fixed a few bugs
+[33mfea592b[m added searching
+[33m851d669[m fixed file / folder names when creating
+[33m75a8025[m small changes and fixes
+[33mdb5de52[m optimized file editor, fix few backend bugs
+[33m22665f9[m optimized file editor, and file explorer
+[33m1c3d649[m small changes and fixes
+[33m15bba2e[m lazy file seperation for file editor
+[33m3f1579a[m worked on tags, fixed other bugs with saving
+[33m1793669[m added tag deletion
+[33m8181453[m worked on tags
+[33me081fbf[m worked on tags
+[33mff8218f[m fixed dragging and saving files
+[33mf151e25[m added saving files
+[33m7d12035[m added saving files
+[33m8500fc6[m fixed adding files state issue
+[33m1dbea4e[m added dragging out of folders, fixed issues
+[33m52b3097[m added dragging into folders + optimistic updates
+[33m231f4fb[m added deleting and fixed issues
+[33m94201ab[m added pinning files/ folders
+[33m3d53a91[m added folder / file adding and syncing w backend
+[33m69f4805[m added toggling folders + files, and ret them from backend
+[33mf80d669[m working on frontend + backend
+[33m27110ae[m working on frontend main panel
+[33m8e1dfdf[m Create README.md
+[33m249d7d7[m bit of frontend work
+[33m98f12c2[m finished password reset flow
+[33me2cac86[m added auth status
+[33m7f54c94[m finished auth pages and verify email page + communication between frontend with backend
+[33me628f70[m added res to landing page, finished auth pay layout
+[33m8d2119b[m finished landing page
+[33m9ff50bf[m started frontend
+[33mb1b68be[m  added auth + email service
+[33md3be326[m initial commit

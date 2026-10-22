@@ -1,5 +1,5 @@
 import ApiFetch from "../../utils/Api.jsx";
-import { ValidateInput } from "../../utils/Validation.jsx";
+import { ValidateInput, ValidateFileName } from "../../utils/Validation.jsx";
 
 export default function useFileExplorerActions({
   folders,
@@ -14,10 +14,8 @@ export default function useFileExplorerActions({
   setIsViewingFile,
   setToName,
   setEditingId,
-  getAvailableName,
-  isCreatingFolder
+  isCreatingFolder,
 }) {
-
   function rollBack(isFolder, previous) {
     if (isFolder) {
       setFolders(previous);
@@ -105,8 +103,8 @@ export default function useFileExplorerActions({
     const res = await ApiFetch(path, { method: "DELETE" }, notify, nav);
 
     if (!res) {
-      setFolders(previousFolders)
-      setFiles(previousFiles)
+      setFolders(previousFolders);
+      setFiles(previousFiles);
       return;
     }
 
@@ -193,7 +191,7 @@ export default function useFileExplorerActions({
     }
 
     if (!res.ok) {
-       const data = await res.json();
+      const data = await res.json();
       notify(
         data.message || "Could not move snippet, pleasey try again",
         "ERROR",
@@ -206,12 +204,24 @@ export default function useFileExplorerActions({
   async function renameFile(item, type, toName) {
     const isFolder = type === "FOLDER";
     const path = `${isFolder ? "/folders" : "/snippets"}/${item.id}/rename`;
+    let filesInSameSpace;
 
-    const finalizedName = getAvailableName(
-      toName,
-      isFolder ? folders : files,
-      type,
-    );
+    // files
+    if (!isFolder) {
+      const folderId = !isFolder ? (item?.folderId ?? null) : null;
+      filesInSameSpace = files.filter(
+        (file) => (file?.folderId ?? null) === folderId,
+      );
+    } else {
+      filesInSameSpace = [...folders];
+    }
+
+    const nameRes = ValidateFileName(toName, filesInSameSpace, type);
+
+    if (!nameRes) {
+      notify(`${isFolder ? "Folder" : "File"} already exists`, "ERROR");
+      return;
+    }
 
     const previous = isFolder
       ? structuredClone(folders)
@@ -221,13 +231,13 @@ export default function useFileExplorerActions({
     if (isFolder) {
       setFolders((prev) =>
         prev.map((folder) =>
-          folder.id === item.id ? { ...folder, name: finalizedName } : folder,
+          folder.id === item.id ? { ...folder, name: nameRes } : folder,
         ),
       );
     } else {
       setFiles((prev) =>
         prev.map((file) =>
-          file.id === item.id ? { ...file, name: finalizedName } : file,
+          file.id === item.id ? { ...file, name: nameRes } : file,
         ),
       );
     }
@@ -237,7 +247,7 @@ export default function useFileExplorerActions({
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: finalizedName }),
+        body: JSON.stringify({ name: nameRes }),
       },
       notify,
       nav,
@@ -306,10 +316,10 @@ export default function useFileExplorerActions({
     const placeholderId = crypto.randomUUID();
 
     let counter = 2;
-    let itemName = `${item.name} copy`;
+    let itemName = `${item.name} - Copy`;
 
     while (items.some((existing) => existing.name === itemName)) {
-      itemName = `${item.name} copy (${counter})`;
+      itemName = `${item.name} - Copy (${counter})`;
       counter++;
     }
     const previousFolders = structuredClone(folders);
@@ -392,84 +402,93 @@ export default function useFileExplorerActions({
     }
   }
 
+  async function createItem(itemName) {
+    const inputRes = ValidateInput(itemName, "GENERAL");
 
-  
-    async function createItem(itemName) {
-      const isFolder = isCreatingFolder;
-      const items = isFolder ? folders : files;
-      const path = isCreatingFolder ? "/folders" : "/snippets";
-  
-      const inputRes = ValidateInput(itemName, "GENERAL");
-  
-      if (inputRes !== "VALID") {
-        notify(`Invalid ${isFolder ? "folder" : "file"} name`, "ERROR");
-        return;
-      }
-  
-      itemName = getAvailableName(
-        itemName,
-        items,
-        isCreatingFolder ? "FOLDER" : "FILE",
+    if (inputRes !== "VALID") {
+      notify(`Invalid ${isFolder ? "folder" : "file"} name`, "ERROR");
+      return;
+    }
+    
+
+    const isFolder = isCreatingFolder;
+
+    let filesInSameSpace;
+
+    const folderId =
+      selectedItem?.type === "FOLDER" ? selectedItem?.data.id : null;
+
+    // files
+    if (!isFolder) {
+      filesInSameSpace = files.filter(
+        (file) => (file?.folderId ?? null) === folderId,
       );
-  
-      if (!itemName) {
-        notify(`This ${isFolder ? "folder" : "file"} already exists`);
-        return;
-      }
-  
-      const folderId =
-        selectedItem?.type === "FOLDER" ? selectedItem.data.id : null;
-  
-      const previous = structuredClone(items);
-  
-      const newItem = isFolder
-        ? {name: itemName}
-        : {name: itemName, folderId: folderId};
-  
-      if (isFolder) {
-        setFolders((prev) => [...prev, newItem]);
-      } else {
-        setFiles((prev) => [...prev, newItem]);
-      }
-  
-      const res = await ApiFetch(
-        path,
-        {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify(newItem),
-        },
-        notify,
-        nav,
-      );
-  
-      if (!res) {
-        rollBack(isFolder, previous);
-        return;
-      }
-  
-      const data = await res.json();
-  
-      if (!res.ok) {
-        notify(
-          data.message ||
-            `Something went wrong while creating ${isFolder ? "folder" : "file"}`,
-          "ERROR",
-        );
-  
-        rollBack(isFolder, previous);
-        return;
-      }
-  
-      if (isFolder) {
-        setFolders((prev) =>
-          prev.map((folder) => (folder === newItem ? data : folder)),
-        );
-      } else {
-        setFiles((prev) => prev.map((file) => (file === newItem ? data : file)));
-      }
+
+      // folders
+    } else {
+      filesInSameSpace = [...folders];
     }
 
+    const nameRes = ValidateFileName(itemName, filesInSameSpace, isFolder ? "FOLDER" : "FILE");
+    
+       if (!nameRes) {
+      notify(`This ${isFolder ? "folder" : "file"} already exists`);
+      return;
+    }
+
+
+    const items = isFolder ? folders : files;
+    const path = isCreatingFolder ? "/folders" : "/snippets";
+
+    const previous = structuredClone(items);
+
+    const newItem = isFolder
+      ? { name: itemName }
+      : { name: itemName, folderId: folderId };
+
+    if (isFolder) {
+      setFolders((prev) => [...prev, newItem]);
+    } else {
+      setFiles((prev) => [...prev, newItem]);
+    }
+
+    const res = await ApiFetch(
+      path,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newItem),
+      },
+      notify,
+      nav,
+    );
+
+    if (!res) {
+      rollBack(isFolder, previous);
+      return;
+    }
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      notify(
+        data.message ||
+          `Something went wrong while creating ${isFolder ? "folder" : "file"}`,
+        "ERROR",
+      );
+
+      rollBack(isFolder, previous);
+      return;
+    }
+
+    if (isFolder) {
+      setFolders((prev) =>
+        prev.map((folder) => (folder === newItem ? data : folder)),
+      );
+    } else {
+      setFiles((prev) => prev.map((file) => (file === newItem ? data : file)));
+    }
+  }
 
   return {
     updateItemPinStatus,
@@ -479,6 +498,6 @@ export default function useFileExplorerActions({
     renameFile,
     emptyRecycleBin,
     pasteItem,
-    createItem
+    createItem,
   };
 }

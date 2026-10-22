@@ -14,7 +14,7 @@ export default function FolderItem({
 
   selectedItem,
   setSelectedItem,
-  selectFile,
+  selectItem,
 
   updateItemPinStatus,
   moveSnippet,
@@ -62,24 +62,10 @@ export default function FolderItem({
       }}
     >
       <div
-        className={`${styles.folderHeader} ${
-          selectedItem?.type === "FOLDER" &&
-          selectedItem?.data?.id === folder.id
-            ? styles.selected
-            : ""
-        }`}
+        className={styles.folderHeader}
         onClick={() => {
-          if (
-            selectedItem?.type === "FOLDER" &&
-            selectedItem?.data?.id === folder.id
-          ) {
-            setSelectedItem(null);
-          } else {
-            setSelectedItem({
-              type: "FOLDER",
-              data: folder,
-            });
-          }
+
+          selectItem(folder, "FOLDER");
 
           setOpenFolders((prev) =>
             prev.includes(index)
@@ -141,7 +127,7 @@ export default function FolderItem({
               key={file.id}
               file={file}
               selectedItem={selectedItem}
-              selectFile={selectFile}
+              selectItem={selectItem}
               updateItemPinStatus={updateItemPinStatus}
               handleContextMenu={handleContextMenu}
               page={page}

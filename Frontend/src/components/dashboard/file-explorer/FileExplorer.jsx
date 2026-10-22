@@ -31,7 +31,7 @@ export default function FileExplorer({
   setIsCreatingFolder,
   isCreatingFolder,
   unsavedChanges,
-  editorRef
+  editorRef,
 }) {
   const [toggleSearchFilter, setToggleSearchFilter] = useState(false);
   const [filterTags, setFilterTags] = useState([]);
@@ -93,7 +93,6 @@ export default function FileExplorer({
     setIsViewingFile,
     setToName,
     setEditingId,
-    getAvailableName,
     isCreatingFolder,
   });
 
@@ -144,55 +143,33 @@ export default function FileExplorer({
     setSearchResults(result);
   }
 
-  function getAvailableName(name, items, type) {
-    if (items.some((item) => item.name === name)) {
-      return null;
-    }
 
-    const trimmedName = name?.trim();
+  function selectItem(item, type) {
 
-    if (!trimmedName) {
-      name = type === "FOLDER" ? "New Folder" : "New File";
-    } else {
-      name = trimmedName;
-    }
-
-    if (!items.some((item) => item.name === name)) {
-      return name;
-    }
-
-    let counter = 2;
-
-    while (items.some((item) => item.name === `${name} (${counter})`)) {
-      counter++;
-    }
-
-    return `${name} (${counter})`;
-  }
-
-  function selectFile(file) {
-
-    if(unsavedChanges){
+    if (selectedItem?.type === "FILE" && unsavedChanges) {
       const snippet = {
         ...selectedItem?.data,
-        ...draft
-      }
-     editorRef.current?.updateSnippet(snippet);
+        ...draft,
+      };
+
+      editorRef.current?.updateSnippet(snippet);
+    }
+
+    if (type == "FILE") {
+      const data = {
+        title: item.title || "",
+        body: item.body || "",
+        tags: item.tags || [],
+      };
+
+      setDraft(data);
+      setOriginal(data);
     }
 
     setSelectedItem({
-      type: "FILE",
-      data: file,
+      type: type,
+      data: item,
     });
-
-    const data = {
-      title: file.title || "",
-      body: file.body || "",
-      tags: file.tags || [],
-    };
-
-    setDraft(data);
-    setOriginal(data);
   }
 
   function onOpen(item, type) {
@@ -281,7 +258,7 @@ export default function FileExplorer({
                   setOpenFolders={setOpenFolders}
                   selectedItem={selectedItem}
                   setSelectedItem={setSelectedItem}
-                  selectFile={selectFile}
+                  selectItem={selectItem}
                   updateItemPinStatus={updateItemPinStatus}
                   moveSnippet={moveSnippet}
                   handleContextMenu={handleContextMenu}
@@ -307,7 +284,7 @@ export default function FileExplorer({
                 key={file.id}
                 file={file}
                 selectedItem={selectedItem}
-                selectFile={selectFile}
+                selectItem={selectItem}
                 updateItemPinStatus={updateItemPinStatus}
                 handleContextMenu={handleContextMenu}
                 isEditing={isEditing}

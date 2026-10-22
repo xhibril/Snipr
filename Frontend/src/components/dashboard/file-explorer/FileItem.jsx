@@ -5,7 +5,7 @@ import { RiFile2Fill, RiPushpinFill } from "react-icons/ri";
 export default function FileItem({
   file,
   selectedItem,
-  selectFile,
+  selectItem,
   updateItemPinStatus,
   handleContextMenu,
   setIsEditing,
@@ -32,12 +32,8 @@ export default function FileItem({
       }}
     >
       <div
-        className={`${styles.fileHeader} ${
-          selectedItem?.type === "FILE" && selectedItem?.data?.id === file.id
-            ? styles.selected
-            : ""
-        }`}
-        onClick={() => selectFile(file)}
+        className={styles.fileHeader}
+        onClick={() => selectItem(file, "FILE")}
         onContextMenu={(e) => handleContextMenu(e, file, "FILE")}
       >
         <RiFile2Fill className={styles.fileIcon} />
