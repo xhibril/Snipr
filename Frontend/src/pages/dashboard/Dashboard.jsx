@@ -35,10 +35,10 @@ export default function Dashboard({ notify }) {
   const [activePage, setActivePage] = useState("REGULAR");
 
   const endpoint = {
-    REGULAR: "",
-    SHARED: "?shared=true",
-    STARRED: "?starred=true",
-    DELETED: "?deleted=true",
+    REGULAR: "?view=ALL",
+    SHARED: "?view=SHARED",
+    STARRED: "?view=PINNED",
+    DELETED: "?view=DELETED",
   };
 
   const endpointSuffix = endpoint[activePage];

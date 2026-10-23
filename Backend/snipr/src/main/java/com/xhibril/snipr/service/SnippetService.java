@@ -1,10 +1,7 @@
 package com.xhibril.snipr.service;
 
 import com.xhibril.snipr.dto.api.ApiResponse;
-import com.xhibril.snipr.dto.snippet.FolderCopyResponse;
-import com.xhibril.snipr.dto.snippet.FolderResponse;
-import com.xhibril.snipr.dto.snippet.SnippetRequest;
-import com.xhibril.snipr.dto.snippet.SnippetResponse;
+import com.xhibril.snipr.dto.snippet.*;
 import com.xhibril.snipr.model.Folder;
 import com.xhibril.snipr.model.Snippet;
 import com.xhibril.snipr.model.User;
@@ -18,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +35,13 @@ public class SnippetService {
         this.folderRepo = folderRepo;
     }
 
+
+    public enum ItemView {
+        ALL,
+        PINNED,
+        SHARED,
+        DELETED
+    }
 
     public ResponseEntity<FolderResponse> addFolder(Long userId, String folderName) {
         Optional<User> userOpt = userRepo.findById(userId);
@@ -222,19 +227,16 @@ public class SnippetService {
         return ResponseEntity.ok().body(new ApiResponse("Folder permanently deleted"));
     }
 
-    public List<FolderResponse> getFolders(Long userId, Boolean shared, Boolean starred, Boolean deleted) {
+    public List<FolderResponse> getFolders(Long userId, ItemView view) {
         List<Folder> folders;
 
-        if (Boolean.TRUE.equals(starred)) {
-            folders = folderRepo.findByUserIdAndIsPinnedTrueAndIsDeletedFalse(userId);
-        } else if (Boolean.TRUE.equals(shared)) {
-            folders = folderRepo.findByUserIdAndIsSharedTrueAndIsDeletedFalse(userId);
-        } else if (Boolean.TRUE.equals(deleted)) {
-            folders = folderRepo.getDeletedFolders(userId, LocalDateTime.now().minusDays(30));
-        } else {
-            folders = folderRepo.findByUserIdAndIsDeletedFalse(userId);
+        switch (view) {
+            case ALL -> folders = folderRepo.findByUserIdAndIsDeletedFalse(userId);
+            case PINNED -> folders = folderRepo.findByUserIdAndIsPinnedTrueAndIsDeletedFalse(userId);
+            case SHARED -> folders = folderRepo.findByUserIdAndIsSharedTrueAndIsDeletedFalse(userId);
+            case DELETED -> folders = folderRepo.getDeletedFolders(userId, LocalDateTime.now().minusDays(30));
+            default -> throw new IllegalArgumentException("Invalid view");
         }
-
 
         return folders.stream()
                 .map(this::toFolderResponse)
@@ -248,21 +250,24 @@ public class SnippetService {
         folderResponse.setName(folder.getName());
         folderResponse.setIsPinned(folder.getIsPinned());
         folderResponse.setIsDeleted(folder.getIsDeleted());
+
+        if (folder.getIsDeleted()) {
+            Long days = 30 - ChronoUnit.DAYS.between(folder.getDeletedAt(), LocalDateTime.now());
+            folderResponse.setDaysRemaining(days);
+            System.out.println("FOLDER DAYS REM: " + days);
+        }
         return folderResponse;
     }
 
-    public List<SnippetResponse> getSnippets(Long userId, Boolean shared, Boolean starred, Boolean deleted) {
+    public List<SnippetResponse> getSnippets(Long userId, ItemView view) {
         List<Snippet> snippets;
 
-        if (Boolean.TRUE.equals(starred)) {
-            snippets = snippetRepo.findStarredSnippets(userId);
-
-        } else if (Boolean.TRUE.equals(shared)) {
-            snippets = snippetRepo.findByUserIdAndIsSharedTrueAndIsDeletedFalse(userId);
-        } else if (Boolean.TRUE.equals(deleted)) {
-            snippets = snippetRepo.getDeletedSnippets(userId, LocalDateTime.now().minusDays(30));
-        } else {
-            snippets = snippetRepo.findByUserIdAndIsDeletedFalse(userId);
+        switch (view) {
+            case ALL -> snippets = snippetRepo.findByUserIdAndIsDeletedFalse(userId);
+            case PINNED -> snippets = snippetRepo.findStarredSnippets(userId);
+            case SHARED -> snippets = snippetRepo.findByUserIdAndIsSharedTrueAndIsDeletedFalse(userId);
+            case DELETED -> snippets = snippetRepo.getDeletedSnippets(userId, LocalDateTime.now().minusDays(30));
+            default -> throw new IllegalArgumentException("Invalid view");
         }
 
 
@@ -279,7 +284,6 @@ public class SnippetService {
             snippetResponse.setFolderId(folder.getId());
         }
 
-
         snippetResponse.setId(snippet.getId());
         snippetResponse.setName(snippet.getFileName());
         snippetResponse.setBody(snippet.getBody());
@@ -288,6 +292,11 @@ public class SnippetService {
         snippetResponse.setTags(snippet.getTags());
         snippetResponse.setIsDeleted(snippet.getIsDeleted());
 
+        if (snippet.getIsDeleted()) {
+            Long days = 30 -ChronoUnit.DAYS.between(snippet.getDeletedAt(), LocalDateTime.now());
+            snippetResponse.setDaysRemaining(days);
+            System.out.println("FILES DAYS REM: " + days);
+        }
 
         return snippetResponse;
     }
@@ -547,7 +556,7 @@ public class SnippetService {
         copy.setBody(original.getBody());
         copy.setTags(original.getTags());
         copy.setTags(new ArrayList<>(original.getTags()));
-        if(folderId != null){
+        if (folderId != null) {
             Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, folderId);
             folderOpt.ifPresent(copy::setFolder);
         }

@@ -6,6 +6,7 @@ public class FolderResponse {
     private String message;
     private Boolean isPinned;
     private Boolean isDeleted;
+    private Long daysRemaining;
 
     public FolderResponse(){}
 
@@ -51,5 +52,14 @@ public class FolderResponse {
 
     public void setIsDeleted(Boolean isDeleted){
         this.isDeleted = isDeleted;
+    }
+
+    public Long getDaysRemaining(){
+        return daysRemaining;
+    }
+
+    public void setDaysRemaining(Long daysRemaining){
+        this.daysRemaining = daysRemaining;
+
     }
 }

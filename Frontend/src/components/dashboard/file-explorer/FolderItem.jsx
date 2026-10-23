@@ -118,6 +118,22 @@ export default function FolderItem({
             )}
           </>
         )}
+
+
+        {page.showExpiration &&
+
+
+<p>
+{folder?.daysRemaining}
+ days
+</p>
+        
+      
+      }
+
+
+
+
       </div>
 
       {page.itemActions.includes("openFolders") && (
@@ -137,6 +153,7 @@ export default function FolderItem({
               toName={toName}
               setToName={setToName}
               editingId={editingId}
+           
             />
           ))}
         </div>
@@ -152,6 +169,7 @@ export default function FolderItem({
             page={page}
             inputRef={inputRef}
             createItem={createItem}
+      
           />
         )}
     </div>

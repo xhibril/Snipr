@@ -14,6 +14,7 @@ export default function FileItem({
   toName,
   setToName,
   editingId,
+  page
 }) {
   const editingInputRef = useRef(null);
 
@@ -69,6 +70,18 @@ export default function FileItem({
         ) : (
           <p className={styles.fileName}>{file.name}</p>
         )}
+
+        
+        {page.showExpiration &&
+
+
+<p>
+{file?.daysRemaining}
+ days
+</p>
+        
+      
+      }
       </div>
     </div>
   );
