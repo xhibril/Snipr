@@ -14,7 +14,6 @@ export default function SearchBar({
   setToggleSearchFilter,
   filterTags,
   setFilterTags,
-  page
 }) {
   return (
     <div className={styles.searchContainer}>

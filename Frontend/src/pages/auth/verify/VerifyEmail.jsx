@@ -30,8 +30,6 @@ export default function VerifyEmail({ notify }) {
                     return;
                 }
 
-                console.log(data);
-
                 notify(data.message, "SUCCESS");
             } catch (err) {
                 notify("Something went wrong, pleasey try again", "ERROR");

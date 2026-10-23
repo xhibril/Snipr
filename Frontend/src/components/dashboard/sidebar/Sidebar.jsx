@@ -30,7 +30,7 @@ export default function Sidebar({
       <div className={styles.options}>
         <button
           className={styles.optionRow}
-          onClick={() => setActivePage("REGULAR")}
+          onClick={() => setActivePage("ALL")}
         >
           <FiFolder className={styles.optionIcon} />
           <p className={styles.optionText}>My Files</p>
@@ -46,7 +46,7 @@ export default function Sidebar({
 
         <button
           className={styles.optionRow}
-          onClick={() => setActivePage("STARRED")}
+          onClick={() => setActivePage("PINNED")}
         >
           <FiStar className={styles.optionIcon} />
           <p className={styles.optionText}>Starred</p>

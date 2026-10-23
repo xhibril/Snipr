@@ -32,12 +32,12 @@ export default function Dashboard({ notify }) {
     tags: [],
   });
 
-  const [activePage, setActivePage] = useState("REGULAR");
+  const [activePage, setActivePage] = useState("ALL");
 
   const endpoint = {
-    REGULAR: "?view=ALL",
+    ALL: "?view=ALL",
     SHARED: "?view=SHARED",
-    STARRED: "?view=PINNED",
+    PINNED: "?view=PINNED",
     DELETED: "?view=DELETED",
   };
 
