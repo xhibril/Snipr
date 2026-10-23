@@ -52,7 +52,6 @@ export default function Auth({ mode, notify, setIsAuth }) {
 
         setIsLoading(true);
 
-    
         try {
             const res = await ApiFetch(path, {
                 method: "POST",
@@ -67,7 +66,6 @@ export default function Auth({ mode, notify, setIsAuth }) {
                 notify(data.message || "Something went wrong, please try again", "ERROR");
                 return;
             }
-
 
             if(isLogin){
                 localStorage.removeItem("email")

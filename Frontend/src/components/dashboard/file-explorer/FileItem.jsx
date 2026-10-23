@@ -4,17 +4,16 @@ import { RiFile2Fill, RiPushpinFill } from "react-icons/ri";
 
 export default function FileItem({
   file,
-  selectedItem,
   selectItem,
   updateItemPinStatus,
   handleContextMenu,
   setIsEditing,
   isEditing,
-  renameFile,
+  renameItem,
   toName,
   setToName,
   editingId,
-  page
+  page,
 }) {
   const editingInputRef = useRef(null);
 
@@ -57,7 +56,7 @@ export default function FileItem({
             onSubmit={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              renameFile(file, "FILE", toName);
+              renameItem(file, "FILE", toName);
               setIsEditing(false);
             }}
           >
@@ -71,17 +70,12 @@ export default function FileItem({
           <p className={styles.fileName}>{file.name}</p>
         )}
 
-        
-        {page.showExpiration &&
-
-
-<p>
-{file?.daysRemaining}
- days
-</p>
-        
-      
-      }
+        {page.showExpiration && (
+          <p>
+            {file?.daysRemaining}
+            days
+          </p>
+        )}
       </div>
     </div>
   );

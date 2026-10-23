@@ -16,6 +16,15 @@ export default function useFileExplorerActions({
   setEditingId,
   isCreatingFolder,
 }) {
+  function getItemConfig(type) {
+    const isFolder = type === "FOLDER";
+    const collection = isFolder ? folders : files;
+    const setCollection = isFolder ? setFolders : setFiles;
+    const basePath = isFolder ? "/folders" : "/snippets";
+
+    return { isFolder, collection, setCollection, basePath };
+  }
+
   function rollBack(isFolder, previous) {
     if (isFolder) {
       setFolders(previous);
@@ -25,39 +34,26 @@ export default function useFileExplorerActions({
   }
 
   async function updateItemPinStatus(item, type) {
-    const isFolder = type === "FOLDER";
+    const { isFolder, basePath, collection, setCollection } =
+      getItemConfig(type);
 
     const status = !item.isPinned;
 
-    const path = `/${isFolder ? "folders" : "snippets"}/${item.id}/pin`;
-    const previous = isFolder
-      ? structuredClone(folders)
-      : structuredClone(files);
+    const path = `${basePath}/${item.id}/pin`;
+
+    const previous = collection;
 
     // opt update
-    if (isFolder) {
-      setFolders(
-        folders.map((folder) =>
-          folder.id === item.id
-            ? {
-                ...folder,
-                isPinned: status,
-              }
-            : folder,
-        ),
-      );
-    } else {
-      setFiles(
-        files.map((file) =>
-          file.id === item.id
-            ? {
-                ...file,
-                isPinned: status,
-              }
-            : file,
-        ),
-      );
-    }
+    setCollection((prev) =>
+      prev.map((currentItem) =>
+        currentItem.id === item.id
+          ? {
+              ...currentItem,
+              isPinned: status,
+            }
+          : current,
+      ),
+    );
 
     const res = await ApiFetch(path, { method: "PATCH" }, notify, nav);
 
@@ -74,6 +70,49 @@ export default function useFileExplorerActions({
     }
   }
 
+  async function deleteAndRecoverHelper(
+    item,
+    type,
+    method,
+    suffix,
+    failureMessage,
+  ) {
+    const { isFolder, basePath } = getItemConfig(type);
+    const path = `${basePath}/${item.id}${suffix}`;
+
+    const previousFolders = folders;
+    const previousFiles = files;
+
+    // opt update
+    if (isFolder) {
+      setFolders((prev) => prev.filter((folder) => folder.id !== item.id));
+      setFiles((prev) => prev.filter((file) => file.folderId !== item.id));
+    } else {
+      setFiles((prev) => prev.filter((file) => file.id !== item.id));
+    }
+
+    const res = await ApiFetch(path, { method: method }, notify, nav);
+
+    if (!res) {
+      setFolders(previousFolders);
+      setFiles(previousFiles);
+      return;
+    }
+
+    if (!res.ok) {
+      const data = await res.json();
+      notify(data.message || failureMessage, "ERROR");
+      setFolders(previousFolders);
+      setFiles(previousFiles);
+      return;
+    }
+
+    if (selectedItem?.data.id === item.id) {
+      setSelectedItem(null);
+      setIsViewingFile(false);
+    }
+  }
+
   async function deleteItem(item, type) {
     // if no item passed from context menu delete selected item
     if (!item || !type) {
@@ -81,106 +120,48 @@ export default function useFileExplorerActions({
       type = selectedItem?.type;
     }
 
+    const suffix = page.deleteMode === "permanent" ? "/permanent" : "";
     const isFolder = type === "FOLDER";
 
-    const isPermanent = page.deleteMode === "permanent";
-    const path = `/${isFolder ? "folders" : "snippets"}/${item.id}${
-      isPermanent ? "/permanent" : ""
-    }`;
-
-    const previousFolders = structuredClone(folders);
-    const previousFiles = structuredClone(files);
-
-    // opt update
-    if (isFolder) {
-      setFolders(folders.filter((folder) => folder.id !== item.id));
-
-      setFiles(files.filter((file) => file.folderId !== item.id));
-    } else {
-      setFiles(files.filter((file) => file.id !== item.id));
-    }
-
-    const res = await ApiFetch(path, { method: "DELETE" }, notify, nav);
-
-    if (!res) {
-      setFolders(previousFolders);
-      setFiles(previousFiles);
-      return;
-    }
-
-    if (!res.ok) {
-      const data = await res.json();
-      notify(data.message || "Could not delete, please try again", "ERROR");
-      setFolders(previousFolders);
-      setFiles(previousFiles);
-      return;
-    }
-
-    if (selectedItem?.data.id === item.id) {
-      setSelectedItem(null);
-      setIsViewingFile(false);
-    }
+    deleteAndRecoverHelper(
+      item,
+      type,
+      "DELETE",
+      suffix,
+      `Could not delete ${isFolder ? "folder" : "file"}, please try again`,
+    );
   }
 
   async function recoverFiles(item, type) {
     const isFolder = type === "FOLDER";
 
-    const path = `${isFolder ? "/folders" : "/snippets"}/${item.id}/recover`;
-
-    const previousFolders = structuredClone(folders);
-    const previousFiles = structuredClone(files);
-
-    if (isFolder) {
-      setFolders(folders.filter((folder) => folder.id !== item.id));
-      setFiles(files.filter((file) => file.folderId !== item.id));
-    } else {
-      setFiles(files.filter((file) => file.id !== item.id));
-    }
-
-    const res = await ApiFetch(path, { method: "PATCH" }, notify, nav);
-
-    if (!res) {
-      setFolders(previousFolders);
-      setFiles(previousFiles);
-      return;
-    }
-
-    if (!res.ok) {
-      const data = await res.json();
-      notify(
-        data.message || `Could not recover ${isFolder ? "folder" : "file"}`,
-        "ERROR",
-      );
-      setFolders(previousFolders);
-      setFiles(previousFiles);
-      return;
-    }
-
-    if (selectedItem?.data.id === item.id) {
-      setSelectedItem(null);
-      setIsViewingFile(false);
-    }
+    deleteAndRecoverHelper(
+      item,
+      type,
+      "PATCH",
+      "/recover",
+      `Could not recover ${isFolder ? "folder" : "file"}, please try again`,
+    );
   }
 
   async function moveSnippet(item) {
     const folderId = item?.folderId;
+    
+    // get files in same space
 
-
-
-    const itemsInSameSpace = files.filter((file) => (file?.folderId ?? null) === folderId);
-
+    const itemsInSameSpace = files.filter(
+      (file) => (file?.folderId ?? null) === folderId,
+    );
 
     const nameRes = ValidateFileName(item?.name, itemsInSameSpace, "FILE");
 
-   if (!nameRes) {
+    if (!nameRes) {
       notify("This file already exists", "ERROR");
       return;
     }
 
-
     const path = `/snippets/${item.id}`;
-
-    const previousFiles = structuredClone(files);
+    const previousFiles = files;
 
     // opt update
     setFiles((prev) =>
@@ -216,24 +197,27 @@ export default function useFileExplorerActions({
     }
   }
 
-  async function renameFile(item, type, toName) {
-
+  async function renameItem(item, type, toName) {
     // same name
-    if(item?.name === toName){
+    if (item?.name === toName) {
       return;
     }
 
-    const isFolder = type === "FOLDER";
-    const path = `${isFolder ? "/folders" : "/snippets"}/${item.id}/rename`;
+    const { isFolder, basePath, collection, setCollection } =
+      getItemConfig(type);
+
+    const path = `${basePath}/${item.id}/rename`;
+
     let filesInSameSpace;
 
-    // files
+    // get files in same space
     if (!isFolder) {
       const folderId = !isFolder ? (item?.folderId ?? null) : null;
       filesInSameSpace = files.filter(
         (file) => (file?.folderId ?? null) === folderId,
       );
     } else {
+      // folders
       filesInSameSpace = [...folders];
     }
 
@@ -244,24 +228,16 @@ export default function useFileExplorerActions({
       return;
     }
 
-    const previous = isFolder
-      ? structuredClone(folders)
-      : structuredClone(files);
+    const previous = collection;
 
     // opt update
-    if (isFolder) {
-      setFolders((prev) =>
-        prev.map((folder) =>
-          folder.id === item.id ? { ...folder, name: nameRes } : folder,
-        ),
-      );
-    } else {
-      setFiles((prev) =>
-        prev.map((file) =>
-          file.id === item.id ? { ...file, name: nameRes } : file,
-        ),
-      );
-    }
+    setCollection((prev) =>
+      prev.map((currentItem) =>
+        currentItem.id === item.id
+          ? { ...currentItem, name: nameRes }
+          : currentItem,
+      ),
+    );
 
     const res = await ApiFetch(
       path,
@@ -289,6 +265,7 @@ export default function useFileExplorerActions({
       rollBack(isFolder, previous);
       return;
     }
+
     setToName(null);
     setEditingId(null);
   }
@@ -296,10 +273,9 @@ export default function useFileExplorerActions({
   async function emptyRecycleBin() {
     const path = "/bin";
 
-    const previousFolders = structuredClone(folders);
-    const previousFiles = structuredClone(files);
+    const previousFolders = folders;
+    const previousFiles = files;
 
-    // opt update
     setFolders([]);
     setFiles([]);
 
@@ -328,17 +304,20 @@ export default function useFileExplorerActions({
   }
 
   async function pasteItem(item, type, folderId) {
-    const isFolder = type === "FOLDER" ? true : false;
+    const { isFolder, basePath } = getItemConfig(type);
 
-    const path = `${isFolder ? "/folders" : "/snippets"}/${item.id}/copy`;
+    const path = `${basePath}/${item.id}/copy`;
 
     let itemsInSameSpace;
 
-    if(!isFolder){
-      itemsInSameSpace = files.filter((file) => (file?.folderId ?? null) === folderId);
-
+    
+    // get files in same space
+    if (!isFolder) {
+      itemsInSameSpace = files.filter(
+        (file) => (file?.folderId ?? null) === folderId,
+      );
     } else {
-      itemsInSameSpace = [...folders]
+      itemsInSameSpace = [...folders];
     }
 
     const placeholderId = crypto.randomUUID();
@@ -350,8 +329,8 @@ export default function useFileExplorerActions({
       itemName = `${item.name} - Copy (${counter})`;
       counter++;
     }
-    const previousFolders = structuredClone(folders);
-    const previousFiles = structuredClone(files);
+    const previousFolders = folders;
+    const previousFiles = files;
 
     // opt update
     if (isFolder) {
@@ -374,7 +353,7 @@ export default function useFileExplorerActions({
       setFiles((prev) => [...prev, ...finalizedFilesToPaste]);
     } else {
       const optimisticFile = {
-        folderId: placeholderId,
+        folderId: folderId,
         name: itemName,
         id: placeholderId,
       };
@@ -431,57 +410,50 @@ export default function useFileExplorerActions({
   }
 
   async function createItem(itemName) {
+    const type = isCreatingFolder ? "FOLDER" : "FILE";
+
+    const { isFolder, basePath, collection, setCollection } =
+      getItemConfig(type);
+
     const inputRes = ValidateInput(itemName, "GENERAL");
 
     if (inputRes !== "VALID") {
       notify(`Invalid ${isFolder ? "folder" : "file"} name`, "ERROR");
       return;
     }
-    
-
-    const isFolder = isCreatingFolder;
 
     let filesInSameSpace;
 
     const folderId =
       selectedItem?.type === "FOLDER" ? selectedItem?.data.id : null;
 
-    // files
+      
+    // get files in same space
     if (!isFolder) {
       filesInSameSpace = files.filter(
         (file) => (file?.folderId ?? null) === folderId,
       );
-
-      // folders
     } else {
       filesInSameSpace = [...folders];
     }
 
-    const nameRes = ValidateFileName(itemName, filesInSameSpace, isFolder ? "FOLDER" : "FILE");
+    const nameRes = ValidateFileName(itemName, filesInSameSpace, type);
 
-       if (!nameRes) {
+    if (!nameRes) {
       notify(`This ${isFolder ? "folder" : "file"} already exists`);
       return;
     }
 
-
-    const items = isFolder ? folders : files;
-    const path = isCreatingFolder ? "/folders" : "/snippets";
-
-    const previous = structuredClone(items);
+    const previous = collection;
 
     const newItem = isFolder
       ? { name: itemName }
       : { name: itemName, folderId: folderId };
 
-    if (isFolder) {
-      setFolders((prev) => [...prev, newItem]);
-    } else {
-      setFiles((prev) => [...prev, newItem]);
-    }
+    setCollection((prev) => [...prev, newItem]);
 
     const res = await ApiFetch(
-      path,
+      basePath,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -509,13 +481,9 @@ export default function useFileExplorerActions({
       return;
     }
 
-    if (isFolder) {
-      setFolders((prev) =>
-        prev.map((folder) => (folder === newItem ? data : folder)),
-      );
-    } else {
-      setFiles((prev) => prev.map((file) => (file === newItem ? data : file)));
-    }
+    setCollection((prev) =>
+      prev.map((currentItem) => (currentItem === newItem ? data : currentItem)),
+    );
   }
 
   return {
@@ -523,7 +491,7 @@ export default function useFileExplorerActions({
     deleteItem,
     recoverFiles,
     moveSnippet,
-    renameFile,
+    renameItem,
     emptyRecycleBin,
     pasteItem,
     createItem,

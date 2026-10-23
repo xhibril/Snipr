@@ -1,5 +1,4 @@
 import styles from "./FileExplorer.module.css";
-import { ValidateInput } from "../../utils/Validation.jsx";
 import SearchFiles from "../../utils/Search.jsx";
 import ExplorerToolBar from "./ExplorerToolBar";
 import SearchBar from "./SearchBar";
@@ -50,7 +49,6 @@ export default function FileExplorer({
 
   // compare two folders/files at a time
   // pinned = 1 gets placed before unpinned = 0
-
   const sortedFolders = useMemo(
     () => [...folders].sort((a, b) => b.isPinned - a.isPinned),
     [folders],
@@ -76,7 +74,7 @@ export default function FileExplorer({
     deleteItem,
     recoverFiles,
     moveSnippet,
-    renameFile,
+    renameItem,
     emptyRecycleBin,
     pasteItem,
     createItem,
@@ -265,7 +263,7 @@ export default function FileExplorer({
                   isEditing={isEditing}
                   setIsEditing={setIsEditing}
                   editingId={editingId}
-                  renameFile={renameFile}
+                  renameItem={renameItem}
                   toName={toName}
                   setToName={setToName}
                   isCreatingItem={isCreatingItem}
@@ -290,7 +288,7 @@ export default function FileExplorer({
                 isEditing={isEditing}
                 setIsEditing={setIsEditing}
                 editingId={editingId}
-                renameFile={renameFile}
+                renameItem={renameItem}
                 toName={toName}
                 setToName={setToName}
                 page={page}
@@ -309,7 +307,7 @@ export default function FileExplorer({
             onDelete={deleteItem}
             onRecover={recoverFiles}
             onOpen={onOpen}
-            onRename={renameFile}
+            onRename={renameItem}
             updatePinStatus={updateItemPinStatus}
             setSelectedItem={setSelectedItem}
             setContextMenu={setContextMenu}

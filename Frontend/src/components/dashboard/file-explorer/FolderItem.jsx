@@ -1,5 +1,5 @@
 import styles from "./FileExplorer.module.css";
-import {  useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { RiFolderFill, RiPushpinFill } from "react-icons/ri";
 import FileItem from "./FileItem";
@@ -13,7 +13,6 @@ export default function FolderItem({
   page,
 
   selectedItem,
-  setSelectedItem,
   selectItem,
 
   updateItemPinStatus,
@@ -23,7 +22,7 @@ export default function FolderItem({
   isEditing,
   setIsEditing,
   editingId,
-  renameFile,
+  renameItem,
   toName,
   setToName,
 
@@ -33,7 +32,6 @@ export default function FolderItem({
   inputRef,
   createItem,
 }) {
-
   const folderFiles = files.filter((file) => file.folderId === folder.id);
 
   const editingInputRef = useRef(null);
@@ -64,7 +62,6 @@ export default function FolderItem({
       <div
         className={styles.folderHeader}
         onClick={() => {
-
           selectItem(folder, "FOLDER");
 
           setOpenFolders((prev) =>
@@ -95,7 +92,7 @@ export default function FolderItem({
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              renameFile(folder, "FOLDER", toName);
+              renameItem(folder, "FOLDER", toName);
               setIsEditing(false);
             }}
           >
@@ -119,21 +116,12 @@ export default function FolderItem({
           </>
         )}
 
-
-        {page.showExpiration &&
-
-
-<p>
-{folder?.daysRemaining}
- days
-</p>
-        
-      
-      }
-
-
-
-
+        {page.showExpiration && (
+          <p>
+            {folder?.daysRemaining}
+            days
+          </p>
+        )}
       </div>
 
       {page.itemActions.includes("openFolders") && (
@@ -149,11 +137,10 @@ export default function FolderItem({
               page={page}
               isEditing={isEditing}
               setIsEditing={setIsEditing}
-              renameFile={renameFile}
+              renameItem={renameItem}
               toName={toName}
               setToName={setToName}
               editingId={editingId}
-           
             />
           ))}
         </div>
@@ -169,7 +156,6 @@ export default function FolderItem({
             page={page}
             inputRef={inputRef}
             createItem={createItem}
-      
           />
         )}
     </div>
