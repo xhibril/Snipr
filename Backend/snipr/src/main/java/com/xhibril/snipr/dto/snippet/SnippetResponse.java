@@ -14,6 +14,7 @@ public class SnippetResponse {
     private List<String> tags;
     private Integer tagAmount;
     private Boolean isDeleted;
+    private Long daysRemaining;
 
     public SnippetResponse(
             Long id,
@@ -120,5 +121,13 @@ public class SnippetResponse {
 
     public void setIsDeleted(Boolean isDeleted){
         this.isDeleted = isDeleted;
+    }
+
+    public Long getDaysRemaining(){
+        return daysRemaining;
+    }
+
+    public void setDaysRemaining(Long daysRemaining){
+        this.daysRemaining = daysRemaining;
     }
 }

@@ -85,25 +85,19 @@ public class SnippetController {
 
 
     @GetMapping("/folders")
-    public List<FolderResponse> getFolders(
-            @RequestParam(required = false) Boolean shared,
-            @RequestParam(required = false) Boolean starred,
-            @RequestParam(required = false) Boolean deleted
-    ) {
+    public List<FolderResponse> getFolders(@RequestParam(defaultValue = "ALL") SnippetService.ItemView view) {
         Long userId = 1L; // place holder;
 
-        return snippetService.getFolders(userId, shared, starred, deleted);
+        return snippetService.getFolders(userId, view);
     }
 
     @GetMapping("/snippets")
     public List<SnippetResponse> getSnippets(
-            @RequestParam(required = false) Boolean shared,
-            @RequestParam(required = false) Boolean starred,
-            @RequestParam(required = false) Boolean deleted
+@RequestParam(defaultValue = "ALL") SnippetService.ItemView view
     ) {
         Long userId = 1L; // place holder;
 
-        return snippetService.getSnippets(userId, shared, starred, deleted);
+        return snippetService.getSnippets(userId, view);
     }
 
 

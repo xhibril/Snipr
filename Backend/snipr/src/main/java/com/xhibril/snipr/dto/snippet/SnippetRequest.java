@@ -14,6 +14,7 @@ public class SnippetRequest {
     private Boolean isPinned;
     private Integer tagAmount;
 
+
     public String getName() {
         return name;
     }
