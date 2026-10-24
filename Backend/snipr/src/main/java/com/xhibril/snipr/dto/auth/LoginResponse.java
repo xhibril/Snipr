@@ -1,9 +1,12 @@
 package com.xhibril.snipr.dto.auth;
 
+import com.xhibril.snipr.model.User;
+
 public class LoginResponse {
 
     private String message;
     private Boolean isTrusted;
+    public User user;
 
 
     public LoginResponse(String message, Boolean isTrusted) {
@@ -26,7 +29,16 @@ public class LoginResponse {
         return isTrusted;
     }
 
+
+
     public String getMessage(){
         return message;
+    }
+    public void setUser(User user){
+        this.user= user;
+    }
+
+    public User getUser(){
+        return user;
     }
 }

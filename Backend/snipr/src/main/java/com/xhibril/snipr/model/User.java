@@ -12,6 +12,8 @@ public class User {
 
     private String email;
 
+    private String username;
+
     private String password;
 
     private boolean verified;
@@ -25,4 +27,10 @@ public class User {
     public void setEmail(String email) { this.email = email; }
     public void setPassword(String password) { this.password = password; }
     public void setIsVerified(boolean verified) { this.verified = verified; }
+
+
+    public void setUsername(String username){this.username = username;}
+    public String getUsername(){
+        return username;
+    }
 }

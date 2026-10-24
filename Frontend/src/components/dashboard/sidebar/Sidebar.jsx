@@ -14,6 +14,7 @@ import {
 
 export default function Sidebar({
   setActivePage,
+  user
 }) {
 
 
@@ -72,8 +73,8 @@ export default function Sidebar({
 
         <div className={styles.accountRow}>
           <div className={styles.accountDetails}>
-            <p className={styles.accountName}>Account name</p>
-            <p className={styles.accountEmail}>email@gmail.com</p>
+            <p className={styles.accountName}>{user?.username}</p>
+            <p className={styles.accountEmail}>{user?.email}</p>
           </div>
 
           <div

@@ -2,11 +2,15 @@ package com.xhibril.snipr.service;
 
 import com.xhibril.snipr.dto.api.ApiResponse;
 import com.xhibril.snipr.dto.auth.LoginResponse;
+import com.xhibril.snipr.dto.auth.SignUpRequest;
+import com.xhibril.snipr.dto.snippet.AuthStatusResponse;
 import com.xhibril.snipr.model.User;
 import com.xhibril.snipr.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.sql.ast.tree.predicate.BooleanExpressionPredicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -19,6 +23,7 @@ import java.util.Optional;
 @Service
 public class AuthService {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     private final UserRepository userRepo;
     private final EmailService emailService;
     private final JwtService jwtService;
@@ -48,20 +53,22 @@ public class AuthService {
 
 
 
-    public ResponseEntity<ApiResponse> registerUser(String email, String password) {
+    public ResponseEntity<ApiResponse> registerUser(SignUpRequest request) {
         // check if email is already registered
-        Optional<User> userOpt = userRepo.findByEmail(email);
+        Optional<User> userOpt = userRepo.findByEmail(request.getEmail());
 
         if (userOpt.isEmpty()) {
 
             User user = new User();
 
-            user.setEmail(email);
-            user.setPassword(password);
+            user.setEmail(request.getEmail());
+            user.setPassword(request.getPassword());
+            user.setUsername(request.getUsername());
             user.setIsVerified(false);
 
+
             userRepo.save(user);
-            emailService.sendVerificationEmail(email);
+            emailService.sendVerificationEmail(request.getEmail());
 
             return ResponseEntity.ok().body(new ApiResponse("Successfully registered"));
         } else {
@@ -121,7 +128,24 @@ public class AuthService {
                 String token = jwtService.generateToken("authToken", claims, time);
                 jwtService.saveToken("authToken", token, "/", time, res);
 
-                return ResponseEntity.ok().body(new LoginResponse("Successfully logged in", true));
+
+                LoginResponse loginResponse = new LoginResponse();
+                User userResponse = new User();
+                userResponse.setUsername(user.getUsername());
+                userResponse.setEmail(user.getEmail());
+
+                loginResponse.setIsTrusted(true);
+                loginResponse.setMessage("Successfully logged in");
+                loginResponse.setUser(userResponse);
+
+
+                System.out.println("LoginResponse: " + loginResponse);
+                System.out.println("isTrusted: " + loginResponse.isTrusted());
+                System.out.println("message: " + loginResponse.getMessage());
+                System.out.println("user.username: " + userResponse.getUsername());
+                System.out.println("user.email: " + userResponse.getEmail());
+
+                return ResponseEntity.ok().body(loginResponse);
             }
         }
 
@@ -135,9 +159,27 @@ public class AuthService {
         return jwtService.extractFromToken(token, "id", Long.class);
     }
 
-    public Boolean isAuthenticated(HttpServletRequest req){
+    public AuthStatusResponse isAuthenticated(HttpServletRequest req){
         Long id = getAuthenticatedId(req);
-        return id != null;
+
+        if(id == null){
+            return new AuthStatusResponse(false, null);
+        }
+
+        Optional<User> userOpt = userRepo.findById(id);
+
+        if(userOpt.isEmpty()){
+            return new AuthStatusResponse(false, null);
+        }
+
+        User user = userOpt.get();
+
+        User userResponse = new User();
+
+        userResponse.setEmail(user.getEmail());
+        userResponse.setUsername(user.getUsername());
+
+        return new AuthStatusResponse(true, userResponse);
     }
 
 

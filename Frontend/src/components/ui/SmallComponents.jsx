@@ -67,6 +67,31 @@ export function CodeField({code, setCode, title}){
 }
 
 
+export function UsernameField({username, setUsername, title}){
+
+
+    return (
+
+        <div className = {styles.field}>
+
+              <label className={styles.fieldLabel}>{title}</label>
+
+      <input className={styles.fieldInput}
+
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+            >
+            </input>
+
+
+
+
+        </div>
+    )
+}
+
+
 
 export function BrandHeader({title}) {
     const nav = useNavigate();

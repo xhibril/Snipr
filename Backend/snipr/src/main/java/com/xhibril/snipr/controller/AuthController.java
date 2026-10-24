@@ -3,6 +3,7 @@ import com.xhibril.snipr.dto.api.ApiResponse;
 import com.xhibril.snipr.dto.auth.LoginRequest;
 import com.xhibril.snipr.dto.auth.LoginResponse;
 import com.xhibril.snipr.dto.auth.SignUpRequest;
+import com.xhibril.snipr.dto.snippet.AuthStatusResponse;
 import com.xhibril.snipr.model.User;
 import com.xhibril.snipr.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +27,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse> registerUser(@RequestBody SignUpRequest request){
-        return authService.registerUser(request.getEmail(), request.getPassword());
+        return authService.registerUser(request);
     }
 
     @PostMapping("/email/resend")
@@ -42,7 +43,7 @@ public class AuthController {
 
 
     @PostMapping("/auth/status")
-    public Boolean isAuthenticated(HttpServletRequest req){
+    public AuthStatusResponse isAuthenticated(HttpServletRequest req){
         return authService.isAuthenticated(req);
     }
 

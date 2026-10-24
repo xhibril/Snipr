@@ -9,7 +9,7 @@ import FileEditor from "../../components/dashboard/file-editor/FileEditor.jsx";
 import Sidebar from "../../components/dashboard/sidebar/Sidebar.jsx";
 import { useRef } from "react";
 
-export default function Dashboard({ notify }) {
+export default function Dashboard({ notify, user }) {
   const [isViewingFile, setIsViewingFile] = useState(false);
   const [folders, setFolders] = useState([]);
   const [files, setFiles] = useState([]);
@@ -81,7 +81,7 @@ export default function Dashboard({ notify }) {
   return (
     <div className={styles.mainContainer}>
       <div className={styles.mainContent}>
-        <Sidebar setActivePage={setActivePage} />
+        <Sidebar setActivePage={setActivePage} user = {user} />
 
         <FileExplorer
           folders={folders}
