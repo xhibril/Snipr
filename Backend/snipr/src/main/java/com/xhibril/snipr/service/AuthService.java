@@ -138,13 +138,6 @@ public class AuthService {
                 loginResponse.setMessage("Successfully logged in");
                 loginResponse.setUser(userResponse);
 
-
-                System.out.println("LoginResponse: " + loginResponse);
-                System.out.println("isTrusted: " + loginResponse.isTrusted());
-                System.out.println("message: " + loginResponse.getMessage());
-                System.out.println("user.username: " + userResponse.getUsername());
-                System.out.println("user.email: " + userResponse.getEmail());
-
                 return ResponseEntity.ok().body(loginResponse);
             }
         }

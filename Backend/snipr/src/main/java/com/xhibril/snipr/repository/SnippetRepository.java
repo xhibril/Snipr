@@ -23,7 +23,7 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
 
     void deleteByUserIdAndFolderId(Long userId, Long folderId);
 
-    List<Snippet> findAllByUserId(Long userId);
+
 
 
     @Modifying
@@ -43,18 +43,9 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
                                           @Param("deletedAt") LocalDateTime deletedAt);
 
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE Snippet s SET s.isPinned = :isPinned WHERE s.user.id = :userId AND s.folder.id = :folderId")
-    void updatePinnedByUserIdAndFolderId(@Param("userId") Long userId,
-                                         @Param("folderId") Long folderId,
-                                         @Param("isPinned") Boolean isPinned);
-
-    List<Snippet> findByUserIdAndIsPinned(Long userId, Boolean isPinned);
 
     List<Snippet> findByUserIdAndIsSharedTrueAndIsDeletedFalse(Long userId);
 
-    List<Snippet> findByUserIdAndIsDeleted(Long userId, Boolean isDeleted);
 
 
     @Query("""
@@ -63,7 +54,7 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
             AND s.isDeleted = true 
             AND s.deletedAt > :time
             """)
-    List<Snippet> getDeletedSnippets(@Param("userId") Long userId,
+    List<Snippet> findDeletedSnippets(@Param("userId") Long userId,
                                      @Param("time") LocalDateTime time);
 
 

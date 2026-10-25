@@ -2,6 +2,7 @@ import styles from "../../../pages/dashboard/Dashboard.module.css";
 
 import logo from "../../../assets/images/logo.svg";
 import { useState } from "react";
+import ApiFetch from "../../utils/Api";
 
 import {
   FiFolder,
@@ -11,15 +12,30 @@ import {
   FiChevronUp,
   FiChevronDown,
 } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
-export default function Sidebar({
-  setActivePage,
-  user
-}) {
+export default function Sidebar({ setActivePage, user, notify }) {
+  const [toggleSettings, setToggleSettings] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const nav = useNavigate();
 
+  async function logout() {
+    setIsLoading(true);
 
-    const [toggleSettings, setToggleSettings] = useState(false);
+    try {
+      const res = await ApiFetch("/logout", { method: "POST" }, notify, nav);
 
+      if (!res?.ok) {
+        notify("Could not logout, please try again", "ERROR");
+        return;
+      }
+    } catch {
+      notify("Could not logout, please try again", "ERORR");
+    } finally {
+      setIsLoading(false);
+      nav("/", { replace: true }); // clear back n forward history
+    }
+  }
 
   return (
     <div className={styles.sideBar}>
@@ -75,6 +91,14 @@ export default function Sidebar({
           <div className={styles.accountDetails}>
             <p className={styles.accountName}>{user?.username}</p>
             <p className={styles.accountEmail}>{user?.email}</p>
+
+            <button
+              className={styles.logoutBtn}
+              onClick={(e) => logout()}
+              disabled={isLoading}
+            >
+              {isLoading ? "Loggin out..." : "Logout"}
+            </button>
           </div>
 
           <div

@@ -35,44 +35,7 @@ public class SnippetService {
         this.folderRepo = folderRepo;
     }
 
-
-    public enum ItemView {
-        ALL,
-        PINNED,
-        SHARED,
-        DELETED
-    }
-
-    public ResponseEntity<FolderResponse> addFolder(Long userId, String folderName) {
-        Optional<User> userOpt = userRepo.findById(userId);
-        Optional<Folder> folderOpt = folderRepo.findByUserIdAndName(userId, folderName);
-
-        if (folderOpt.isPresent()) {
-            return ResponseEntity.badRequest().body(new FolderResponse("Folder already exists"));
-        }
-
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-
-            Folder folder = new Folder();
-            folder.setUser(user);
-            folder.setName(folderName);
-
-            Folder folderSaved = folderRepo.save(folder);
-
-            FolderResponse folderResponse = new FolderResponse();
-            folderResponse.setName(folderSaved.getName());
-            folderResponse.setId(folderSaved.getId());
-            folderResponse.setMessage("Folder successfully created");
-
-            return ResponseEntity.ok().body(folderResponse);
-        } else {
-            return ResponseEntity.badRequest().body(new FolderResponse("Invalid request"));
-        }
-    }
-
-
-    public ResponseEntity<SnippetResponse> addSnippet(Long userId, String fileName, Long folderId) {
+    public ResponseEntity<SnippetResponse> addSnippet(Long userId, SnippetRequest request) {
 
         Optional<User> userOpt = userRepo.findById(userId);
 
@@ -81,11 +44,11 @@ public class SnippetService {
             Snippet snippet = new Snippet();
 
             snippet.setUser(user);
-            snippet.setFileName(fileName);
+            snippet.setFileName(request.getName());
             snippet.setTitle("Untitled");
 
-            if (folderId != null) {
-                Optional<Folder> folderOpt = folderRepo.findById(folderId);
+            if (request.getFolderId() != null) {
+                Optional<Folder> folderOpt = folderRepo.findById(request.getFolderId());
 
                 if (folderOpt.isPresent()) {
                     Folder folder = folderOpt.get();
@@ -113,7 +76,7 @@ public class SnippetService {
 
 
     @Transactional
-    public ResponseEntity<ApiResponse> moveSnippet(Long userId, Long snippetId, Long folderId) {
+    public ResponseEntity<ApiResponse> moveSnippet(Long userId, Long snippetId, SnippetRequest request) {
         Optional<Snippet> snippetOpt = snippetRepo.findById(snippetId);
 
         if (snippetOpt.isEmpty()) {
@@ -127,12 +90,12 @@ public class SnippetService {
             return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
         }
 
-        if (folderId == null) {
+        if (request.getFolderId() == null) {
             snippetRepo.moveSnippet(null, snippetId);
             return ResponseEntity.ok().body(new ApiResponse("Snippet successfully moved"));
         }
 
-        Optional<Folder> folderOpt = folderRepo.findById(folderId);
+        Optional<Folder> folderOpt = folderRepo.findById(request.getFolderId());
 
         if (folderOpt.isEmpty()) {
             return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
@@ -188,77 +151,6 @@ public class SnippetService {
     }
 
 
-    @Transactional
-    public ResponseEntity<ApiResponse> deleteFolder(Long userId, Long folderId) {
-        Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, folderId);
-
-        if (folderOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
-        }
-
-        Folder folder = folderOpt.get();
-
-        folder.setIsDeleted(true);
-        folder.setDeletedAt(LocalDateTime.now());
-        folderRepo.save(folder);
-        snippetRepo.updateDeletedByUserIdAndFolderId(userId, folderId, true, LocalDateTime.now());
-
-        return ResponseEntity.ok().body(new ApiResponse("Folder moved to trash"));
-    }
-
-
-    @Transactional
-    public ResponseEntity<ApiResponse> permanentlyDeleteFolder(Long userId, Long folderId) {
-        Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, folderId);
-
-        if (folderOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
-        }
-
-        Folder folder = folderOpt.get();
-
-        if (!Boolean.TRUE.equals(folder.getIsDeleted())) {
-            return ResponseEntity.badRequest().body(new ApiResponse("Folder is not in trash"));
-        }
-
-        snippetRepo.deleteByUserIdAndFolderId(userId, folderId);
-        folderRepo.delete(folder);
-
-        return ResponseEntity.ok().body(new ApiResponse("Folder permanently deleted"));
-    }
-
-    public List<FolderResponse> getFolders(Long userId, ItemView view) {
-        List<Folder> folders;
-
-        switch (view) {
-            case ALL -> folders = folderRepo.findByUserIdAndIsDeletedFalse(userId);
-            case PINNED -> folders = folderRepo.findByUserIdAndIsPinnedTrueAndIsDeletedFalse(userId);
-            case SHARED -> folders = folderRepo.findByUserIdAndIsSharedTrueAndIsDeletedFalse(userId);
-            case DELETED -> folders = folderRepo.getDeletedFolders(userId, LocalDateTime.now().minusDays(30));
-            default -> throw new IllegalArgumentException("Invalid view");
-        }
-
-        return folders.stream()
-                .map(this::toFolderResponse)
-                .toList();
-    }
-
-
-    public FolderResponse toFolderResponse(Folder folder) {
-        FolderResponse folderResponse = new FolderResponse();
-        folderResponse.setId(folder.getId());
-        folderResponse.setName(folder.getName());
-        folderResponse.setIsPinned(folder.getIsPinned());
-        folderResponse.setIsDeleted(folder.getIsDeleted());
-
-        if (folder.getIsDeleted()) {
-            Long days = 30 - ChronoUnit.DAYS.between(folder.getDeletedAt(), LocalDateTime.now());
-            folderResponse.setDaysRemaining(days);
-            System.out.println("FOLDER DAYS REM: " + days);
-        }
-        return folderResponse;
-    }
-
     public List<SnippetResponse> getSnippets(Long userId, ItemView view) {
         List<Snippet> snippets;
 
@@ -266,7 +158,7 @@ public class SnippetService {
             case ALL -> snippets = snippetRepo.findByUserIdAndIsDeletedFalse(userId);
             case PINNED -> snippets = snippetRepo.findStarredSnippets(userId);
             case SHARED -> snippets = snippetRepo.findByUserIdAndIsSharedTrueAndIsDeletedFalse(userId);
-            case DELETED -> snippets = snippetRepo.getDeletedSnippets(userId, LocalDateTime.now().minusDays(30));
+            case DELETED -> snippets = snippetRepo.findDeletedSnippets(userId, LocalDateTime.now().minusDays(30));
             default -> throw new IllegalArgumentException("Invalid view");
         }
 
@@ -295,9 +187,7 @@ public class SnippetService {
         if (snippet.getIsDeleted()) {
             Long days = 30 -ChronoUnit.DAYS.between(snippet.getDeletedAt(), LocalDateTime.now());
             snippetResponse.setDaysRemaining(days);
-            System.out.println("FILES DAYS REM: " + days);
         }
-
         return snippetResponse;
     }
 
@@ -320,26 +210,6 @@ public class SnippetService {
     }
 
 
-    @Transactional
-    public ResponseEntity<ApiResponse> updateFolderPinStatus(Long userId, Long folderId) {
-        Optional<Folder> folderOpt = folderRepo.findById(folderId);
-        List<Snippet> snippets = snippetRepo.findByUserIdAndFolderId(userId, folderId);
-
-
-        if (folderOpt.isPresent()) {
-            Folder folder = folderOpt.get();
-            User user = folder.getUser();
-
-            if (user.getId() == userId) {
-                Boolean pinStatus = !Boolean.TRUE.equals(folder.getIsPinned());
-                folderRepo.updatePinStatus(pinStatus, folderId);
-                return ResponseEntity.ok().body(new ApiResponse("Snippet successfully updated"));
-            }
-        }
-
-
-        return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
-    }
 
 
     public ResponseEntity<SnippetResponse> updateSnippet(Long userId, SnippetRequest request) {
@@ -409,29 +279,9 @@ public class SnippetService {
     }
 
 
-    @Transactional
-    public ResponseEntity<ApiResponse> recoverFolder(Long userId, Long folderId) {
-        Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, folderId);
-        List<Snippet> snippets =
-                snippetRepo.findByUserIdAndFolderId(userId, folderId);
-
-        if (folderOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
-        }
-        Folder folder = folderOpt.get();
-        folder.setDeletedAt(null);
-        folder.setIsDeleted(false);
-        folderRepo.save(folder);
-
-        if (!snippets.isEmpty()) {
-            snippetRepo.updateDeletedByUserIdAndFolderId(userId, folderId, false, null);
-        }
-
-        return ResponseEntity.ok().body(new ApiResponse("Folder successfully recovered"));
-    }
 
 
-    public ResponseEntity<ApiResponse> renameSnippet(Long userId, Long snippetId, String toName) {
+    public ResponseEntity<ApiResponse> renameSnippet(Long userId, Long snippetId, SnippetRequest request) {
         Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, snippetId);
 
         if (snippetOpt.isEmpty()) {
@@ -439,104 +289,17 @@ public class SnippetService {
         }
 
         Snippet snippet = snippetOpt.get();
-        snippet.setFileName(toName);
+        snippet.setFileName(request.getName());
         snippetRepo.save(snippet);
         return ResponseEntity.ok().body(new ApiResponse("Snippet successfully updated"));
     }
 
 
-    public ResponseEntity<ApiResponse> renameFolder(Long userId, Long folderId, String toName) {
-        Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, folderId);
-        if (folderOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
-        }
-
-        Folder folder = folderOpt.get();
-        folder.setName(toName);
-        folderRepo.save(folder);
-        return ResponseEntity.ok().body(new ApiResponse("Folder successfully updated"));
-    }
-
-
-    @Transactional
-    public ResponseEntity<ApiResponse> emptyRecycleBin(Long userId) {
-        snippetRepo.deleteByUserIdAndIsDeletedTrue(userId);
-        folderRepo.deleteByUserIdAndIsDeletedTrue(userId);
-        return ResponseEntity.ok().body(new ApiResponse("Recycle bin successfully emptied"));
-    }
-
-
-    @Transactional
-    public ResponseEntity<FolderCopyResponse> copyFolder(Long userId, Long folderId,
-                                                         String itemName) {
-        Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, folderId);
-
-        if (folderOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(new FolderCopyResponse("Invalid request"));
-        }
-
-        Folder originalFolder = folderOpt.get();
-
-        Folder copiedFolder = new Folder();
-        copiedFolder.setName(itemName);
-        copiedFolder.setUser(originalFolder.getUser());
-        copiedFolder.setIsPinned(originalFolder.getIsPinned());
-
-        Folder savedFolder = folderRepo.save(copiedFolder);
-
-
-        List<Snippet> originalSnippets =
-                snippetRepo.findByUserIdAndFolderId(userId, folderId);
-
-        List<Snippet> newSnippets = new ArrayList<>();
-        List<SnippetResponse> snippetResponses = new ArrayList<>();
-
-        for (Snippet original : originalSnippets) {
-            Snippet copy = new Snippet();
-
-            copy.setUser(original.getUser());
-            copy.setFolder(savedFolder);
-            copy.setFileName(original.getFileName());
-            copy.setTitle(original.getTitle());
-            copy.setBody(original.getBody());
-            copy.setTags(new ArrayList<>(original.getTags()));
-
-            copy.setIsPinned(original.getIsPinned());
-            newSnippets.add(copy);
-
-            SnippetResponse response = new SnippetResponse();
-
-            response.setId(original.getId());
-            response.setFolderId(savedFolder.getId());
-            response.setName(original.getFileName());
-            response.setTitle(original.getTitle());
-            response.setBody(original.getTitle());
-            response.setTags(original.getTags());
-
-            response.setIsPinned(original.getIsPinned());
-            snippetResponses.add(response);
-        }
-        snippetRepo.saveAll(newSnippets);
-
-        FolderCopyResponse folderCopyResponse = new FolderCopyResponse(savedFolder, snippetResponses);
-
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        System.out.println(
-                mapper.writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(folderCopyResponse)
-        );
-
-        return ResponseEntity.ok(folderCopyResponse);
-    }
-
 
     @Transactional
     public ResponseEntity<SnippetResponse> copySnippet(Long userId,
                                                        Long snippetId,
-                                                       Long folderId,
-                                                       String itemName) {
+                                                       SnippetRequest request) {
 
         Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, snippetId);
 
@@ -550,14 +313,14 @@ public class SnippetService {
         SnippetResponse response = new SnippetResponse();
 
         copy.setUser(original.getUser());
-        copy.setFileName(itemName);
+        copy.setFileName(request.getName());
         copy.setIsPinned(original.getIsPinned());
         copy.setTitle(original.getTitle());
         copy.setBody(original.getBody());
         copy.setTags(original.getTags());
         copy.setTags(new ArrayList<>(original.getTags()));
-        if (folderId != null) {
-            Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, folderId);
+        if (request.getFolderId() != null) {
+            Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, request.getFolderId());
             folderOpt.ifPresent(copy::setFolder);
         }
 
@@ -571,8 +334,8 @@ public class SnippetService {
         response.setTags(savedSnippet.getTags());
 
 
-        if (folderId != null) {
-            Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, folderId);
+        if (request.getFolderId() != null) {
+            Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, request.getFolderId());
             folderOpt.ifPresent(folder -> response.setFolderId(folder.getId()));
         }
 

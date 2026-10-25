@@ -30,8 +30,6 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
 
     List<Folder> findByUserIdAndIsSharedTrueAndIsDeletedFalse(Long userId);
 
-    List<Folder> findByUserIdAndIsDeleted(Long userId, Boolean isDeleted);
-
 
     @Query("""
             SELECT f FROM Folder f 
@@ -39,7 +37,7 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
             AND f.isDeleted = true
             AND f.deletedAt > :time
             """)
-    List<Folder> getDeletedFolders(@Param("userId") Long userId,
+    List<Folder> findDeletedFolders(@Param("userId") Long userId,
                                    @Param("time") LocalDateTime time);
 
 

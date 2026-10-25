@@ -81,7 +81,7 @@ export default function Dashboard({ notify, user }) {
   return (
     <div className={styles.mainContainer}>
       <div className={styles.mainContent}>
-        <Sidebar setActivePage={setActivePage} user = {user} />
+        <Sidebar setActivePage={setActivePage} user = {user} notify = {notify} />
 
         <FileExplorer
           folders={folders}
