@@ -1,6 +1,7 @@
 package com.xhibril.snipr.service;
 
 import com.xhibril.snipr.dto.api.ApiResponse;
+import com.xhibril.snipr.dto.auth.LoginRequest;
 import com.xhibril.snipr.dto.auth.LoginResponse;
 import com.xhibril.snipr.dto.auth.SignUpRequest;
 import com.xhibril.snipr.dto.snippet.AuthStatusResponse;
@@ -8,11 +9,9 @@ import com.xhibril.snipr.model.User;
 import com.xhibril.snipr.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.hibernate.sql.ast.tree.predicate.BooleanExpressionPredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -101,16 +100,16 @@ public class AuthService {
     }
 
 
-    public ResponseEntity<LoginResponse> login(String email, String password, Boolean rememberMe, HttpServletResponse res){
-        Optional<User> userOpt = userRepo.findByEmail(email);
+    public ResponseEntity<LoginResponse> login(LoginRequest request, HttpServletResponse res){
+        Optional<User> userOpt = userRepo.findByEmail(request.getEmail());
 
         if(userOpt.isPresent()){
             User user = userOpt.get();
 
-            if(email.equals(user.getEmail()) && password.equals(user.getPassword())){
+            if(request.getEmail().equals(user.getEmail()) && request.getPassword().equals(user.getPassword())){
 
                 if(!user.getIsVerified()){
-                    emailService.sendVerificationEmail(email);
+                    emailService.sendVerificationEmail(request.getEmail());
                     return ResponseEntity.status(403).body(new LoginResponse("Not verified", false));
                 }
 
@@ -119,10 +118,10 @@ public class AuthService {
 
                 int time;
 
-                if(rememberMe == null){
+                if(!request.getRememberMe()){
                     time = TIME.TWO_HOURS.getSeconds();
                 } else {
-                    time = rememberMe ? TIME.WEEK.getSeconds() : TIME.TWO_HOURS.getSeconds();
+                    time = request.getRememberMe() ? TIME.WEEK.getSeconds() : TIME.TWO_HOURS.getSeconds();
                 }
 
                 String token = jwtService.generateToken("authToken", claims, time);

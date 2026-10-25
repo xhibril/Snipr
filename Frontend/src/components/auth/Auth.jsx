@@ -14,7 +14,7 @@ import { useState, useEffect } from "react";
 export default function Auth({ mode, notify, setIsAuth }) {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
-  const [remember, setRemember] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -58,7 +58,7 @@ export default function Auth({ mode, notify, setIsAuth }) {
         const credentials = {
   email,
   password,
-  remember,
+  rememberMe,
   ...(!isLogin && { username }),
 };
 
@@ -84,8 +84,6 @@ export default function Auth({ mode, notify, setIsAuth }) {
         );
         return;
       }
-
-
 
 
       if (isLogin) {
@@ -138,7 +136,8 @@ export default function Auth({ mode, notify, setIsAuth }) {
           />
 
           <div className={styles.remember}>
-            <input type="checkbox" />
+            <input type="checkbox"   checked={rememberMe}
+  onChange={(e) => setRememberMe(e.target.checked)}/>
             <p>Remember me</p>
           </div>
 

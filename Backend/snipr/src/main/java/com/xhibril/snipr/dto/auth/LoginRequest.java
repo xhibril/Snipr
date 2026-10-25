@@ -3,7 +3,7 @@ package com.xhibril.snipr.dto.auth;
 public class LoginRequest {
     private String email;
     private String password;
-    private Boolean rememberMe;
+    private Boolean rememberMe = false;
 
     public void setEmail(String email){
         this.email = email;

@@ -201,7 +201,7 @@ export default function PasswordReset({ notify }) {
                     STEP === "COMPLETED" ? (
                         <button className={global.submit}
                             type="submit"
-                            onClick={() => nav("/dashboard")}
+                            onClick={() => nav("/dashboard", {replace: true})}
                             disabled={isLoading}>
 
                             {isLoading ? "Loading..." : "Back"}

@@ -41,7 +41,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletResponse res){
-        return authService.login(request.getEmail(), request.getPassword(), request.getRememberMe(), res);
+        return authService.login(request, res);
     }
 
 

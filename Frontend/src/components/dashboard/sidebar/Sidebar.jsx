@@ -14,7 +14,7 @@ import {
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
-export default function Sidebar({ setActivePage, user, notify }) {
+export default function Sidebar({ setActivePage, isAuth, notify, setIsAuth }) {
   const [toggleSettings, setToggleSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const nav = useNavigate();
@@ -33,6 +33,10 @@ export default function Sidebar({ setActivePage, user, notify }) {
       notify("Could not logout, please try again", "ERORR");
     } finally {
       setIsLoading(false);
+      setIsAuth({
+        authenticated: false,
+        user: null
+      })
       nav("/", { replace: true }); // clear back n forward history
     }
   }
@@ -83,14 +87,15 @@ export default function Sidebar({ setActivePage, user, notify }) {
           className={`${styles.accountSettings} ${toggleSettings ? styles.show : ""}`}
         >
           <button>Change Password</button>
+                    <button onClick={() => nav("/account/profile")}>Update Username</button>
           <button>Change Email</button>
           <button>Delete Account</button>
         </div>
 
         <div className={styles.accountRow}>
           <div className={styles.accountDetails}>
-            <p className={styles.accountName}>{user?.username}</p>
-            <p className={styles.accountEmail}>{user?.email}</p>
+            <p className={styles.accountName}>{isAuth?.user?.username}</p>
+            <p className={styles.accountEmail}>{isAuth?.user?.email}</p>
 
             <button
               className={styles.logoutBtn}

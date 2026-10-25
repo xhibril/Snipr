@@ -11,6 +11,7 @@ import VerifyEmail from "./pages/auth/verify/VerifyEmail.jsx";
 import AuthGate from "./components/layout/AuthGate.jsx";
 import Dashboard from "./pages/dashboard/Dashboard.jsx";
 import PasswordReset from "./pages/auth/password-reset/PasswordReset.jsx";
+import UpdateUsername from "./pages/account-settings/UpdateUsername.jsx";
 
 function App() {
   useEffect(() => {
@@ -30,7 +31,6 @@ function App() {
   const [id, setId] = useState(null);
 
   const [isAuth, setIsAuth] = useState({
-    loading: true,
     authenticated: false,
     user: null,
   });
@@ -62,20 +62,20 @@ function App() {
         });
 
         const data = await res.json();
-
         setIsAuth({
-          loading: false,
-          authenticated: data.IsAuthenticated,
+          authenticated: data.isAuthenticated,
           user: data.user ?? null,
         });
       } catch (err) {
         setIsAuth({
-          loading: false,
           authenticated: false,
           user: null,
         });
       }
     }
+
+
+
   }, []);
 
   return (
@@ -106,8 +106,12 @@ function App() {
               ></Route>
               <Route
                 path="/dashboard"
-                element={<Dashboard notify={notify} user = {isAuth.user}/>}
+                element={<Dashboard notify={notify} setIsAuth = {setIsAuth} isAuth = {isAuth}/>}
               ></Route>
+
+
+              <Route path = "/account/profile"
+              element = {<UpdateUsername notify = {notify} isAuth = {isAuth} setIsAuth = {setIsAuth}/>}></Route>
             </Route>
           </Route>
         </Routes>
