@@ -1,6 +1,6 @@
 export function ValidatePassword(password) {
   if (!password) {
-    return "Input cannot be empty";
+    return "Password cannot be empty";
   }
 
   const minLength = 8;
@@ -56,27 +56,6 @@ export function ValidateCode(code, maxDigitsAllowed) {
   return "VALID";
 }
 
-export function ValidateURL(url) {
-  if (!url) return "URL is required";
-
-  if (url.length < 10) return "URL must be between 10 and 1024 characters";
-  if (url.length > 1024) return "URL must be between 10 and 1024 characters";
-
-  const regex = /^(https?:\/\/)?([\w-]+\.)+[a-zA-Z]{2,}/;
-
-  if (!regex.test(url)) return "Please enter a valid URL";
-  return "VALID";
-}
-
-export function ValidateAlias(alias) {
-  if (alias.length < 3) return "Alias must be at least 3 characters";
-
-  if (alias.length > 10) return "Alias must be less than 10 characters";
-
-  if (ValidateInput(alias, "ALIAS") !== "VALID") return "Invalid alias";
-
-  return "VALID";
-}
 
 export function ValidateInput(input, type) {
   const allowedMap = {
@@ -90,6 +69,9 @@ export function ValidateInput(input, type) {
     MESSAGE:
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?;:'\"()[]{}-_/@#$%^&*+=|~`",
     ALIAS: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+
+    USERNAME:
+  "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.",
   };
 
   for (let c of input) {

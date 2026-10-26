@@ -1,5 +1,6 @@
 package com.xhibril.snipr.controller;
 
+import com.xhibril.snipr.dto.account.UpdatePasswordRequest;
 import com.xhibril.snipr.dto.account.UpdateUsernameRequest;
 import com.xhibril.snipr.dto.api.ApiResponse;
 import com.xhibril.snipr.service.AccountService;
@@ -28,6 +29,15 @@ public class AccountController {
 
         return accountService.updateUsername(userId, request);
 
+    }
+
+    @PatchMapping("/account/password")
+    public ResponseEntity<ApiResponse> updatePassword(HttpServletRequest req,
+                                                      @RequestBody UpdatePasswordRequest request){
+
+        Long userId = authService.getAuthenticatedId(req);
+
+        return accountService.updatePassword(userId, request);
     }
 
 

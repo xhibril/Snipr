@@ -12,6 +12,7 @@ import AuthGate from "./components/layout/AuthGate.jsx";
 import Dashboard from "./pages/dashboard/Dashboard.jsx";
 import PasswordReset from "./pages/auth/password-reset/PasswordReset.jsx";
 import UpdateUsername from "./pages/account-settings/UpdateUsername.jsx";
+import UpdatePassword from "./pages/account-settings/UpdatePassword.jsx";
 
 function App() {
   useEffect(() => {
@@ -113,6 +114,10 @@ function App() {
               <Route path = "/account/profile"
               element = {<UpdateUsername notify = {notify} isAuth = {isAuth} setIsAuth = {setIsAuth}/>}></Route>
             </Route>
+
+            <Route path = "/account/password"
+            element = {<UpdatePassword notify={notify}/>}
+            />
           </Route>
         </Routes>
       </BrowserRouter>

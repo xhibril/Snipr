@@ -50,3 +50,23 @@ cursor: pointer;
 .submit:hover{
     background-color:  rgba(25, 127, 147, 0.85)
 }
+
+
+
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionButtons .submit {
+  width: auto; 
+}
+
+.backButton {
+  flex: 0 0 30%;
+  background-color: gray;
+}
+
+.continueButton {
+  flex: 1;
+}
