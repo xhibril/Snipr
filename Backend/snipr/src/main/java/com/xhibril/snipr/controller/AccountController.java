@@ -1,8 +1,11 @@
 package com.xhibril.snipr.controller;
 
+import com.xhibril.snipr.dto.account.UpdateEmailRequest;
+import com.xhibril.snipr.dto.account.UpdateEmailResponse;
 import com.xhibril.snipr.dto.account.UpdatePasswordRequest;
 import com.xhibril.snipr.dto.account.UpdateUsernameRequest;
 import com.xhibril.snipr.dto.api.ApiResponse;
+import com.xhibril.snipr.model.UpdateEmail;
 import com.xhibril.snipr.service.AccountService;
 import com.xhibril.snipr.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,7 +46,28 @@ public class AccountController {
 
 
 
+    @PostMapping("/account/email/request")
+    public ResponseEntity<UpdateEmailResponse> updateEmailRequest(HttpServletRequest req,
+                                                                  @RequestBody UpdateEmailRequest request){
+
+        Long userId = authService.getAuthenticatedId(req);
+        return accountService.updateEmailRequest(userId, request);
+    }
 
 
+    @PostMapping("/account/email/verify")
+    public ResponseEntity<UpdateEmailResponse> updateEmailVerify(HttpServletRequest req,
+                                                                 @RequestBody UpdateEmailRequest request){
+        Long userId = authService.getAuthenticatedId(req);
+        return accountService.updateEmailVerify(userId, request);
+    }
+
+
+    @PatchMapping("/account/email")
+    public ResponseEntity<UpdateEmailResponse> updateEmailChange(HttpServletRequest req,
+                                                                 @RequestBody UpdateEmailRequest request){
+        Long userId = authService.getAuthenticatedId(req);
+        return accountService.updateEmailChange(userId, request);
+    }
 
 }

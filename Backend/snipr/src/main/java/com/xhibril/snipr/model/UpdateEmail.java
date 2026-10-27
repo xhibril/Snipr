@@ -28,6 +28,9 @@ public class UpdateEmail {
     @Column(name = "reset_token_expires_at")
     private Instant resetTokenExpiration;
 
+
+    private Integer attemptsRemaining;
+
     public Long getId() { return id; }
     public User getUser() { return user; }
     public String getPendingEmail() { return pendingEmail; }
@@ -43,4 +46,14 @@ public class UpdateEmail {
     public void setExpiresAt(Instant expiresAt) { this.expiresAt = expiresAt; }
     public void setResetToken(String resetToken) { this.resetToken = resetToken; }
     public void setResetTokenExpiration(Instant resetTokenExpiration) { this.resetTokenExpiration = resetTokenExpiration; }
+
+    public void setAttemptsRemaining(Integer attemptsRemaining){
+        this.attemptsRemaining = attemptsRemaining;
+    }
+
+
+    public Integer getAttemptsRemaining(){
+        return attemptsRemaining;
+    }
 }
+

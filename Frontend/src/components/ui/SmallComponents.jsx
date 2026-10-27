@@ -5,6 +5,12 @@ import { FiEye } from "react-icons/fi";
 import { useState } from "react";
 
 
+
+
+export const DEFAULT_FAILURE_MESSAGE =
+  "Something went wrong, please try again";
+
+
 export function EmailField({ email, setEmail, title }) {
 
     return (

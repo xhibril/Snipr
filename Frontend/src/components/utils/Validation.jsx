@@ -1,6 +1,6 @@
 export function ValidatePassword(password) {
   if (!password) {
-    return "Password cannot be empty";
+    return "Password is required";
   }
 
   const minLength = 8;

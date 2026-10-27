@@ -16,10 +16,9 @@ export default function UpdatePassword({ notify }) {
   const nav = useNavigate();
 
   async function updatePassword() {
-    const oldPasswordRes = ValidatePassword(oldPassword);
 
-    if (oldPasswordRes !== "VALID") {
-      notify(oldPasswordRes, "ERROR");
+    if(!oldPassword){
+      notify("Password is required", "ERROR");
       return;
     }
 
