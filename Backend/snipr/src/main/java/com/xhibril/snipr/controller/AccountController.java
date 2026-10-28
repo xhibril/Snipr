@@ -1,9 +1,6 @@
 package com.xhibril.snipr.controller;
 
-import com.xhibril.snipr.dto.account.UpdateEmailRequest;
-import com.xhibril.snipr.dto.account.UpdateEmailResponse;
-import com.xhibril.snipr.dto.account.UpdatePasswordRequest;
-import com.xhibril.snipr.dto.account.UpdateUsernameRequest;
+import com.xhibril.snipr.dto.account.*;
 import com.xhibril.snipr.dto.api.ApiResponse;
 import com.xhibril.snipr.model.UpdateEmail;
 import com.xhibril.snipr.service.AccountService;
@@ -70,4 +67,12 @@ public class AccountController {
         return accountService.updateEmailChange(userId, request);
     }
 
+
+
+    @DeleteMapping("/account")
+    public ResponseEntity<ApiResponse> deleteAccount(HttpServletRequest req,
+                                                     @RequestBody DeleteAccountRequest request){
+        Long userId = authService.getAuthenticatedId(req);
+        return accountService.deleteAccount(userId, request);
+    }
 }

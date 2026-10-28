@@ -1,12 +1,11 @@
 package com.xhibril.snipr.service;
 
-import com.xhibril.snipr.dto.account.UpdateEmailRequest;
-import com.xhibril.snipr.dto.account.UpdateEmailResponse;
-import com.xhibril.snipr.dto.account.UpdatePasswordRequest;
-import com.xhibril.snipr.dto.account.UpdateUsernameRequest;
+import com.xhibril.snipr.dto.account.*;
 import com.xhibril.snipr.dto.api.ApiResponse;
 import com.xhibril.snipr.model.UpdateEmail;
 import com.xhibril.snipr.model.User;
+import com.xhibril.snipr.repository.FolderRepository;
+import com.xhibril.snipr.repository.SnippetRepository;
 import com.xhibril.snipr.repository.UpdateEmailRepository;
 import com.xhibril.snipr.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -28,14 +27,20 @@ public class AccountService {
 
     private final UserRepository userRepo;
     private final UpdateEmailRepository updateEmailRepo;
+    private final SnippetRepository snippetRepo;
+    private final FolderRepository folderRepo;
     private final EmailService emailService;
 
     public AccountService(UserRepository userRepo,
                           UpdateEmailRepository updateEmailRepo,
-                          EmailService emailService) {
+                          EmailService emailService,
+                          SnippetRepository snippetRepo,
+                          FolderRepository folderRepo) {
         this.userRepo = userRepo;
         this.updateEmailRepo = updateEmailRepo;
         this.emailService = emailService;
+        this.snippetRepo = snippetRepo;
+        this.folderRepo = folderRepo;
     }
 
 
@@ -242,6 +247,36 @@ public class AccountService {
         updateEmailRepo.deleteAllByUser(user);
 
         return ResponseEntity.ok().body(new UpdateEmailResponse("Email successfully changed"));
+    }
+
+
+    @Transactional
+    public ResponseEntity<ApiResponse> deleteAccount(Long userId, DeleteAccountRequest request){
+        Optional<User> userOpt = userRepo.findById(userId);
+
+
+        if(userOpt.isEmpty()){
+            return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
+        }
+
+        User user = userOpt.get();
+
+        if(!user.getPassword().equals(request.getPassword())){
+            return ResponseEntity.badRequest().body(new ApiResponse("Password is incorrect"));
+        }
+        String email = user.getEmail();
+
+        snippetRepo.deleteAllByUser(user);
+        folderRepo.deleteAllByUser(user);
+        userRepo.delete(user);
+
+
+        String json = emailService.createBody("Your account has been deleted", email);
+        emailService.sendEmail(json);
+
+
+        return ResponseEntity.ok().body(new ApiResponse("Account successfully deleted"));
+
     }
 
 

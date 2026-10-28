@@ -89,7 +89,7 @@ export default function Sidebar({ setActivePage, isAuth, notify, setIsAuth }) {
           <button onClick={() => nav("/account/password")}>Change Password</button>
                     <button onClick={() => nav("/account/profile")}>Change Username</button>
           <button onClick={() => nav("/account/email")}>Change Email</button>
-          <button>Delete Account</button>
+          <button onClick={() => nav("/account/delete")}>Delete Account</button>
         </div>
 
         <div className={styles.accountRow}>

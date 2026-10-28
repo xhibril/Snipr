@@ -68,7 +68,7 @@ public class EmailService {
 
     }
 
-    private void sendEmail(String json) {
+    public void sendEmail(String json) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.smtp2go.com/v3/email/send"))
@@ -83,7 +83,7 @@ public class EmailService {
         }
     }
 
-    private String createBody(String html, String email){
+    public String createBody(String html, String email){
         ObjectMapper mapper = new ObjectMapper();
 
         Map<String, Object> body = new HashMap<>();

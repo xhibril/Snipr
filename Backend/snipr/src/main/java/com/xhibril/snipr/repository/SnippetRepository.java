@@ -2,6 +2,7 @@ package com.xhibril.snipr.repository;
 
 import com.xhibril.snipr.model.Folder;
 import com.xhibril.snipr.model.Snippet;
+import com.xhibril.snipr.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -79,4 +80,6 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
 
 
     void deleteByUserIdAndIsDeletedTrue(Long userId);
+
+    void deleteAllByUser(User user);
 }

@@ -14,6 +14,7 @@ import PasswordReset from "./pages/auth/password-reset/PasswordReset.jsx";
 import UpdateUsername from "./pages/account-settings/UpdateUsername.jsx";
 import UpdatePassword from "./pages/account-settings/UpdatePassword.jsx";
 import UpdateEmail from "./pages/account-settings/UpdateEmail.jsx";
+import DeleteAccount from "./pages/account-settings/DeleteAccount.jsx";
 
 function App() {
   useEffect(() => {
@@ -123,6 +124,9 @@ function App() {
             <Route path = "/account/email"
             element = {<UpdateEmail notify = {notify} setIsAuth={setIsAuth}/>}/>
           </Route>
+
+          <Route path = "/account/delete"
+          element ={<DeleteAccount notify={notify} setIsAuth={setIsAuth}/>}/>
         </Routes>
       </BrowserRouter>
     </>
