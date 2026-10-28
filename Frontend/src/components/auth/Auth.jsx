@@ -6,16 +6,20 @@ import {
   UsernameField,
 } from "../../components/ui/SmallComponents.jsx";
 import ApiFetch from "../utils/Api.jsx";
-import { ValidateEmail, ValidatePassword } from "../utils/Validation.jsx";
+import {
+  ValidateEmail,
+  ValidatePassword,
+  ValidateUsername,
+} from "../utils/Validation.jsx";
 import global from "../../css/Global.module.css";
 import styles from "./Auth.module.css";
 import { useState, useEffect } from "react";
 
-export default function Auth({ mode, notify, setIsAuth }) {
-  const [email, setEmail] = useState(null);
-  const [password, setPassword] = useState(null);
-  const [rememberMe, setRememberMe] = useState(false);
+export default function Auth({ mode, notify, setAuth }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const nav = useNavigate();
@@ -39,13 +43,21 @@ export default function Auth({ mode, notify, setIsAuth }) {
   }, []);
 
   async function submitCredentials(path) {
+    if (!isLogin) {
+      const usernameRes = ValidateUsername(username);
+      if (usernameRes !== "VALID") {
+        notify(usernameRes, "ERROR");
+        return;
+      }
+    }
+
     const emailRes = ValidateEmail(email);
     if (emailRes !== "VALID") {
       notify(emailRes, "ERROR");
       return;
     }
 
-    const passwordRes = ValidatePassword(password);
+    const passwordRes = ValidatePassword(password, "required");
     if (passwordRes !== "VALID") {
       notify(passwordRes, "ERROR");
       return;
@@ -54,13 +66,12 @@ export default function Auth({ mode, notify, setIsAuth }) {
     setIsLoading(true);
 
     try {
-
-        const credentials = {
-  email,
-  password,
-  rememberMe,
-  ...(!isLogin && { username }),
-};
+      const credentials = {
+        email,
+        password,
+        rememberMe,
+        ...(!isLogin && { username }),
+      };
 
       const res = await ApiFetch(
         path,
@@ -85,14 +96,12 @@ export default function Auth({ mode, notify, setIsAuth }) {
         return;
       }
 
-
       if (isLogin) {
         localStorage.removeItem("email");
-        setIsAuth({
+        setAuth({
           authenticated: data.IsAuthenticated,
           user: data.user ?? null,
         });
-
 
         nav("/dashboard");
       } else {
@@ -120,7 +129,7 @@ export default function Auth({ mode, notify, setIsAuth }) {
         >
           <BrandHeader title={isLogin ? "Login" : "Sign up"} />
 
-          {!isLogin &&  (
+          {!isLogin && (
             <UsernameField
               username={username}
               setUsername={setUsername}
@@ -136,8 +145,11 @@ export default function Auth({ mode, notify, setIsAuth }) {
           />
 
           <div className={styles.remember}>
-            <input type="checkbox"   checked={rememberMe}
-  onChange={(e) => setRememberMe(e.target.checked)}/>
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
             <p>Remember me</p>
           </div>
 

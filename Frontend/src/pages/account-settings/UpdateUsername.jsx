@@ -10,7 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { ValidateInput } from "../../components/utils/Validation";
 
-export default function UpdateUsername({ notify, isAuth, setIsAuth }) {
+export default function UpdateUsername({ notify, auth, setAuth }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -69,7 +69,7 @@ export default function UpdateUsername({ notify, isAuth, setIsAuth }) {
         return;
       }
 
-      setIsAuth((prev) => ({
+      setAuth((prev) => ({
         ...prev,
         user: {
           ...prev.user,

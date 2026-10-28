@@ -1,16 +1,16 @@
 import { useState } from "react";
 import "./App.css";
 import Landing from "./pages/landing/Landing.jsx";
-import Login from "./pages/auth/login/Login.jsx";
-import Signup from "./pages/auth/signup/SignUp.jsx";
+import Login from "./pages/auth/Login.jsx";
+import Signup from "./pages/auth/SignUp.jsx";
 import Notification from "./components/ui/Notification.jsx";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Default from "./components/layout/Default.jsx";
 import { useRef, useEffect } from "react";
-import VerifyEmail from "./pages/auth/verify/VerifyEmail.jsx";
+import VerifyEmail from "./pages/auth/VerifyEmail.jsx";
 import AuthGate from "./components/layout/AuthGate.jsx";
 import Dashboard from "./pages/dashboard/Dashboard.jsx";
-import PasswordReset from "./pages/auth/password-reset/PasswordReset.jsx";
+import PasswordReset from "./pages/auth/PasswordReset.jsx";
 import UpdateUsername from "./pages/account-settings/UpdateUsername.jsx";
 import UpdatePassword from "./pages/account-settings/UpdatePassword.jsx";
 import UpdateEmail from "./pages/account-settings/UpdateEmail.jsx";
@@ -33,7 +33,7 @@ function App() {
   const [type, setType] = useState(null);
   const [id, setId] = useState(null);
 
-  const [isAuth, setIsAuth] = useState({
+  const [auth, setAuth] = useState({
     authenticated: false,
     user: null,
   });
@@ -65,12 +65,12 @@ function App() {
         });
 
         const data = await res.json();
-        setIsAuth({
+        setAuth({
           authenticated: data.isAuthenticated,
           user: data.user ?? null,
         });
       } catch (err) {
-        setIsAuth({
+        setAuth({
           authenticated: false,
           user: null,
         });
@@ -90,10 +90,10 @@ function App() {
           <Route path="/" element={<Landing />}></Route>
 
           <Route element={<Default />}>
-            <Route element={<AuthGate isAuth={isAuth.authenticated} />}>
+            <Route element={<AuthGate auth={auth.authenticated} />}>
               <Route
                 path="/login"
-                element={<Login notify={notify} setIsAuth={setIsAuth} />}
+                element={<Login notify={notify} setAuth={setAuth} />}
               ></Route>
               <Route
                 path="/signup"
@@ -109,12 +109,12 @@ function App() {
               ></Route>
               <Route
                 path="/dashboard"
-                element={<Dashboard notify={notify} setIsAuth = {setIsAuth} isAuth = {isAuth}/>}
+                element={<Dashboard notify={notify} setAuth = {setAuth} auth = {auth}/>}
               ></Route>
 
 
               <Route path = "/account/profile"
-              element = {<UpdateUsername notify = {notify} isAuth = {isAuth} setIsAuth = {setIsAuth}/>}></Route>
+              element = {<UpdateUsername notify = {notify} auth = {auth} setAuth = {setAuth}/>}></Route>
             </Route>
 
             <Route path = "/account/password"
@@ -122,11 +122,11 @@ function App() {
             />
 
             <Route path = "/account/email"
-            element = {<UpdateEmail notify = {notify} setIsAuth={setIsAuth}/>}/>
+            element = {<UpdateEmail notify = {notify} setIsAuth={setAuth}/>}/>
           </Route>
 
           <Route path = "/account/delete"
-          element ={<DeleteAccount notify={notify} setIsAuth={setIsAuth}/>}/>
+          element ={<DeleteAccount notify={notify} setAuth={setAuth}/>}/>
         </Routes>
       </BrowserRouter>
     </>

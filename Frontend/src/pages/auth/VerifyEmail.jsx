@@ -1,20 +1,22 @@
 import styles from "./VerifyEmail.module.css"
-import emailIcon from "../../../assets/images/emailIcon.svg"
-import global from "../../../css/Global.module.css"
-import ApiFetch from "../../../components/utils/Api"
+import emailIcon from "../../assets/images/emailIcon.svg"
+import global from "../../css/Global.module.css"
+import ApiFetch from "../../components/utils/Api"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 export default function VerifyEmail({ notify }) {
     const email = localStorage.getItem("email")
 
     const [isLoading, setLoading] = useState(false)
+    const nav = useNavigate();
 
     async function Resend() {
         setLoading(true)
 
         if (email) {
             try {
-                const res = await ApiFetch("/api/email/resend", {
+                const res = await ApiFetch("/email/resend", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email })
@@ -33,6 +35,7 @@ export default function VerifyEmail({ notify }) {
                 notify(data.message, "SUCCESS");
             } catch (err) {
                 notify("Something went wrong, pleasey try again", "ERROR");
+                console.log(err)
                 return;
 
             } finally {

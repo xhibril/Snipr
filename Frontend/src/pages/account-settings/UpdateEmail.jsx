@@ -11,7 +11,7 @@ import global from "../../css/Global.module.css";
 import { DEFAULT_FAILURE_MESSAGE } from "../../components/ui/SmallComponents";
 import { useNavigate } from "react-router-dom";
 
-export default function UpdateEmail({ notify, setIsAuth }) {
+export default function UpdateEmail({ notify, setAuth }) {
   const [pendingEmail, setPendingEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState("INIT");
@@ -99,7 +99,7 @@ export default function UpdateEmail({ notify, setIsAuth }) {
         setPassword("");
         setStep("COMPLETED");
 
-        setIsAuth((prev) => ({
+        setAuth((prev) => ({
             ...prev,
             user : {
                 ...prev.user,

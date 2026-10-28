@@ -1,8 +1,8 @@
-import global from "../../../css/Global.module.css"
-import { ValidateEmail, ValidateCode, ValidatePassword } from "../../../components/utils/Validation"
+import global from "../../css/Global.module.css"
+import { ValidateEmail, ValidateCode, ValidatePassword } from "../../components/utils/Validation"
 import { useState } from "react"
-import { EmailField, PasswordField, CodeField, BrandHeader } from "../../../components/ui/SmallComponents"
-import ApiFetch from "../../../components/utils/Api"
+import { EmailField, PasswordField, CodeField, BrandHeader } from "../../components/ui/SmallComponents"
+import ApiFetch from "../../components/utils/Api"
 import { useNavigate } from "react-router-dom"
 
 export default function PasswordReset({ notify }) {

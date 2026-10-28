@@ -1,15 +1,15 @@
 package com.xhibril.snipr.controller;
+import com.xhibril.snipr.dto.auth.ResendVerificationEmailRequest;
 import com.xhibril.snipr.dto.api.ApiResponse;
 import com.xhibril.snipr.dto.auth.LoginRequest;
 import com.xhibril.snipr.dto.auth.LoginResponse;
 import com.xhibril.snipr.dto.auth.SignUpRequest;
 import com.xhibril.snipr.dto.snippet.AuthStatusResponse;
-import com.xhibril.snipr.model.User;
 import com.xhibril.snipr.service.AccountService;
 import com.xhibril.snipr.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.juli.logging.Log;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,20 +27,20 @@ public class AuthController {
         this.accountService = accountService;
     }
 
-
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse> registerUser(@RequestBody SignUpRequest request){
+    public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody SignUpRequest request){
         return authService.registerUser(request);
     }
 
     @PostMapping("/email/resend")
-    public ResponseEntity<ApiResponse> resendVerificationEmail(@RequestBody User user){
-        return authService.resendVerificationEmail(user.getEmail());
+    public ResponseEntity<ApiResponse> resendVerificationEmail(
+            @RequestBody ResendVerificationEmailRequest request){
+        return authService.resendVerificationEmail(request);
     }
 
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletResponse res){
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request, HttpServletResponse res){
         return authService.login(request, res);
     }
 

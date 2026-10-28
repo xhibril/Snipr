@@ -14,7 +14,7 @@ import {
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
-export default function Sidebar({ setActivePage, isAuth, notify, setIsAuth }) {
+export default function Sidebar({ setActivePage, auth, notify, setAuth }) {
   const [toggleSettings, setToggleSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const nav = useNavigate();
@@ -33,7 +33,7 @@ export default function Sidebar({ setActivePage, isAuth, notify, setIsAuth }) {
       notify("Could not logout, please try again", "ERORR");
     } finally {
       setIsLoading(false);
-      setIsAuth({
+      setAuth({
         authenticated: false,
         user: null
       })
@@ -94,8 +94,8 @@ export default function Sidebar({ setActivePage, isAuth, notify, setIsAuth }) {
 
         <div className={styles.accountRow}>
           <div className={styles.accountDetails}>
-            <p className={styles.accountName}>{isAuth?.user?.username}</p>
-            <p className={styles.accountEmail}>{isAuth?.user?.email}</p>
+            <p className={styles.accountName}>{auth?.user?.username}</p>
+            <p className={styles.accountEmail}>{auth?.user?.email}</p>
 
             <button
               className={styles.logoutBtn}

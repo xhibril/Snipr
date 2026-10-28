@@ -1,5 +1,6 @@
 package com.xhibril.snipr.service;
 
+import com.xhibril.snipr.dto.auth.ResendVerificationEmailRequest;
 import com.xhibril.snipr.dto.api.ApiResponse;
 import com.xhibril.snipr.dto.auth.LoginRequest;
 import com.xhibril.snipr.dto.auth.LoginResponse;
@@ -88,12 +89,13 @@ public class AuthService {
     }
 
 
-    public ResponseEntity<ApiResponse> resendVerificationEmail(String email) {
-        Optional<Boolean> isVerifiedOpt = userRepo.isVerified(email);
+    public ResponseEntity<ApiResponse> resendVerificationEmail(
+            ResendVerificationEmailRequest request) {
+        Optional<Boolean> isVerifiedOpt = userRepo.isVerified(request.getEmail());
 
         if (isVerifiedOpt.isPresent()) {
             if (!isVerifiedOpt.get()) {
-                return emailService.sendVerificationEmail(email);
+                return emailService.sendVerificationEmail(request.getEmail());
             }
         }
         return ResponseEntity.ok().body(new ApiResponse("If an account with this email exists, a verification email has been sent."));

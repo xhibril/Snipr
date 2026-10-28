@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import global from "../../css/Global.module.css";
 import { useState } from "react";
 
-export default function DeleteAccount({ notify, setIsAuth }) {
+export default function DeleteAccount({ notify, setAuth }) {
   const [confirmDeletion, setConfirmDeletion] = useState(false);
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +41,7 @@ export default function DeleteAccount({ notify, setIsAuth }) {
         }
 
 
-       setIsAuth({
+       setAuth({
             authenticated: false,
     user: null,
        });
