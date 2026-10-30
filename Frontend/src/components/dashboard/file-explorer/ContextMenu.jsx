@@ -19,6 +19,7 @@ export default function ContextMenu({
   pasteItem,
   copy,
   setCopy,
+  setToName
 }) {
   return (
     <div
@@ -91,6 +92,7 @@ export default function ContextMenu({
               onClick={() => {
                 setIsEditing(true);
                 setEditingId(file.id);
+                setToName(file.name)
                 setContextMenu(null);
               }}
             >

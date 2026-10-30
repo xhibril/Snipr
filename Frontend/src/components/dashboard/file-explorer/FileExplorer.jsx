@@ -39,10 +39,11 @@ export default function FileExplorer({
   const [openFolders, setOpenFolders] = useState([]);
   const [copy, setCopy] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [toName, setToName] = useState(null);
+  const [editingId, setEditingId] = useState("");
+  const [toName, setToName] = useState("");
   const [contextMenu, setContextMenu] = useState(null);
   const inputRef = useRef(null);
+
 
   const nav = useNavigate();
   const page = PAGE_CONFIG[activePage] ?? PAGE_CONFIG.REGULAR;
@@ -158,6 +159,7 @@ export default function FileExplorer({
         title: item.title || "",
         body: item.body || "",
         tags: item.tags || [],
+  
       };
 
       setDraft(data);
@@ -321,6 +323,7 @@ export default function FileExplorer({
             setCopy={setCopy}
             pasteItem={pasteItem}
             page={page}
+            setToName = {setToName}
           />
         )}
 

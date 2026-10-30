@@ -5,6 +5,7 @@ import { FiPlus, FiX } from "react-icons/fi";
 import { useState, useEffect, useImperativeHandle } from "react";
 import ApiFetch from "../../utils/Api";
 import { useRef } from "react";
+import { ValidateInput } from "../../utils/Validation";
 
 export default function FileEditor({
   isViewingFile,
@@ -22,15 +23,14 @@ export default function FileEditor({
   notify,
   editorRef,
   unsavedChanges,
-  setUnsavedChanges
+  setUnsavedChanges,
 }) {
-
   const [newTag, setNewTag] = useState("");
   const [isAddingTag, setIsAddingTag] = useState(false);
   const selectedIdRef = useRef(selectedItem?.data?.id);
 
   useImperativeHandle(editorRef, () => ({
-    updateSnippet
+    updateSnippet,
   }));
 
   // auto save
@@ -53,15 +53,16 @@ export default function FileEditor({
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [draft, original, selectedItem?.data?.id, isViewingFile]);
-
+  }, [draft, original, selectedItem?.data?.id, 
+    selectedItem?.data?.name, isViewingFile]);
 
   // unsaved changes
   useEffect(() => {
     if (
       draft.body !== original.body ||
       draft.title !== original.title ||
-      JSON.stringify(original.tags ?? []) !== JSON.stringify(draft.tags ?? []) // compare by content n order
+      JSON.stringify(original.tags ?? []) 
+      !== JSON.stringify(draft.tags ?? []) // compare by content n order
     ) {
       setUnsavedChanges(true);
     } else {
@@ -69,19 +70,36 @@ export default function FileEditor({
     }
   }, [draft, original]);
 
-
   useEffect(() => {
     if (selectedItem?.type !== "FILE") return;
     setIsViewingFile(true);
-    syncDraft();
   }, [selectedItem]);
 
-    useEffect(() => {
-     selectedIdRef.current = selectedItem?.data?.id;
-  }, [selectedItem])
+  useEffect(() => {
+    selectedIdRef.current = selectedItem?.data?.id;
+  }, [selectedItem]);
 
   async function updateSnippet(snippet) {
     const previousSnippet = structuredClone(selectedItem?.data);
+
+    if (snippet.title.length > 120) {
+      notify("File title cannot be more than 120 characters", "ERROR");
+      return;
+    }
+
+    if (snippet.body.length > 100_000) {
+      notify("File body limit exceeded", "ERROR");
+      return;
+    }
+
+    for (const tag of snippet.tags ?? []) {
+      const tagRes = ValidateInput(tag, "TAG");
+
+      if (tagRes !== "VALID") {
+        notify(`${tag} is not a valid tag`, "ERROR");
+        return;
+      }
+    }
 
     // opt update
     setFiles(files.map((file) => (file.id === snippet.id ? snippet : file)));
@@ -110,30 +128,25 @@ export default function FileEditor({
       return;
     }
 
-
-
-
-    if(selectedIdRef === snippet.id){
+    if (selectedIdRef.current === snippet.id) {
       syncSelected(data);
-      syncDraft();
+      syncDraft(data);
     }
-
-
   }
 
-  function syncDraft() {
-    if (!selectedItem?.data) return;
+  function syncDraft(data) {
+    if (!data) return;
 
-    const { title, body, tags } = selectedItem.data;
+    const {title, body, tags } = data;
 
-    const data = {
+    const newData = {
       title: title || "",
       body: body || "",
       tags: tags || [],
     };
 
-    setOriginal(data);
-    setDraft(data);
+    setOriginal(newData);
+    setDraft(newData);
   }
 
   function syncSelected(data) {
@@ -154,7 +167,7 @@ export default function FileEditor({
             if (unsavedChanges) {
               const snippet = {
                 ...selectedItem?.data,
-                ...draft,
+                ...draft
               };
               updateSnippet(snippet);
             }

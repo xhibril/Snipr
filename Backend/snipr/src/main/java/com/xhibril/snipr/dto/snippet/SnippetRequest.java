@@ -1,18 +1,36 @@
 package com.xhibril.snipr.dto.snippet;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 import java.util.List;
 
 public class SnippetRequest {
 
     private Long id;
+
+    @NotBlank(message = "Enter a file name")
+    @Size(max = 255, message = "File name cannot be more than 255 characters")
     private String name;
+
     private Long folderId;
+
+
+    @Size(max = 100000, message = "File body limit exceeded")
     private String body;
+
+    @Size(max = 120, message = "File title cannot be more than 120 characters")
     private String title;
-    private List<String> tags;
+
+    private List<
+            @NotBlank(message = "Enter a tag name")
+            @Pattern(regexp = "[A-Za-z]+", message = "Enter a valid tag"
+            )String> tags;
+
+
     private String query;
     private Boolean isPinned;
-    private Integer tagAmount;
 
 
     public String getName() {
@@ -23,11 +41,11 @@ public class SnippetRequest {
         this.name = name;
     }
 
-    public void folderId(Long folderId){
+    public void folderId(Long folderId) {
         this.folderId = folderId;
     }
 
-    public Long getFolderId(){
+    public Long getFolderId() {
         return folderId;
     }
 
@@ -64,25 +82,21 @@ public class SnippetRequest {
     }
 
 
-    public void setId(Long id){ this.id = id;}
-    public Long getId(){
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
         return id;
     }
 
 
-    public void setIsPinned(Boolean isPinned){
+    public void setIsPinned(Boolean isPinned) {
         this.isPinned = isPinned;
     }
 
-    public Boolean getIsPinned(){
+    public Boolean getIsPinned() {
         return isPinned;
     }
 
-    public void setTagAmount(Integer tagAmount){
-        this.tagAmount = tagAmount;
-    }
-
-    public Integer getTagAmount(){
-        return tagAmount;
-    }
 }

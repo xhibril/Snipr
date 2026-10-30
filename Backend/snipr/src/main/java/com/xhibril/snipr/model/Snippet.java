@@ -21,7 +21,10 @@ public class Snippet {
     @JoinColumn(name = "folder_id", nullable = true)
     private Folder folder;
 
-    private String fileName;
+    private String name;
+
+    @Lob
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String body;
     private String title;
     private Boolean isPinned = false;
@@ -65,12 +68,12 @@ public class Snippet {
         this.folder = folder;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getName() {
+        return name;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getBody() {

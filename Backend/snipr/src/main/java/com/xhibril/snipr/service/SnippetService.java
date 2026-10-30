@@ -44,7 +44,7 @@ public class SnippetService {
             Snippet snippet = new Snippet();
 
             snippet.setUser(user);
-            snippet.setFileName(request.getName());
+            snippet.setName(request.getName());
             snippet.setTitle("Untitled");
 
             if (request.getFolderId() != null) {
@@ -60,7 +60,7 @@ public class SnippetService {
 
             SnippetResponse snippetResponse = new SnippetResponse();
             snippetResponse.setMessage("Snippet successfully saved");
-            snippetResponse.setName(savedSnippet.getFileName());
+            snippetResponse.setName(savedSnippet.getName());
             snippetResponse.setId(savedSnippet.getId());
             snippetResponse.setTitle(snippet.getTitle());
 
@@ -177,7 +177,7 @@ public class SnippetService {
         }
 
         snippetResponse.setId(snippet.getId());
-        snippetResponse.setName(snippet.getFileName());
+        snippetResponse.setName(snippet.getName());
         snippetResponse.setBody(snippet.getBody());
         snippetResponse.setTitle(snippet.getTitle());
         snippetResponse.setIsPinned(snippet.getIsPinned());
@@ -217,7 +217,7 @@ public class SnippetService {
 
         if (snippetOpt.isPresent()) {
             Snippet snippet = snippetOpt.get();
-            snippet.setFileName(request.getName());
+            snippet.setName(request.getName());
             snippet.setBody(request.getBody());
             snippet.setTitle(request.getTitle());
 
@@ -250,7 +250,7 @@ public class SnippetService {
                 snippetRes.setFolderId(snippet.getFolder().getId());
             }
 
-            snippetRes.setName(snippet.getFileName());
+            snippetRes.setName(snippet.getName());
             snippetRes.setTitle(snippet.getTitle());
             snippetRes.setBody(snippet.getBody());
             snippetRes.setTags(snippet.getTags());
@@ -289,7 +289,7 @@ public class SnippetService {
         }
 
         Snippet snippet = snippetOpt.get();
-        snippet.setFileName(request.getName());
+        snippet.setName(request.getName());
         snippetRepo.save(snippet);
         return ResponseEntity.ok().body(new ApiResponse("Snippet successfully updated"));
     }
@@ -313,7 +313,7 @@ public class SnippetService {
         SnippetResponse response = new SnippetResponse();
 
         copy.setUser(original.getUser());
-        copy.setFileName(request.getName());
+        copy.setName(request.getName());
         copy.setIsPinned(original.getIsPinned());
         copy.setTitle(original.getTitle());
         copy.setBody(original.getBody());
@@ -327,7 +327,7 @@ public class SnippetService {
         Snippet savedSnippet = snippetRepo.save(copy);
 
         response.setId(savedSnippet.getId());
-        response.setName(savedSnippet.getFileName());
+        response.setName(savedSnippet.getName());
         response.setIsPinned(savedSnippet.getIsPinned());
         response.setTitle(savedSnippet.getTitle());
         response.setBody(savedSnippet.getBody());

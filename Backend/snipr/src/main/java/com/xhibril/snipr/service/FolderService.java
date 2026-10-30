@@ -220,7 +220,7 @@ public class FolderService {
 
             copy.setUser(original.getUser());
             copy.setFolder(savedFolder);
-            copy.setFileName(original.getFileName());
+            copy.setName(original.getName());
             copy.setTitle(original.getTitle());
             copy.setBody(original.getBody());
             copy.setTags(new ArrayList<>(original.getTags()));
@@ -232,7 +232,7 @@ public class FolderService {
 
             response.setId(original.getId());
             response.setFolderId(savedFolder.getId());
-            response.setName(original.getFileName());
+            response.setName(original.getName());
             response.setTitle(original.getTitle());
             response.setBody(original.getTitle());
             response.setTags(original.getTags());

@@ -146,7 +146,7 @@ export default function useFileExplorerActions({
 
   async function moveSnippet(item) {
     const folderId = item?.folderId;
-    
+
     // get files in same space
 
     const itemsInSameSpace = files.filter(
@@ -206,6 +206,13 @@ export default function useFileExplorerActions({
     const { isFolder, basePath, collection, setCollection } =
       getItemConfig(type);
 
+    if (toName.length > 255) {
+      notify(
+        `${isCreatingFolder ? "Folder" : "File"} cannot be more than 255 characters`,
+      );
+      return;
+    }
+
     const path = `${basePath}/${item.id}/rename`;
 
     let filesInSameSpace;
@@ -221,9 +228,9 @@ export default function useFileExplorerActions({
       filesInSameSpace = [...folders];
     }
 
-    const nameRes = ValidateFileName(toName, filesInSameSpace, type);
+    const finalName = ValidateFileName(toName, filesInSameSpace, type);
 
-    if (!nameRes) {
+    if (!finalName) {
       notify(`This ${isFolder ? "folder" : "file"} already exists`, "ERROR");
       return;
     }
@@ -234,28 +241,33 @@ export default function useFileExplorerActions({
     setCollection((prev) =>
       prev.map((currentItem) =>
         currentItem.id === item.id
-          ? { ...currentItem, name: nameRes }
+          ? { ...currentItem, name: finalName }
           : currentItem,
       ),
     );
 
+    // update file name if its a selected item
+if (!isFolder && selectedItem?.data?.id === item.id) {
+  setSelectedItem((prev) => ({
+    ...prev,
+    data: {
+      ...prev.data,
+      name: finalName,
+    },
+  }));
+}
     const res = await ApiFetch(
       path,
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: nameRes }),
+        body: JSON.stringify({ name: finalName }),
       },
       notify,
       nav,
     );
 
-    if (!res) {
-      rollBack(isFolder, previous);
-      return;
-    }
-
-    if (!res.ok) {
+    if (!res?.ok) {
       const data = await res.json();
       notify(
         data.message ||
@@ -310,7 +322,6 @@ export default function useFileExplorerActions({
 
     let itemsInSameSpace;
 
-    
     // get files in same space
     if (!isFolder) {
       itemsInSameSpace = files.filter(
@@ -415,10 +426,10 @@ export default function useFileExplorerActions({
     const { isFolder, basePath, collection, setCollection } =
       getItemConfig(type);
 
-    const inputRes = ValidateInput(itemName, "GENERAL");
-
-    if (inputRes !== "VALID") {
-      notify(`Invalid ${isFolder ? "folder" : "file"} name`, "ERROR");
+    if (itemName.length > 255) {
+      notify(
+        `${isCreatingFolder ? "Folder" : "File"} cannot be more than 255 characters`,
+      );
       return;
     }
 
@@ -427,7 +438,6 @@ export default function useFileExplorerActions({
     const folderId =
       selectedItem?.type === "FOLDER" ? selectedItem?.data.id : null;
 
-      
     // get files in same space
     if (!isFolder) {
       filesInSameSpace = files.filter(
@@ -437,9 +447,9 @@ export default function useFileExplorerActions({
       filesInSameSpace = [...folders];
     }
 
-    const nameRes = ValidateFileName(itemName, filesInSameSpace, type);
+    const finalName = ValidateFileName(itemName, filesInSameSpace, type);
 
-    if (!nameRes) {
+    if (!finalName) {
       notify(`This ${isFolder ? "folder" : "file"} already exists`);
       return;
     }
@@ -447,8 +457,8 @@ export default function useFileExplorerActions({
     const previous = collection;
 
     const newItem = isFolder
-      ? { name: itemName }
-      : { name: itemName, folderId: folderId };
+      ? { name: finalName }
+      : { name: finalName, folderId: folderId };
 
     setCollection((prev) => [...prev, newItem]);
 

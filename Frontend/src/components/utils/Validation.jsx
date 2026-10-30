@@ -6,20 +6,21 @@ const DIGITS = "0123456789";
 const ALLOWED_CHARACTERS_BY_TYPE = {
   GENERAL: `${LETTERS}${DIGITS}.!?() `,
 
-  FILE_NAME: `${LETTERS}${DIGITS}._- `,
-
   EMAIL: `${LETTERS}${DIGITS}._-+@`,
 
   PASSWORD: `${LETTERS}${DIGITS}!.@#$%^&* `,
 
-  FILE_CONTENT: `${LETTERS}${DIGITS} .,!?;:'"()[]{}-_/@#$%^&*+=|~\` `,
-
   USERNAME: `${LETTERS}${DIGITS}_.`,
 
-  TAGS: `${LETTERS}`,
+  TAG: `${LETTERS}`,
 };
 
 export function ValidateInput(input, type) {
+// only allow file names to be empty
+   if (!input?.trim()) {
+    return type === "FILE_NAME" ? "VALID" : "INVALID";
+  }
+
   const allowedCharacters = ALLOWED_CHARACTERS_BY_TYPE[type];
 
   for (const character of input) {
@@ -131,7 +132,7 @@ export function ValidateUsername(username){
 
 
 export function ValidateFileName(name, itemsInSameSpace, type) {
-  if (itemsInSameSpace.some((item) => item?.name === name)) {
+if (itemsInSameSpace.some((item) => item?.name === name)) {
     return null;
   }
 
@@ -151,7 +152,7 @@ export function ValidateFileName(name, itemsInSameSpace, type) {
   let counter = 2;
 
   while (
-    itemsInSameSpace.some((item) => item?.name === `${name} (${counter}`)
+    itemsInSameSpace.some((item) => item?.name === `${name} (${counter})`)
   ) {
     counter++;
   }
