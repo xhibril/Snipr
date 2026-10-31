@@ -2,85 +2,69 @@ import styles from "../../../pages/dashboard/Dashboard.module.css";
 
 import { RiFileAddLine, RiFolderAddLine } from "react-icons/ri";
 import { FiPlus, FiX } from "react-icons/fi";
-import { useState, useEffect, useImperativeHandle } from "react";
+import { useState, useEffect, useRef } from "react";
 import ApiFetch from "../../utils/Api";
-import { useRef } from "react";
 import { ValidateInput } from "../../utils/Validation";
+import { DEFAULT_FAILURE_MESSAGE } from "../../ui/SmallComponents";
 
 export default function FileEditor({
-  isViewingFile,
-  setIsViewingFile,
-  selectedItem,
-  setSelectedItem,
-  draft,
-  original,
-  setDraft,
-  setOriginal,
   setFiles,
-  files,
-  setIsCreatingItem,
-  setIsCreatingFolder,
+  file,
   notify,
-  editorRef,
-  unsavedChanges,
-  setUnsavedChanges,
 }) {
+
   const [newTag, setNewTag] = useState("");
   const [isAddingTag, setIsAddingTag] = useState(false);
-  const selectedIdRef = useRef(selectedItem?.data?.id);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useImperativeHandle(editorRef, () => ({
-    updateSnippet,
-  }));
+  const [draft, setDraft] = useState({
+    title: file.title || "",
+    body: file.body || "",
+    tags: file.tags || [],
+  });
+
+  const [original, setOriginal] = useState({
+    title: file.title || "",
+    body: file.body || "",
+    tags: file.tags || [],
+  });
+
+  const dirty = JSON.stringify(draft) !== JSON.stringify(original);
+
+  const latest = useRef({ dirty, draft, file });
+  latest.current = { dirty, draft, file };
+
+  //  save when changing snippets
+  useEffect(
+    () => () => {
+      if (latest.current.dirty) {
+      updateSnippet({
+        ...latest.current.file,
+        ...latest.current.draft
+      });
+      }},
+    [],
+  );
 
   // auto save
   useEffect(() => {
-    if (!selectedItem?.data || !isViewingFile) return;
-
-    const hasChanges =
-      draft.body !== original.body ||
-      draft.title !== original.title ||
-      JSON.stringify(draft.tags ?? []) !== JSON.stringify(original.tags ?? []);
-
-    if (!hasChanges) return;
+    if (!dirty) return;
 
     const timer = setTimeout(() => {
       const snippet = {
-        ...selectedItem?.data,
+        ...file,
         ...draft,
       };
       updateSnippet(snippet);
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [draft, original, selectedItem?.data?.id, 
-    selectedItem?.data?.name, isViewingFile]);
-
-  // unsaved changes
-  useEffect(() => {
-    if (
-      draft.body !== original.body ||
-      draft.title !== original.title ||
-      JSON.stringify(original.tags ?? []) 
-      !== JSON.stringify(draft.tags ?? []) // compare by content n order
-    ) {
-      setUnsavedChanges(true);
-    } else {
-      setUnsavedChanges(false);
-    }
-  }, [draft, original]);
-
-  useEffect(() => {
-    if (selectedItem?.type !== "FILE") return;
-    setIsViewingFile(true);
-  }, [selectedItem]);
-
-  useEffect(() => {
-    selectedIdRef.current = selectedItem?.data?.id;
-  }, [selectedItem]);
+  }, [draft, file]);
 
   async function updateSnippet(snippet) {
-    const previousSnippet = structuredClone(selectedItem?.data);
+    if (isLoading) return;
+    const previousSnippet = file;
+    const previousOriginal = original;
 
     if (snippet.title.length > 120) {
       notify("File title cannot be more than 120 characters", "ERROR");
@@ -102,58 +86,62 @@ export default function FileEditor({
     }
 
     // opt update
-    setFiles(files.map((file) => (file.id === snippet.id ? snippet : file)));
+    setFiles((prev) =>
+      prev.map((file) => (file.id === snippet.id ? snippet : file)),
+    );
 
-    const res = await ApiFetch("/snippets", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: snippet.id,
-        name: snippet.name,
-        body: snippet.body,
-        title: snippet.title,
-        isPinned: snippet.isPinned,
-        tags: snippet.tags,
-        folderId: snippet.folderId,
-      }),
-    });
+    const { title, body, tags } = snippet;
 
-    if (!res) return;
-    const data = await res.json();
-
-    if (!res.ok) {
-      notify(data.message || "Could not update snippet", "ERROR");
-      syncSelected(previousSnippet);
-      syncDraft();
-      return;
-    }
-
-    if (selectedIdRef.current === snippet.id) {
-      syncSelected(data);
-      syncDraft(data);
-    }
-  }
-
-  function syncDraft(data) {
-    if (!data) return;
-
-    const {title, body, tags } = data;
-
-    const newData = {
-      title: title || "",
-      body: body || "",
-      tags: tags || [],
+    const optOriginal = {
+      title: title,
+      body: body,
+      tags: tags,
     };
 
-    setOriginal(newData);
-    setDraft(newData);
+    setOriginal(optOriginal);
+
+    try {
+      setIsLoading(true);
+
+      const res = await ApiFetch("/snippets", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: snippet.id,
+          name: snippet.name,
+          body: snippet.body,
+          title: snippet.title,
+          isPinned: snippet.isPinned,
+          tags: snippet.tags,
+          folderId: snippet.folderId,
+        }),
+      });
+
+      if (!res) {
+        rollbackSave(previousSnippet, previousOriginal);
+        return;
+      }
+      const data = await res.json();
+
+      if (!res.ok) {
+        notify(data.message || "Could not update snippet", "ERROR");
+        rollbackSave(previousSnippet, previousOriginal);
+        return;
+      }
+    } catch (err) {
+      notify(DEFAULT_FAILURE_MESSAGE, "ERROR");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
-  function syncSelected(data) {
-    setSelectedItem((prev) => ({
-      ...prev,
-      data,
-    }));
+  function rollbackSave(previousSnippet, previousOriginal) {
+    setFiles((prev) =>
+      prev.map((file) =>
+        file.id === previousSnippet.id ? previousSnippet : file,
+      ),
+    );
+    setOriginal(previousOriginal);
   }
 
   return (
@@ -164,18 +152,16 @@ export default function FileEditor({
           if (e.ctrlKey && e.key === "s") {
             e.preventDefault();
 
-            if (unsavedChanges) {
+            if (dirty) {
               const snippet = {
-                ...selectedItem?.data,
-                ...draft
+                ...file,
+                ...draft,
               };
               updateSnippet(snippet);
             }
           }
-        }}
-      >
-        {isViewingFile ? (
-          <>
+        }}>
+
             <div className={styles.fileInfo}>
               <input
                 type="text"
@@ -253,55 +239,19 @@ export default function FileEditor({
             <textarea
               className={styles.fileContent}
               value={draft.body}
-              onChange={(e) => setDraft({ ...draft, body: e.target.value })}
-            >
+              onChange={(e) => setDraft({ ...draft, body: e.target.value })}>
               {draft.body}
             </textarea>
-          </>
-        ) : (
-          <>
-            <div className={styles.defaultMenu}>
-              <h1>SNIPR.</h1>
-              <p>Start</p>
 
-              <div
-                className={styles.newFile}
-                onClick={() => {
-                  setIsCreatingItem((prev) =>
-                    prev?.type === "FILE" ? false : { type: "FILE" },
-                  );
-                  setIsCreatingFolder(false);
-                }}
-              >
-                <RiFileAddLine /> <a>New File</a>
-              </div>
 
-              <div
-                className={styles.newFolder}
-                onClick={() => {
-                  setIsCreatingItem((prev) =>
-                    prev?.type === "FOLDER" ? false : { type: "FOLDER" },
-                  );
-                  setIsCreatingFolder(true);
-                }}
-              >
-                <RiFolderAddLine />
-                <a>New Folder</a>
-              </div>
-            </div>
-          </>
-        )}
-
-        {isViewingFile && unsavedChanges && (
+        {dirty && (
           <div className={styles.saveContainer}>
-            <p className={styles.saveStatus}>
-              {unsavedChanges ? "Unsaved changes" : ""}
-            </p>
+            <p className={styles.saveStatus}>Unsaved changes</p>
             <button
               className={styles.saveBtn}
               onClick={() => {
                 const snippet = {
-                  ...selectedItem?.data,
+                  ...file,
                   ...draft,
                 };
                 updateSnippet(snippet);

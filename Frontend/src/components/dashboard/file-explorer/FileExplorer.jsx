@@ -20,17 +20,13 @@ export default function FileExplorer({
   notify,
   selectedItem,
   setSelectedItem,
-  setIsViewingFile,
-  setDraft,
-  draft,
-  setOriginal,
   activePage,
+  openFile,
   setIsCreatingItem,
   isCreatingItem,
   setIsCreatingFolder,
   isCreatingFolder,
-  unsavedChanges,
-  editorRef,
+  setOpenFileId
 }) {
   const [toggleSearchFilter, setToggleSearchFilter] = useState(false);
   const [filterTags, setFilterTags] = useState([]);
@@ -89,16 +85,17 @@ export default function FileExplorer({
     page,
     selectedItem,
     setSelectedItem,
-    setIsViewingFile,
+    setOpenFileId,
     setToName,
     setEditingId,
     isCreatingFolder,
+    openFile
   });
 
   useEffect(() => {
     setSelectedItem(null);
     setOpenFolders([]);
-    setIsViewingFile(false);
+    setOpenFileId(null)
   }, [activePage]);
 
   // close context menu
@@ -144,39 +141,14 @@ export default function FileExplorer({
 
 
   function selectItem(item, type) {
-
-    if (selectedItem?.type === "FILE" && unsavedChanges) {
-      const snippet = {
-        ...selectedItem?.data,
-        ...draft,
-      };
-
-      editorRef.current?.updateSnippet(snippet);
+    setSelectedItem({type: type, data: item})
+    if(type === "FILE"){
+      setOpenFileId(item.id)
     }
-
-    if (type == "FILE") {
-      const data = {
-        title: item.title || "",
-        body: item.body || "",
-        tags: item.tags || [],
-  
-      };
-
-      setDraft(data);
-      setOriginal(data);
-    }
-
-    setSelectedItem({
-      type: type,
-      data: item,
-    });
   }
 
   function onOpen(item, type) {
-    setSelectedItem({
-      data: item,
-      type: type,
-    });
+    selectItem(item, type)
 
     if (type === "FOLDER") {
       const index = sortedFolders.findIndex((folder) => folder.id === item.id);

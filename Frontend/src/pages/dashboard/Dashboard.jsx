@@ -7,30 +7,17 @@ import ApiFetch from "../../components/utils/Api.jsx";
 import FileExplorer from "../../components/dashboard/file-explorer/FileExplorer.jsx";
 import FileEditor from "../../components/dashboard/file-editor/FileEditor.jsx";
 import Sidebar from "../../components/dashboard/sidebar/Sidebar.jsx";
-import { useRef } from "react";
+import DefaultMenu from "../../components/dashboard/default-menu/DefaultMenu.jsx";
 
 export default function Dashboard({ notify, auth, setAuth }) {
-  const [isViewingFile, setIsViewingFile] = useState(false);
   const [folders, setFolders] = useState([]);
   const [files, setFiles] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [openFileId, setOpenFileId] = useState(false);
   const [isCreatingItem, setIsCreatingItem] = useState(false);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
-  const [unsavedChanges, setUnsavedChanges] = useState(false);
-  const editorRef = useRef(null);
   const nav = useNavigate();
-
-  const [draft, setDraft] = useState({
-    title: "",
-    body: "",
-    tags: [],
-  });
-
-  const [original, setOriginal] = useState({
-    title: "",
-    body: "",
-    tags: [],
-  });
+  const openFile = files.find((file) => file.id === openFileId);
 
   const [activePage, setActivePage] = useState("ALL");
 
@@ -88,41 +75,25 @@ export default function Dashboard({ notify, auth, setAuth }) {
           folders={folders}
           setFolders={setFolders}
           files={files}
+          openFile = {openFile}
           setFiles={setFiles}
           notify={notify}
           selectedItem={selectedItem}
           setSelectedItem={setSelectedItem}
-          setIsViewingFile={setIsViewingFile}
-          setDraft={setDraft}
-          setOriginal={setOriginal}
+          openFileId = {openFileId}
+          setOpenFileId = {setOpenFileId}
           activePage={activePage}
           isCreatingFolder={isCreatingFolder}
           setIsCreatingFolder={setIsCreatingFolder}
           isCreatingItem={isCreatingItem}
           setIsCreatingItem={setIsCreatingItem}
-          editorRef = {editorRef}
-          unsavedChanges={unsavedChanges}
-          draft = {draft}
         />
 
-        <FileEditor
-          isViewingFile={isViewingFile}
-          setIsViewingFile={setIsViewingFile}
-          selectedItem={selectedItem}
-          draft={draft}
-          original={original}
-          setDraft={setDraft}
-          setOriginal={setOriginal}
-          setSelectedItem={setSelectedItem}
-          files={files}
-          setFiles={setFiles}
-          setIsCreatingFolder={setIsCreatingFolder}
-          setIsCreatingItem={setIsCreatingItem}
-          notify={notify}
-          unsavedChanges={unsavedChanges}
-          setUnsavedChanges={setUnsavedChanges}
-          editorRef={editorRef}
-        />
+
+        {openFile ? 
+        <FileEditor notify={notify} file = {openFile} setFiles={setFiles}/>  :
+        <DefaultMenu setIsCreatingFolder={setIsCreatingFolder} 
+        setIsCreatingItem={setIsCreatingItem}/>}
       </div>
     </div>
   );

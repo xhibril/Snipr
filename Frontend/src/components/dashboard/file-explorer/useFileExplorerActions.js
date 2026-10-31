@@ -1,3 +1,4 @@
+import { DEFAULT_FAILURE_MESSAGE } from "../../ui/SmallComponents.jsx";
 import ApiFetch from "../../utils/Api.jsx";
 import { ValidateInput, ValidateFileName } from "../../utils/Validation.jsx";
 
@@ -9,9 +10,10 @@ export default function useFileExplorerActions({
   notify,
   nav,
   page,
-  selectedItem,
   setSelectedItem,
-  setIsViewingFile,
+  selectedItem,
+  setOpenFileId,
+  openFile,
   setToName,
   setEditingId,
   isCreatingFolder,
@@ -51,7 +53,7 @@ export default function useFileExplorerActions({
               ...currentItem,
               isPinned: status,
             }
-          : current,
+          : currentItem,
       ),
     );
 
@@ -107,9 +109,12 @@ export default function useFileExplorerActions({
       return;
     }
 
-    if (selectedItem?.data.id === item.id) {
+    if(selectedItem?.type === type && selectedItem?.data.id === item.id){
       setSelectedItem(null);
-      setIsViewingFile(false);
+    }
+
+    if(openFile?.id === item.id){
+      setOpenFileId(null);
     }
   }
 
@@ -266,6 +271,13 @@ if (!isFolder && selectedItem?.data?.id === item.id) {
       notify,
       nav,
     );
+
+if(!res){
+      notify(DEFAULT_FAILURE_MESSAGE, "ERROR"
+      );
+      rollBack(isFolder, previous);
+      return;
+}
 
     if (!res?.ok) {
       const data = await res.json();
