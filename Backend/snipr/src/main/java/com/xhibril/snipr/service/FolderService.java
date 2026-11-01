@@ -27,20 +27,22 @@ public class FolderService {
     private final UserRepository userRepo;
     private final FolderRepository folderRepo;
     private final SnippetRepository snippetRepo;
+    private final CommonService commonService;
 
     public FolderService(UserRepository userRepo,
                          FolderRepository folderRepo,
-                         SnippetRepository snippetRepo){
+                         SnippetRepository snippetRepo, CommonService commonService){
         this.userRepo = userRepo;
         this.folderRepo = folderRepo;
         this.snippetRepo = snippetRepo;
+        this.commonService = commonService;
     }
+
 
     public ResponseEntity<FolderResponse> addFolder(Long userId, FolderRequest request) {
         Optional<User> userOpt = userRepo.findById(userId);
-        Optional<Folder> folderOpt = folderRepo.findByUserIdAndName(userId, request.getName());
 
-        if (folderOpt.isPresent()) {
+        if (!commonService.isFolderNameValid(userId, request.getName())) {
             return ResponseEntity.badRequest().body(new FolderResponse("Folder already exists"));
         }
 
@@ -166,6 +168,12 @@ public class FolderService {
             return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
         }
         Folder folder = folderOpt.get();
+
+        String name = folder.getName();
+        if(!commonService.isFolderNameValid(userId, name)){
+            return ResponseEntity.badRequest().body(new ApiResponse("This folder already exists"));
+        }
+
         folder.setDeletedAt(null);
         folder.setIsDeleted(false);
         folderRepo.save(folder);
@@ -183,6 +191,10 @@ public class FolderService {
             return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
         }
 
+        if(!commonService.isFolderNameValid(userId, request.getName())){
+            return ResponseEntity.badRequest().body(new ApiResponse("This folder already exists"));
+        }
+
         Folder folder = folderOpt.get();
         folder.setName(request.getName());
         folderRepo.save(folder);
@@ -197,6 +209,10 @@ public class FolderService {
 
         if (folderOpt.isEmpty()) {
             return ResponseEntity.badRequest().body(new FolderCopyResponse("Invalid request"));
+        }
+
+        if(!commonService.isFolderNameValid(userId, request.getName())){
+            return ResponseEntity.badRequest().body(new FolderCopyResponse("This folder already exists"));
         }
 
         Folder originalFolder = folderOpt.get();

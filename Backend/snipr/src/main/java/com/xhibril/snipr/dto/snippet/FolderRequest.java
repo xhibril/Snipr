@@ -7,7 +7,6 @@ public class FolderRequest {
 
     private Long id;
 
-
     @NotBlank(message = "Enter a folder name")
     @Size(max = 255, message = "Folder name cannot be more than 255 characters")
     private String name;

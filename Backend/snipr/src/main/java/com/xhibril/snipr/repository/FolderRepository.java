@@ -52,4 +52,8 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
     void deleteByUserIdAndIsDeletedTrue(Long userId);
 
     void deleteAllByUser(User user);
+
+
+
+    Optional<Folder> findByUserIdAndNameAndIsDeletedFalse(Long userId, String name);
 }

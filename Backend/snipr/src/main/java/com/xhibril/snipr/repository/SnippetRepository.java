@@ -82,4 +82,11 @@ public interface SnippetRepository extends JpaRepository<Snippet, Long> {
     void deleteByUserIdAndIsDeletedTrue(Long userId);
 
     void deleteAllByUser(User user);
+
+
+    Optional<Snippet> findByUserIdAndFolderIsNullAndNameAndIsDeletedFalse(Long userId, String name);
+
+
+
+    Optional<Snippet> findByUserIdAndFolderIdAndNameAndIsDeletedFalse(Long userId, Long folderId, String name);
 }

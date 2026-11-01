@@ -109,11 +109,11 @@ export default function useFileExplorerActions({
       return;
     }
 
-    if(selectedItem?.type === type && selectedItem?.data.id === item.id){
+    if (selectedItem?.type === type && selectedItem?.data.id === item.id) {
       setSelectedItem(null);
     }
 
-    if(openFile?.id === item.id){
+    if (openFile?.id === item.id) {
       setOpenFileId(null);
     }
   }
@@ -146,13 +146,13 @@ export default function useFileExplorerActions({
       "PATCH",
       "/recover",
       `Could not recover ${isFolder ? "folder" : "file"}, please try again`,
+
     );
   }
 
   async function moveSnippet(item, previousFolderId, currentFolderId) {
-
     // moved around in same space
-    if(previousFolderId === currentFolderId) return;
+    if (previousFolderId === currentFolderId) return;
 
     const folderId = item?.folderId;
 
@@ -255,15 +255,15 @@ export default function useFileExplorerActions({
     );
 
     // update file name if its a selected item
-if (!isFolder && selectedItem?.data?.id === item.id) {
-  setSelectedItem((prev) => ({
-    ...prev,
-    data: {
-      ...prev.data,
-      name: finalName,
-    },
-  }));
-}
+    if (!isFolder && selectedItem?.data?.id === item.id) {
+      setSelectedItem((prev) => ({
+        ...prev,
+        data: {
+          ...prev.data,
+          name: finalName,
+        },
+      }));
+    }
     const res = await ApiFetch(
       path,
       {
@@ -275,12 +275,11 @@ if (!isFolder && selectedItem?.data?.id === item.id) {
       nav,
     );
 
-if(!res){
-      notify(DEFAULT_FAILURE_MESSAGE, "ERROR"
-      );
+    if (!res) {
+      notify(DEFAULT_FAILURE_MESSAGE, "ERROR");
       rollBack(isFolder, previous);
       return;
-}
+    }
 
     if (!res?.ok) {
       const data = await res.json();

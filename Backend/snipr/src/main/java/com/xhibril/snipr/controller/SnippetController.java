@@ -30,7 +30,7 @@ public class SnippetController {
 
     @PostMapping("/snippets")
     public ResponseEntity<SnippetResponse> addSnippet(
-            @RequestBody SnippetRequest request,
+            @RequestBody SnippetRequests.Create request,
             HttpServletRequest req
     ) {
         Long userId = authService.getAuthenticatedId(req);
@@ -40,7 +40,7 @@ public class SnippetController {
     @PatchMapping("/snippets/{snippetId}")
     public ResponseEntity<ApiResponse> moveSnippet(
             @PathVariable Long snippetId,
-            @RequestBody SnippetRequest request,
+            @RequestBody SnippetRequests.Move request,
             HttpServletRequest req
     ) {
         Long userId = authService.getAuthenticatedId(req);
@@ -87,7 +87,7 @@ public class SnippetController {
 
     @PatchMapping("/snippets")
     public ResponseEntity<SnippetResponse> updateSnippet(
-            @RequestBody SnippetRequest request,
+            @RequestBody SnippetRequests.Update request,
             HttpServletRequest req
     ) {
         Long userId = authService.getAuthenticatedId(req);
@@ -107,7 +107,7 @@ public class SnippetController {
     @PatchMapping("/snippets/{snippetId}/rename")
     public ResponseEntity<ApiResponse> renameSnippet(
             @PathVariable Long snippetId,
-            @RequestBody SnippetRequest request,
+            @RequestBody SnippetRequests.Rename request,
             HttpServletRequest req
     ) {
         Long userId = authService.getAuthenticatedId(req);
@@ -118,7 +118,7 @@ public class SnippetController {
     @PostMapping("/snippets/{snippetId}/copy")
     public ResponseEntity<SnippetResponse> copySnippet(
             @PathVariable Long snippetId,
-            @RequestBody SnippetRequest request,
+            @RequestBody SnippetRequests.Copy request,
             HttpServletRequest req
     ) {
         Long userId = authService.getAuthenticatedId(req);

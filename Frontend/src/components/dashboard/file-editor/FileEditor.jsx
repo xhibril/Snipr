@@ -108,10 +108,8 @@ export default function FileEditor({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: snippet.id,
-          name: snippet.name,
           body: snippet.body,
           title: snippet.title,
-          isPinned: snippet.isPinned,
           tags: snippet.tags,
           folderId: snippet.folderId,
         }),

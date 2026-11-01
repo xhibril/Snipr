@@ -26,29 +26,36 @@ public class SnippetService {
     private final UserRepository userRepo;
     private final SnippetRepository snippetRepo;
     private final FolderRepository folderRepo;
+    private final CommonService commonService;
 
     public SnippetService(UserRepository userRepo,
                           SnippetRepository snippetRepo,
-                          FolderRepository folderRepo) {
+                          FolderRepository folderRepo,
+                          CommonService commonService) {
         this.userRepo = userRepo;
         this.snippetRepo = snippetRepo;
         this.folderRepo = folderRepo;
+        this.commonService = commonService;
     }
 
-    public ResponseEntity<SnippetResponse> addSnippet(Long userId, SnippetRequest request) {
+    public ResponseEntity<SnippetResponse> addSnippet(Long userId, SnippetRequests.Create request) {
 
         Optional<User> userOpt = userRepo.findById(userId);
 
         if (userOpt.isPresent()) {
+            if(!commonService.isSnippetNameValid(userId, request.folderId(), request.name())){
+                return ResponseEntity.badRequest().body(new SnippetResponse("This file already exists"));
+            }
+
             User user = userOpt.get();
             Snippet snippet = new Snippet();
 
             snippet.setUser(user);
-            snippet.setName(request.getName());
+            snippet.setName(request.name());
             snippet.setTitle("Untitled");
 
-            if (request.getFolderId() != null) {
-                Optional<Folder> folderOpt = folderRepo.findById(request.getFolderId());
+            if (request.folderId() != null) {
+                Optional<Folder> folderOpt = folderRepo.findById(request.folderId());
 
                 if (folderOpt.isPresent()) {
                     Folder folder = folderOpt.get();
@@ -76,7 +83,7 @@ public class SnippetService {
 
 
     @Transactional
-    public ResponseEntity<ApiResponse> moveSnippet(Long userId, Long snippetId, SnippetRequest request) {
+    public ResponseEntity<ApiResponse> moveSnippet(Long userId, Long snippetId, SnippetRequests.Move request) {
         Optional<Snippet> snippetOpt = snippetRepo.findById(snippetId);
 
         if (snippetOpt.isEmpty()) {
@@ -84,18 +91,24 @@ public class SnippetService {
         }
 
         Snippet snippet = snippetOpt.get();
+        String name = snippet.getName();
+        if(!commonService.isSnippetNameValid(userId, request.folderId(), name)){
+            return ResponseEntity.badRequest().body(new ApiResponse("This file already exists"));
+        }
+
+
         User userSnippet = snippet.getUser();
 
         if (!userSnippet.getId().equals(userId)) {
             return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
         }
 
-        if (request.getFolderId() == null) {
+        if (request.folderId() == null) {
             snippetRepo.moveSnippet(null, snippetId);
             return ResponseEntity.ok().body(new ApiResponse("Snippet successfully moved"));
         }
 
-        Optional<Folder> folderOpt = folderRepo.findById(request.getFolderId());
+        Optional<Folder> folderOpt = folderRepo.findById(request.folderId());
 
         if (folderOpt.isEmpty()) {
             return ResponseEntity.badRequest().body(new ApiResponse("Invalid request"));
@@ -212,25 +225,15 @@ public class SnippetService {
 
 
 
-    public ResponseEntity<SnippetResponse> updateSnippet(Long userId, SnippetRequest request) {
-        Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, request.getId());
+    public ResponseEntity<SnippetResponse> updateSnippet(Long userId, SnippetRequests.Update request) {
+        Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, request.id());
 
         if (snippetOpt.isPresent()) {
             Snippet snippet = snippetOpt.get();
-            snippet.setName(request.getName());
-            snippet.setBody(request.getBody());
-            snippet.setTitle(request.getTitle());
+            snippet.setBody(request.body());
+            snippet.setTitle(request.title());
 
-
-            if (request.getFolderId() != null) {
-                Optional<Folder> folderOpt = folderRepo.findById(request.getFolderId());
-
-                if (folderOpt.isPresent()) {
-                    snippet.setFolder(folderOpt.get());
-                }
-            }
-
-            List<String> tags = request.getTags();
+            List<String> tags = request.tags();
 
             if (tags == null) {
                 tags = new ArrayList<>();
@@ -250,7 +253,6 @@ public class SnippetService {
                 snippetRes.setFolderId(snippet.getFolder().getId());
             }
 
-            snippetRes.setName(snippet.getName());
             snippetRes.setTitle(snippet.getTitle());
             snippetRes.setBody(snippet.getBody());
             snippetRes.setTags(snippet.getTags());
@@ -271,6 +273,14 @@ public class SnippetService {
         }
 
         Snippet snippet = snippetOpt.get();
+
+
+        String name = snippet.getName();
+        Long folderId = snippet.getFolder() == null ? null : snippet.getFolder().getId();
+        if(!commonService.isSnippetNameValid(userId, folderId, name)){
+            return ResponseEntity.badRequest().body(new ApiResponse("This file already exists"));
+        }
+
         snippet.setDeletedAt(null);
         snippet.setIsDeleted(false);
         snippetRepo.save(snippet);
@@ -281,7 +291,7 @@ public class SnippetService {
 
 
 
-    public ResponseEntity<ApiResponse> renameSnippet(Long userId, Long snippetId, SnippetRequest request) {
+    public ResponseEntity<ApiResponse> renameSnippet(Long userId, Long snippetId, SnippetRequests.Rename request) {
         Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, snippetId);
 
         if (snippetOpt.isEmpty()) {
@@ -289,7 +299,13 @@ public class SnippetService {
         }
 
         Snippet snippet = snippetOpt.get();
-        snippet.setName(request.getName());
+
+        Long folderId = snippet.getFolder() == null ? null : snippet.getFolder().getId();
+        if(!commonService.isSnippetNameValid(userId, folderId, request.name())){
+            return ResponseEntity.badRequest().body(new ApiResponse("This file already exists"));
+        }
+
+        snippet.setName(request.name());
         snippetRepo.save(snippet);
         return ResponseEntity.ok().body(new ApiResponse("Snippet successfully updated"));
     }
@@ -299,12 +315,16 @@ public class SnippetService {
     @Transactional
     public ResponseEntity<SnippetResponse> copySnippet(Long userId,
                                                        Long snippetId,
-                                                       SnippetRequest request) {
+                                                       SnippetRequests.Copy request) {
 
         Optional<Snippet> snippetOpt = snippetRepo.findByUserIdAndId(userId, snippetId);
 
         if (snippetOpt.isEmpty()) {
             return ResponseEntity.badRequest().body(new SnippetResponse("Invalid request"));
+        }
+
+        if(!commonService.isSnippetNameValid(userId, request.folderId(), request.name())){
+            return ResponseEntity.badRequest().body(new SnippetResponse("This file already exists"));
         }
 
         Snippet original = snippetOpt.get();
@@ -313,14 +333,14 @@ public class SnippetService {
         SnippetResponse response = new SnippetResponse();
 
         copy.setUser(original.getUser());
-        copy.setName(request.getName());
+        copy.setName(request.name());
         copy.setIsPinned(original.getIsPinned());
         copy.setTitle(original.getTitle());
         copy.setBody(original.getBody());
         copy.setTags(original.getTags());
         copy.setTags(new ArrayList<>(original.getTags()));
-        if (request.getFolderId() != null) {
-            Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, request.getFolderId());
+        if (request.folderId() != null) {
+            Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, request.folderId());
             folderOpt.ifPresent(copy::setFolder);
         }
 
@@ -334,8 +354,8 @@ public class SnippetService {
         response.setTags(savedSnippet.getTags());
 
 
-        if (request.getFolderId() != null) {
-            Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, request.getFolderId());
+        if (request.folderId() != null) {
+            Optional<Folder> folderOpt = folderRepo.findByUserIdAndId(userId, request.folderId());
             folderOpt.ifPresent(folder -> response.setFolderId(folder.getId()));
         }
 
