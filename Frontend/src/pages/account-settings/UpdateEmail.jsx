@@ -10,6 +10,7 @@ import global from "../../css/Global.module.css";
 
 import { DEFAULT_FAILURE_MESSAGE } from "../../components/ui/SmallComponents";
 import { useNavigate } from "react-router-dom";
+import { ValidateEmail } from "../../components/utils/Validation";
 
 export default function UpdateEmail({ notify, setAuth }) {
   const [pendingEmail, setPendingEmail] = useState("");
@@ -21,6 +22,16 @@ export default function UpdateEmail({ notify, setAuth }) {
   const nav = useNavigate();
 
   async function updateEmail() {
+
+
+    const validateEmail = ValidateEmail(pendingEmail);
+
+    if(validateEmail !== "VALID"){
+      notify(validateEmail, "ERROR");
+      return;
+    }
+
+
     if (step === "INIT") {
       try {
         setIsLoading(true);

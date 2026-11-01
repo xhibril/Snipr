@@ -130,6 +130,7 @@ export default function FileEditor({
       }
     } catch (err) {
       notify(DEFAULT_FAILURE_MESSAGE, "ERROR");
+      rollbackSave(previousSnippet, previousOriginal);
     } finally {
       setIsLoading(false);
     }

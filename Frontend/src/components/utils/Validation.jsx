@@ -16,8 +16,8 @@ const ALLOWED_CHARACTERS_BY_TYPE = {
 };
 
 export function ValidateInput(input, type) {
-// only allow file names to be empty
-   if (!input?.trim()) {
+  // only allow file names to be empty
+  if (!input?.trim()) {
     return type === "FILE_NAME" ? "VALID" : "INVALID";
   }
 
@@ -44,15 +44,13 @@ export function ValidatePassword(password, check = "strength") {
   const minLength = 8;
   const maxLength = 32;
 
-  
-if (password.length < minLength) {
-  return "Password must be at least 8 characters.";
-}
+  if (password.length < minLength) {
+    return "Password must be at least 8 characters.";
+  }
 
-if (password.length > maxLength) {
-  return "Password must be no more than 32 characters.";
-}
-
+  if (password.length > maxLength) {
+    return "Password must be no more than 32 characters.";
+  }
 
   if (ValidateInput(password, "PASSWORD") !== "VALID") {
     return "Invalid Input";
@@ -85,15 +83,17 @@ export function ValidateEmail(email) {
   return "VALID";
 }
 
-export function ValidateCode(code, maxDigitsAllowed) {
+export function ValidateCode(code) {
   if (!code) {
     return "Enter the verification code.";
   }
 
   const regex = /^[0-9]+$/;
 
-  if (code.length > maxDigitsAllowed) {
-    return `Verification code must be no more than ${maxDigitsAllowed} digits.`;
+  const CODE_LENGTH = 6;
+
+  if (code.length !== CODE_LENGTH) {
+    return `Verification code must be ${CODE_LENGTH} digits.`;
   }
 
   if (!regex.test(code)) {
@@ -103,36 +103,31 @@ export function ValidateCode(code, maxDigitsAllowed) {
   return "VALID";
 }
 
-export function ValidateUsername(username){
-
-  if(!username){
+export function ValidateUsername(username) {
+  if (!username) {
     return "Enter a username";
   }
 
   const minLength = 3;
   const maxLength = 20;
 
-  if(username.length < minLength){
-    return "Username must be at least 3 characters"
+  if (username.length < minLength) {
+    return "Username must be at least 3 characters";
   }
 
-  if(username.legnth > maxLength){
-    return "Username must be no more than 20 characters"
+  if (username.legnth > maxLength) {
+    return "Username must be no more than 20 characters";
   }
 
-
-  if(ValidateInput(username, "USERNAME") !== "VALID"){
+  if (ValidateInput(username, "USERNAME") !== "VALID") {
     return "Username can contain letters, numbers, underscores, and periods only.";
   }
-
 
   return "VALID";
 }
 
-
-
 export function ValidateFileName(name, itemsInSameSpace, type) {
-if (itemsInSameSpace.some((item) => item?.name === name)) {
+  if (itemsInSameSpace.some((item) => item?.name === name)) {
     return null;
   }
 

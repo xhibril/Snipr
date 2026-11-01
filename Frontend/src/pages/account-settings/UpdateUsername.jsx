@@ -40,7 +40,7 @@ export default function UpdateUsername({ notify, auth, setAuth }) {
 
     if (
       trimmedName.toLocaleLowerCase() ===
-      isAuth?.user.username.toLocaleLowerCase()
+      setAuth?.user?.username.toLocaleLowerCase()
     ) {
       notify("Username cannot be same as old", "ERROR");
       return;

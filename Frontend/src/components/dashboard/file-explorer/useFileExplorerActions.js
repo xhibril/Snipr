@@ -149,11 +149,14 @@ export default function useFileExplorerActions({
     );
   }
 
-  async function moveSnippet(item) {
+  async function moveSnippet(item, previousFolderId, currentFolderId) {
+
+    // moved around in same space
+    if(previousFolderId === currentFolderId) return;
+
     const folderId = item?.folderId;
 
     // get files in same space
-
     const itemsInSameSpace = files.filter(
       (file) => (file?.folderId ?? null) === folderId,
     );

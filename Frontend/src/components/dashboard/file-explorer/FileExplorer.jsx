@@ -214,7 +214,8 @@ export default function FileExplorer({
             moveSnippet({
               ...file,
               folderId: null,
-            });
+            }, file?.folderId, null);
+            
           }}
         >
           {!isSearching &&

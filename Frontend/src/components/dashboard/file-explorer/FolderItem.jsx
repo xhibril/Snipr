@@ -55,7 +55,7 @@ export default function FolderItem({
           moveSnippet({
             ...file,
             folderId: folder.id,
-          });
+          }, file?.folderId, folder.id);
         }
       }}
     >

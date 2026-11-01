@@ -122,7 +122,7 @@ function App() {
             />
 
             <Route path = "/account/email"
-            element = {<UpdateEmail notify = {notify} setIsAuth={setAuth}/>}/>
+            element = {<UpdateEmail notify = {notify} setAuth={setAuth}/>}/>
           </Route>
 
           <Route path = "/account/delete"
