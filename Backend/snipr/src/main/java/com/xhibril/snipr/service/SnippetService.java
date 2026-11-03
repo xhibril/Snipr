@@ -299,7 +299,6 @@ public class SnippetService {
         }
 
         Snippet snippet = snippetOpt.get();
-
         Long folderId = snippet.getFolder() == null ? null : snippet.getFolder().getId();
         if(!commonService.isSnippetNameValid(userId, folderId, request.name())){
             return ResponseEntity.badRequest().body(new ApiResponse("This file already exists"));
@@ -352,6 +351,7 @@ public class SnippetService {
         response.setTitle(savedSnippet.getTitle());
         response.setBody(savedSnippet.getBody());
         response.setTags(savedSnippet.getTags());
+        response.setMessage("Snippet successfully copied");
 
 
         if (request.folderId() != null) {

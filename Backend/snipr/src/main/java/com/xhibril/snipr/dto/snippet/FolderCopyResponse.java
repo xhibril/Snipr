@@ -17,6 +17,7 @@ public class FolderCopyResponse {
         this.snippets = snippets;
     }
 
+
     public FolderCopyResponse(String message){
         this.message = message;
     }

@@ -115,7 +115,7 @@ export function ValidateUsername(username) {
     return "Username must be at least 3 characters";
   }
 
-  if (username.legnth > maxLength) {
+  if (username.length > maxLength) {
     return "Username must be no more than 20 characters";
   }
 

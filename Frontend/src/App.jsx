@@ -70,6 +70,7 @@ function App() {
           user: data.user ?? null,
         });
       } catch (err) {
+        console.log(err)
         setAuth({
           authenticated: false,
           user: null,

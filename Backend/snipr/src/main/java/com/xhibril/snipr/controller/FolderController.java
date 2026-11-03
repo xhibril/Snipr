@@ -6,6 +6,7 @@ import com.xhibril.snipr.dto.snippet.FolderRequest;
 import com.xhibril.snipr.dto.snippet.FolderResponse;
 import com.xhibril.snipr.service.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,7 @@ public class FolderController {
 
     @PostMapping("/folders")
     public ResponseEntity<FolderResponse> addFolder(
+            @Valid
             @RequestBody FolderRequest request,
             HttpServletRequest req
     ) {
@@ -83,6 +85,11 @@ public class FolderController {
 
     @PatchMapping("/folders/{folderId}/rename")
     public ResponseEntity<ApiResponse> renameFolder(
+
+
+
+            
+            @Valid
             @PathVariable Long folderId,
             @RequestBody FolderRequest request,
             HttpServletRequest req
@@ -95,6 +102,7 @@ public class FolderController {
 
     @PostMapping("/folders/{folderId}/copy")
     public ResponseEntity<FolderCopyResponse> copyFolder(
+            @Valid
             @PathVariable Long folderId,
             @RequestBody FolderRequest request,
             HttpServletRequest req

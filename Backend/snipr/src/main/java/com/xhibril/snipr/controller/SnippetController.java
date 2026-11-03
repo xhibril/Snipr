@@ -7,6 +7,7 @@ import com.xhibril.snipr.service.CommonService;
 import com.xhibril.snipr.service.ItemView;
 import com.xhibril.snipr.service.SnippetService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,7 @@ public class SnippetController {
 
     @PostMapping("/snippets")
     public ResponseEntity<SnippetResponse> addSnippet(
+            @Valid
             @RequestBody SnippetRequests.Create request,
             HttpServletRequest req
     ) {
@@ -39,6 +41,9 @@ public class SnippetController {
 
     @PatchMapping("/snippets/{snippetId}")
     public ResponseEntity<ApiResponse> moveSnippet(
+
+
+
             @PathVariable Long snippetId,
             @RequestBody SnippetRequests.Move request,
             HttpServletRequest req
@@ -87,6 +92,7 @@ public class SnippetController {
 
     @PatchMapping("/snippets")
     public ResponseEntity<SnippetResponse> updateSnippet(
+            @Valid
             @RequestBody SnippetRequests.Update request,
             HttpServletRequest req
     ) {
@@ -106,6 +112,7 @@ public class SnippetController {
 
     @PatchMapping("/snippets/{snippetId}/rename")
     public ResponseEntity<ApiResponse> renameSnippet(
+            @Valid
             @PathVariable Long snippetId,
             @RequestBody SnippetRequests.Rename request,
             HttpServletRequest req
@@ -117,6 +124,7 @@ public class SnippetController {
 
     @PostMapping("/snippets/{snippetId}/copy")
     public ResponseEntity<SnippetResponse> copySnippet(
+            @Valid
             @PathVariable Long snippetId,
             @RequestBody SnippetRequests.Copy request,
             HttpServletRequest req

@@ -61,7 +61,7 @@ public class AuthService {
 
             User user = new User();
 
-            user.setEmail(request.getEmail());
+            user.setEmail(request.getEmail().toLowerCase());
             user.setPassword(request.getPassword());
             user.setUsername(request.getUsername());
             user.setIsVerified(false);
@@ -108,7 +108,7 @@ public class AuthService {
         if(userOpt.isPresent()){
             User user = userOpt.get();
 
-            if(request.getEmail().equals(user.getEmail()) && request.getPassword().equals(user.getPassword())){
+            if(request.getEmail().equalsIgnoreCase(user.getEmail()) && request.getPassword().equals(user.getPassword())){
 
                 if(!user.getIsVerified()){
                     emailService.sendVerificationEmail(request.getEmail());

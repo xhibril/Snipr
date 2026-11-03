@@ -1,6 +1,6 @@
 import { DEFAULT_FAILURE_MESSAGE } from "../../ui/SmallComponents.jsx";
 import ApiFetch from "../../utils/Api.jsx";
-import { ValidateInput, ValidateFileName } from "../../utils/Validation.jsx";
+import {ValidateFileName } from "../../utils/Validation.jsx";
 
 export default function useFileExplorerActions({
   folders,
