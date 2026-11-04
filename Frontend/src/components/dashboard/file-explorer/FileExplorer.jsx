@@ -22,10 +22,8 @@ export default function FileExplorer({
   setSelectedItem,
   activePage,
   openFile,
-  setIsCreatingItem,
-  isCreatingItem,
-  setIsCreatingFolder,
-  isCreatingFolder,
+  creationType,
+  setCreationType,
   setOpenFileId
 }) {
   const [toggleSearchFilter, setToggleSearchFilter] = useState(false);
@@ -34,15 +32,14 @@ export default function FileExplorer({
   const [searchResults, setSearchResults] = useState([]);
   const [openFolders, setOpenFolders] = useState([]);
   const [copy, setCopy] = useState([]);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingId, setEditingId] = useState("");
-  const [toName, setToName] = useState("");
+  const [editingTarget, setEditingTarget] = useState(null);
+  const [pendingName, setPendingName] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const inputRef = useRef(null);
 
 
   const nav = useNavigate();
-  const page = PAGE_CONFIG[activePage] ?? PAGE_CONFIG.REGULAR;
+  const page = PAGE_CONFIG[activePage] ?? PAGE_CONFIG.ALL;
 
   // compare two folders/files at a time
   // pinned = 1 gets placed before unpinned = 0
@@ -64,7 +61,22 @@ export default function FileExplorer({
   );
 
   const isSearching = searchQuery.trim() !== "" || filterTags.length > 0;
-  const displayedFiles = isSearching ? searchResults : sortedFiles;
+
+  const displayedFiles = useMemo(() => {
+
+    if(!isSearching){
+      return sortedFiles;
+    }
+
+    const filesToSearch = files.filter((file) => file.isDeleted === false);
+
+    return SearchFiles(filesToSearch, searchQuery, filterTags);
+
+
+
+
+
+  }, [files ,sortedFiles, isSearching, searchQuery, filterTags])
 
   const {
     updateItemPinStatus,
@@ -86,9 +98,9 @@ export default function FileExplorer({
     selectedItem,
     setSelectedItem,
     setOpenFileId,
-    setToName,
-    setEditingId,
-    isCreatingFolder,
+    setPendingName,
+    setEditingTarget,
+    creationType,
     openFile
   });
 
@@ -101,7 +113,7 @@ export default function FileExplorer({
   // close context menu
   useEffect(() => {
     const closeMenu = () => {
-      setIsEditing(false);
+      setEditingTarget(null);
       setContextMenu(null);
       document.removeEventListener("click", closeMenu);
     };
@@ -115,8 +127,8 @@ export default function FileExplorer({
 
   function handleContextMenu(e, file, type) {
     e.preventDefault();
-    setIsCreatingItem(false);
-    setIsEditing(false);
+    setCreationType(null);
+    setEditingTarget(null);
 
     setContextMenu({
       x: e.clientX,
@@ -126,18 +138,6 @@ export default function FileExplorer({
     });
   }
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      searchItems();
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery, filterTags]);
-
-  async function searchItems() {
-    const result = SearchFiles(sortedFiles, searchQuery, filterTags);
-    setSearchResults(result);
-  }
 
 
   function selectItem(item, type) {
@@ -169,10 +169,8 @@ export default function FileExplorer({
       <div className={styles.fileExplorer}>
         {page.showExplorerToolBar && (
           <ExplorerToolBar
-            isCreatingItem={isCreatingItem}
-            setIsCreatingItem={setIsCreatingItem}
-            isCreatingFolder={isCreatingFolder}
-            setIsCreatingFolder={setIsCreatingFolder}
+          creationType = {creationType}
+          setCreationType = {setCreationType}
             inputRef={inputRef}
             createItem={createItem}
             selectedItem={selectedItem}
@@ -201,7 +199,7 @@ export default function FileExplorer({
             if (e.target !== e.currentTarget) return;
 
             setSelectedItem(null);
-            setIsCreatingItem(false);
+            setCreationType(null);
 
             e.preventDefault();
             handleContextMenu(e, null, "PANEL");
@@ -235,15 +233,14 @@ export default function FileExplorer({
                   updateItemPinStatus={updateItemPinStatus}
                   moveSnippet={moveSnippet}
                   handleContextMenu={handleContextMenu}
-                  isEditing={isEditing}
-                  setIsEditing={setIsEditing}
-                  editingId={editingId}
+                 
+                  editingTarget = {editingTarget}
+                  setEditingTarget = {setEditingTarget}
                   renameItem={renameItem}
-                  toName={toName}
-                  setToName={setToName}
-                  isCreatingItem={isCreatingItem}
-                  setIsCreatingItem={setIsCreatingItem}
-                  isCreatingFolder={isCreatingFolder}
+                  pendingName={pendingName}
+                  setPendingName={setPendingName}
+                            creationType = {creationType}
+          setCreationType = {setCreationType}
                   inputRef={inputRef}
                   createItem={createItem}
                   page={page}
@@ -260,12 +257,11 @@ export default function FileExplorer({
                 selectItem={selectItem}
                 updateItemPinStatus={updateItemPinStatus}
                 handleContextMenu={handleContextMenu}
-                isEditing={isEditing}
-                setIsEditing={setIsEditing}
-                editingId={editingId}
+                editingTarget={editingTarget}
+                setEditingTarget={setEditingTarget}
                 renameItem={renameItem}
-                toName={toName}
-                setToName={setToName}
+                pendingName={pendingName}
+                setPendingName={setPendingName}
                 page={page}
               />
             );
@@ -286,25 +282,21 @@ export default function FileExplorer({
             updatePinStatus={updateItemPinStatus}
             setSelectedItem={setSelectedItem}
             setContextMenu={setContextMenu}
-            isEditing={isEditing}
-            setIsEditing={setIsEditing}
-            setEditingId={setEditingId}
-            editingID={editingId}
-            setIsCreatingFolder={setIsCreatingFolder}
-            setIsCreatingItem={setIsCreatingItem}
+            editingTarget={editingTarget}
+            setEditingTarget={setEditingTarget}
+          setCreationType = {setCreationType}
             copy={copy}
             setCopy={setCopy}
             pasteItem={pasteItem}
             page={page}
-            setToName = {setToName}
+            setPendingName = {setPendingName}
           />
         )}
 
-        {isCreatingItem && selectedItem?.type !== "FOLDER" && (
+        {creationType && selectedItem?.type !== "FOLDER" && (
           <NewItem
-            isCreatingItem={isCreatingItem}
-            setIsCreatingItem={setIsCreatingItem}
-            isCreatingFolder={isCreatingFolder}
+                                    creationType = {creationType}
+          setCreationType = {setCreationType}
             inputRef={inputRef}
             createItem={createItem}
             page={page}

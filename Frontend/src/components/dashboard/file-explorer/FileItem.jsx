@@ -7,21 +7,20 @@ export default function FileItem({
   selectItem,
   updateItemPinStatus,
   handleContextMenu,
-  setIsEditing,
-  isEditing,
+ editingTarget,
+ setEditingTarget,
   renameItem,
-  toName,
-  setToName,
-  editingId,
+  pendingName,
+  setPendingName,
   page,
 }) {
   const editingInputRef = useRef(null);
 
   useEffect(() => {
-    if (isEditing && editingId === file.id) {
+    if (editingTarget && editingTarget.id === file.id) {
       editingInputRef.current?.focus();
     }
-  }, [isEditing, editingId, file.id]);
+  }, [editingTarget, file.id]);
 
   return (
     <div
@@ -43,26 +42,23 @@ export default function FileItem({
             onClick={(e) => {
               e.stopPropagation();
 
-              updateItemPinStatus({
-                type: "FILE",
-                data: file,
-              });
+              updateItemPinStatus(file, "FILE")
             }}
           />
         )}
 
-        {isEditing && editingId === file.id ? (
+        {editingTarget && editingTarget.id === file.id ? (
           <form
             onSubmit={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              renameItem(file, "FILE", toName);
-              setIsEditing(false);
+              renameItem(file, "FILE", pendingName);
+              setEditingTarget(null);
             }}
           >
             <input
-              value={toName}
-              onChange={(e) => setToName(e.target.value)}
+              value={pendingName}
+              onChange={(e) => setPendingName(e.target.value)}
               ref={editingInputRef}
             />
           </form>

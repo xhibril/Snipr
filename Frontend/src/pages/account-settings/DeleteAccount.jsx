@@ -1,5 +1,4 @@
-import ApiFetch from "../../components/utils/Api";
-import { DEFAULT_FAILURE_MESSAGE } from "../../components/ui/SmallComponents";
+import apiFetch from "../../components/utils/Api";
 import {
   BrandHeader,
   PasswordField,
@@ -21,20 +20,24 @@ export default function DeleteAccount({ notify, setAuth }) {
         return;
     }
 
-
     try {
         setIsLoading(true);
 
-        const res = await ApiFetch("/account", 
+        const res = await apiFetch("/account", 
             {
                 method: "DELETE",
                 headers: {"Content-Type" : "application/json"},
                 body: JSON.stringify({password})
 
-        })
+        }, notify, nav)
 
 
-        if(!res?.ok){
+        if(!res){
+          return;
+        }
+
+
+        if(!res.ok){
             const data = await res.json();
             notify(data.message || "Could not delete account", "ERROR");
             return;
@@ -47,10 +50,8 @@ export default function DeleteAccount({ notify, setAuth }) {
        });
        nav("/", { replace: true });
 
-    } catch (err){
-        notify(DEFAULT_FAILURE_MESSAGE, "ERROR");
-
-    } finally{
+    }
+    finally{
         setIsLoading(false);
     }
 

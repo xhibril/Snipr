@@ -41,9 +41,6 @@ public class SnippetController {
 
     @PatchMapping("/snippets/{snippetId}")
     public ResponseEntity<ApiResponse> moveSnippet(
-
-
-
             @PathVariable Long snippetId,
             @RequestBody SnippetRequests.Move request,
             HttpServletRequest req

@@ -1,11 +1,9 @@
 import styles from "../../../pages/dashboard/Dashboard.module.css";
-
-import { RiFileAddLine, RiFolderAddLine } from "react-icons/ri";
 import { FiPlus, FiX } from "react-icons/fi";
 import { useState, useEffect, useRef } from "react";
-import ApiFetch from "../../utils/Api";
+import apiFetch from "../../utils/Api";
 import { ValidateInput } from "../../utils/Validation";
-import { DEFAULT_FAILURE_MESSAGE } from "../../ui/SmallComponents";
+import { useNavigate } from "react-router-dom";
 
 export default function FileEditor({
   setFiles,
@@ -16,6 +14,7 @@ export default function FileEditor({
   const [newTag, setNewTag] = useState("");
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const nav = useNavigate();
 
   const [draft, setDraft] = useState({
     title: file.title || "",
@@ -103,7 +102,7 @@ export default function FileEditor({
     try {
       setIsLoading(true);
 
-      const res = await ApiFetch("/snippets", {
+      const res = await apiFetch("/snippets", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -113,7 +112,7 @@ export default function FileEditor({
           tags: snippet.tags,
           folderId: snippet.folderId,
         }),
-      });
+      }, notify, nav);
 
       if (!res) {
         rollbackSave(previousSnippet, previousOriginal);
@@ -126,9 +125,6 @@ export default function FileEditor({
         rollbackSave(previousSnippet, previousOriginal);
         return;
       }
-    } catch (err) {
-      notify(DEFAULT_FAILURE_MESSAGE, "ERROR");
-      rollbackSave(previousSnippet, previousOriginal);
     } finally {
       setIsLoading(false);
     }
@@ -192,8 +188,6 @@ export default function FileEditor({
 
                         setDraft({
                           ...draft,
-                          title: draft.title,
-                          body: draft.body,
                           tags: [...(draft.tags ?? []), newTag],
                         });
 

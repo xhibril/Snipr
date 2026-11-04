@@ -5,7 +5,7 @@ import {
   PasswordField,
   UsernameField,
 } from "../../components/ui/SmallComponents.jsx";
-import ApiFetch from "../utils/Api.jsx";
+import apiFetch from "../utils/Api.jsx";
 import {
   ValidateEmail,
   ValidatePassword,
@@ -63,7 +63,7 @@ export default function Auth({ mode, notify, setAuth }) {
       return;
     }
 
-    setIsLoading(true);
+
 
     try {
       const credentials = {
@@ -73,7 +73,9 @@ export default function Auth({ mode, notify, setAuth }) {
         ...(!isLogin && { username }),
       };
 
-      const res = await ApiFetch(
+      setIsLoading(true);
+
+      const res = await apiFetch(
         path,
         {
           method: "POST",

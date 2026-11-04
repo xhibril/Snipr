@@ -34,7 +34,7 @@ function App() {
   const [id, setId] = useState(null);
 
   const [auth, setAuth] = useState({
-    authenticated: false,
+    authenticated: null,
     user: null,
   });
 
@@ -70,16 +70,12 @@ function App() {
           user: data.user ?? null,
         });
       } catch (err) {
-        console.log(err)
         setAuth({
           authenticated: false,
           user: null,
         });
       }
     }
-
-
-
   }, []);
 
   return (
@@ -91,7 +87,7 @@ function App() {
           <Route path="/" element={<Landing />}></Route>
 
           <Route element={<Default />}>
-            <Route element={<AuthGate auth={auth.authenticated} />}>
+            <Route element={<AuthGate isAuth={auth.authenticated} />}>
               <Route
                 path="/login"
                 element={<Login notify={notify} setAuth={setAuth} />}

@@ -3,9 +3,8 @@ import { FiPlus } from "react-icons/fi";
 import { useEffect, useRef } from "react";
 
 export default function NewItem({
-  isCreatingItem,
-  setIsCreatingItem,
-  isCreatingFolder,
+          creationType,
+          setCreationType,
   createItem,
   page,
   inputRef,
@@ -13,19 +12,19 @@ export default function NewItem({
   const formRef = useRef(null);
 
   useEffect(() => {
-    if (isCreatingItem) {
+    if (creationType) {
       inputRef.current?.focus();
     }
-  }, [isCreatingItem, isCreatingFolder]);
+  }, [creationType]);
 
   useEffect(() => {
-    if (!isCreatingItem) return;
+    if (!creationType) return;
 
     const closeField = (e) => {
       // let submission continue if click is inside the form
       if (formRef.current?.contains(e.target)) return;
 
-      setIsCreatingItem(false);
+      setCreationType(null);
     };
 
     document.addEventListener("mousedown", closeField);
@@ -33,9 +32,9 @@ export default function NewItem({
     return () => {
       document.removeEventListener("mousedown", closeField);
     };
-  }, [isCreatingItem, setIsCreatingItem]);
+  }, [creationType]);
 
-  if (!isCreatingItem || !page.itemActions.includes("create")) {
+  if (!creationType || !page.itemActions.includes("create")) {
     return null;
   }
 
@@ -53,14 +52,14 @@ export default function NewItem({
 
         inputRef.current.value = "";
         
-        setIsCreatingItem(false);
+        setCreationType(null);
       }}
       onClick={(e) => e.stopPropagation()}
     >
       <input
         className={styles.addFileField}
         ref={inputRef}
-        placeholder={isCreatingFolder ? "Folder name" : "File name"}
+        placeholder={creationType === "FOLDER" ? "Folder name" : "File name"}
       />
 
       <button type="submit">

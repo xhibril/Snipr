@@ -39,7 +39,6 @@ public class SnippetService {
     }
 
     public ResponseEntity<SnippetResponse> addSnippet(Long userId, SnippetRequests.Create request) {
-
         Optional<User> userOpt = userRepo.findById(userId);
 
         if (userOpt.isPresent()) {

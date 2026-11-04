@@ -2,7 +2,7 @@ import global from "../../css/Global.module.css"
 import { ValidateEmail, ValidateCode, ValidatePassword } from "../../components/utils/Validation"
 import { useState } from "react"
 import { EmailField, PasswordField, CodeField, BrandHeader } from "../../components/ui/SmallComponents"
-import ApiFetch from "../../components/utils/Api"
+import apiFetch from "../../components/utils/Api"
 import { useNavigate } from "react-router-dom"
 
 export default function PasswordReset({ notify }) {
@@ -11,7 +11,7 @@ export default function PasswordReset({ notify }) {
 
     const jsonHeaders = { "Content-Type": "application/json" };
 
-    const [STEP, setStep] = useState("EMAIL")
+    const [step, setStep] = useState("EMAIL")
     const [email, setEmail] = useState("")
     const [code, setCode] = useState("")
     const [newPassword, setNewPassword] = useState("")
@@ -23,7 +23,7 @@ export default function PasswordReset({ notify }) {
 
     async function resetPassword() {
 
-        if (STEP === "EMAIL") {
+        if (step === "EMAIL") {
 
             const validateEmail = ValidateEmail(email);
 
@@ -32,16 +32,19 @@ export default function PasswordReset({ notify }) {
                 return;
             }
 
-            setIsLoading(true);
+          
 
             try {
-                const emailRes = await ApiFetch("/password/reset/init", {
+                  setIsLoading(true);
+                const emailRes = await apiFetch("/password/reset/init", {
                     method: "POST",
                     headers: jsonHeaders,
                     body: JSON.stringify({ email })
                 }, notify, nav)
 
-                if (!emailRes) return;
+                if (!emailRes) {
+                    return;
+                }
 
                 const data = await emailRes.json();
 
@@ -54,8 +57,6 @@ export default function PasswordReset({ notify }) {
                 setStep("CODE");
                 return;
 
-            } catch (err) {
-                notify("Something went wrong, please try again", "ERROR");
             } finally {
                 setIsLoading(false);
             }
@@ -63,7 +64,7 @@ export default function PasswordReset({ notify }) {
 
 
 
-        if (STEP === "CODE") {
+        if (step === "CODE") {
             const validateCode = ValidateCode(code);
 
             if (validateCode !== "VALID") {
@@ -72,16 +73,17 @@ export default function PasswordReset({ notify }) {
             }
 
 
-            setIsLoading(true);
+       
 
             try {
-                const codeRes = await ApiFetch("/password/reset/verify", {
+                     setIsLoading(true);
+                const codeRes = await apiFetch("/password/reset/verify", {
                     method: "POST",
                     headers: jsonHeaders,
                     body: JSON.stringify({ email, code })
                 }, notify, nav);
 
-                if (!codeRes) return;
+                if (!codeRes) {return};
 
                 const data = await codeRes.json();
 
@@ -94,8 +96,6 @@ export default function PasswordReset({ notify }) {
                 setStep("RESET")
                 return;
 
-            } catch (err) {
-                notify("Something went wrong, please try again", "ERROR");
             } finally {
                 setIsLoading(false);
             }
@@ -103,7 +103,7 @@ export default function PasswordReset({ notify }) {
 
 
 
-        if (STEP === "RESET") {
+        if (step === "RESET") {
             const validatePassword = ValidatePassword(newPassword);
 
             if (validatePassword !== "VALID") {
@@ -116,10 +116,11 @@ export default function PasswordReset({ notify }) {
                 return;
             }
 
-            setIsLoading(false);
+      
 
             try {
-                const passwordRes = await ApiFetch("/password/reset/complete", {
+                 setIsLoading(true);
+                const passwordRes = await apiFetch("/password/reset/complete", {
                     method: "POST",
                     headers: jsonHeaders,
                     body: JSON.stringify({ email, newPassword, confirmPassword, resetToken })
@@ -141,28 +142,12 @@ export default function PasswordReset({ notify }) {
                 setStep("COMPLETED")
                 return;
 
-            } catch (err) {
-                notify("Something went wrong, please try again", "ERROR");
-                return;
             } finally {
                 setIsLoading(false);
             }
 
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     return (
 
@@ -178,17 +163,17 @@ export default function PasswordReset({ notify }) {
                 <BrandHeader title={"Reset Password"} />
 
 
-                {STEP === "EMAIL" && (
+                {step === "EMAIL" && (
                     <EmailField email={email} setEmail={setEmail} title={"Email"} />
                 )}
 
 
-                {STEP === "CODE" && (
+                {step === "CODE" && (
                     <CodeField code={code} setCode={setCode} title={"Code"} />
                 )}
 
 
-                {STEP === "RESET" && (
+                {step === "RESET" && (
                     <>
                         <PasswordField password={newPassword} setPassword={setNewPassword} title={"New Password"} />
                         <PasswordField password={confirmPassword} setPassword={setConfirmPassword} title={"Confirm Password"} />
@@ -198,7 +183,7 @@ export default function PasswordReset({ notify }) {
 
 
                 {
-                    STEP === "COMPLETED" ? (
+                    step === "COMPLETED" ? (
                         <button className={global.submit}
                             type="submit"
                             onClick={() => nav("/dashboard", {replace: true})}

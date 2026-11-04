@@ -1,5 +1,5 @@
 import { DEFAULT_FAILURE_MESSAGE } from "../../ui/SmallComponents.jsx";
-import ApiFetch from "../../utils/Api.jsx";
+import apiFetch from "../../utils/Api.jsx";
 import {ValidateFileName } from "../../utils/Validation.jsx";
 
 export default function useFileExplorerActions({
@@ -14,9 +14,9 @@ export default function useFileExplorerActions({
   selectedItem,
   setOpenFileId,
   openFile,
-  setToName,
-  setEditingId,
-  isCreatingFolder,
+  setPendingName,
+  setEditingTarget,
+  creationType
 }) {
   function getItemConfig(type) {
     const isFolder = type === "FOLDER";
@@ -57,7 +57,7 @@ export default function useFileExplorerActions({
       ),
     );
 
-    const res = await ApiFetch(path, { method: "PATCH" }, notify, nav);
+    const res = await apiFetch(path, { method: "PATCH" }, notify, nav);
 
     if (!res) {
       rollBack(isFolder, previous);
@@ -93,7 +93,7 @@ export default function useFileExplorerActions({
       setFiles((prev) => prev.filter((file) => file.id !== item.id));
     }
 
-    const res = await ApiFetch(path, { method: method }, notify, nav);
+    const res = await apiFetch(path, { method: method }, notify, nav);
 
     if (!res) {
       setFolders(previousFolders);
@@ -178,7 +178,7 @@ export default function useFileExplorerActions({
       ),
     );
 
-    const res = await ApiFetch(
+    const res = await apiFetch(
       path,
       {
         method: "PATCH",
@@ -205,16 +205,16 @@ export default function useFileExplorerActions({
     }
   }
 
-  async function renameItem(item, type, toName) {
+  async function renameItem(item, type, pendingName) {
     // same name
-    if (item?.name === toName) {
+    if (item?.name === pendingName) {
       return;
     }
 
     const { isFolder, basePath, collection, setCollection } =
       getItemConfig(type);
 
-    if (toName.length > 255) {
+    if (pendingName.length > 255) {
       notify(
         `${isCreatingFolder ? "Folder" : "File"} cannot be more than 255 characters`,
       );
@@ -236,7 +236,7 @@ export default function useFileExplorerActions({
       filesInSameSpace = [...folders];
     }
 
-    const finalName = ValidateFileName(toName, filesInSameSpace, type);
+    const finalName = ValidateFileName(pendingName, filesInSameSpace, type);
 
     if (!finalName) {
       notify(`This ${isFolder ? "folder" : "file"} already exists`, "ERROR");
@@ -264,7 +264,7 @@ export default function useFileExplorerActions({
         },
       }));
     }
-    const res = await ApiFetch(
+    const res = await apiFetch(
       path,
       {
         method: "PATCH",
@@ -281,7 +281,7 @@ export default function useFileExplorerActions({
       return;
     }
 
-    if (!res?.ok) {
+    if (!res.ok) {
       const data = await res.json();
       notify(
         data.message ||
@@ -292,8 +292,8 @@ export default function useFileExplorerActions({
       return;
     }
 
-    setToName(null);
-    setEditingId(null);
+    setPendingName(null);
+    setEditingTarget(null);
   }
 
   async function emptyRecycleBin() {
@@ -305,7 +305,7 @@ export default function useFileExplorerActions({
     setFolders([]);
     setFiles([]);
 
-    const res = await ApiFetch(
+    const res = await apiFetch(
       path,
       {
         method: "DELETE",
@@ -386,7 +386,7 @@ export default function useFileExplorerActions({
       setFiles((prev) => [...prev, optimisticFile]);
     }
 
-    const res = await ApiFetch(
+    const res = await apiFetch(
       path,
       {
         method: "POST",
@@ -435,14 +435,12 @@ export default function useFileExplorerActions({
   }
 
   async function createItem(itemName) {
-    const type = isCreatingFolder ? "FOLDER" : "FILE";
-
     const { isFolder, basePath, collection, setCollection } =
-      getItemConfig(type);
+      getItemConfig(creationType);
 
     if (itemName.length > 255) {
       notify(
-        `${isCreatingFolder ? "Folder" : "File"} cannot be more than 255 characters`,
+        `${isFolder ? "Folder" : "File"} cannot be more than 255 characters`,
       );
       return;
     }
@@ -461,7 +459,7 @@ export default function useFileExplorerActions({
       filesInSameSpace = [...folders];
     }
 
-    const finalName = ValidateFileName(itemName, filesInSameSpace, type);
+    const finalName = ValidateFileName(itemName, filesInSameSpace, creationType);
 
     if (!finalName) {
       notify(`This ${isFolder ? "folder" : "file"} already exists`);
@@ -476,7 +474,7 @@ export default function useFileExplorerActions({
 
     setCollection((prev) => [...prev, newItem]);
 
-    const res = await ApiFetch(
+    const res = await apiFetch(
       basePath,
       {
         method: "POST",

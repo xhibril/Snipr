@@ -19,16 +19,14 @@ export default function FolderItem({
   moveSnippet,
   handleContextMenu,
 
-  isEditing,
-  setIsEditing,
-  editingId,
+  editingTarget,
+  setEditingTarget,
   renameItem,
-  toName,
-  setToName,
+  pendingName,
+  setPendingName,
 
-  isCreatingItem,
-  setIsCreatingItem,
-  isCreatingFolder,
+  creationType,
+  setCreationType,
   inputRef,
   createItem,
 }) {
@@ -37,10 +35,10 @@ export default function FolderItem({
   const editingInputRef = useRef(null);
 
   useEffect(() => {
-    if (isEditing && editingId === folder.id) {
+    if (editingTarget && editingTarget.id === folder.id) {
       editingInputRef.current?.focus();
     }
-  }, [isEditing, editingId, folder.id]);
+  }, [editingTarget, folder.id]);
 
   return (
     <div
@@ -79,26 +77,23 @@ export default function FolderItem({
             onClick={(e) => {
               e.stopPropagation();
 
-              updateItemPinStatus({
-                type: "FOLDER",
-                data: folder,
-              });
+              updateItemPinStatus(folder, "FOLDER");
             }}
           />
         )}
 
-        {isEditing && editingId === folder.id ? (
+        {editingTarget && editingTarget.id === folder.id ? (
           <form
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              renameItem(folder, "FOLDER", toName);
-              setIsEditing(false);
+              renameItem(folder, "FOLDER", pendingName);
+              setEditingTarget(null);
             }}
           >
             <input
-              value={toName}
-              onChange={(e) => setToName(e.target.value)}
+              value={pendingName}
+              onChange={(e) => setPendingName(e.target.value)}
               ref={editingInputRef}
             />
           </form>
@@ -135,24 +130,23 @@ export default function FolderItem({
               updateItemPinStatus={updateItemPinStatus}
               handleContextMenu={handleContextMenu}
               page={page}
-              isEditing={isEditing}
-              setIsEditing={setIsEditing}
               renameItem={renameItem}
-              toName={toName}
-              setToName={setToName}
-              editingId={editingId}
+              pendingName={pendingName}
+              setPendingName={setPendingName}
+              editingTarget = {editingTarget}
+              setEditingTarget = {setEditingTarget}
+             
             />
           ))}
         </div>
       )}
 
-      {isCreatingItem &&
+      {creationType &&
         selectedItem?.type === "FOLDER" &&
         selectedItem?.data?.id === folder.id && (
           <NewItem
-            isCreatingItem={isCreatingItem}
-            setIsCreatingItem={setIsCreatingItem}
-            isCreatingFolder={isCreatingFolder}
+          creationType = {creationType}
+          setCreationType = {setCreationType}
             page={page}
             inputRef={inputRef}
             createItem={createItem}

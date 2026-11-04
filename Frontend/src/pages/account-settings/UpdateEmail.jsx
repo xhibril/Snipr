@@ -5,7 +5,7 @@ import {
   CodeField,
   PasswordField,
 } from "../../components/ui/SmallComponents";
-import ApiFetch from "../../components/utils/Api";
+import apiFetch from "../../components/utils/Api";
 import global from "../../css/Global.module.css";
 
 import { DEFAULT_FAILURE_MESSAGE } from "../../components/ui/SmallComponents";
@@ -36,7 +36,7 @@ export default function UpdateEmail({ notify, setAuth }) {
       try {
         setIsLoading(true);
 
-        const res = await ApiFetch(
+        const res = await apiFetch(
           "/account/email/request",
           {
             method: "POST",
@@ -47,17 +47,19 @@ export default function UpdateEmail({ notify, setAuth }) {
           nav,
         );
 
+        if(!res){
+          return;
+        }
+
         const data = await res.json();
 
-        if (!res?.ok) {
+        if (!res.ok) {
           notify(data.message || DEFAULT_FAILURE_MESSAGE, "ERROR");
           return;
         }
 
         notify(data.message || "Verification code sent", "SUCCESS");
         setStep("VERIFY");
-      } catch (err) {
-        notify(DEFAULT_FAILURE_MESSAGE, "ERROR");
       } finally {
         setIsLoading(false);
       }
@@ -67,7 +69,7 @@ export default function UpdateEmail({ notify, setAuth }) {
       try {
         setIsLoading(true);
 
-        const verifyRes = await ApiFetch(
+        const verifyRes = await apiFetch(
           "/account/email/verify",
           {
             method: "POST",
@@ -78,16 +80,19 @@ export default function UpdateEmail({ notify, setAuth }) {
           nav,
         );
 
+        if(!verifyRes){
+          return;
+        }
         const verifyData = await verifyRes.json();
 
-        if (!verifyRes?.ok) {
+        if (!verifyRes.ok) {
           notify(verifyData.message || DEFAULT_FAILURE_MESSAGE, "ERROR");
           return;
         }
 
         const resetToken = verifyData.resetToken;
 
-        const changeRes = await ApiFetch(
+        const changeRes = await apiFetch(
           "/account/email",
           {
             method: "PATCH",
@@ -98,9 +103,13 @@ export default function UpdateEmail({ notify, setAuth }) {
           nav,
         );
 
+        if(!changeRes){
+          return;
+        }
+
         const changeData = await changeRes.json();
 
-        if (!changeRes?.ok) {
+        if (!changeRes.ok) {
           notify(changeData.message || DEFAULT_FAILURE_MESSAGE, "ERROR");
           return;
         }
@@ -119,8 +128,6 @@ export default function UpdateEmail({ notify, setAuth }) {
         }))
 
         notify(changeData.message || "Email successfully changed", "SUCCESS");
-      } catch (err) {
-        notify(DEFAULT_FAILURE_MESSAGE, "ERROR");
       } finally {
         setIsLoading(false);
       }

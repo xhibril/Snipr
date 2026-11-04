@@ -1,5 +1,5 @@
 import global from "../../css/Global.module.css";
-import ApiFetch from "../../components/utils/Api";
+import apiFetch from "../../components/utils/Api";
 
 import { useState } from "react";
 import {
@@ -40,7 +40,7 @@ export default function UpdateUsername({ notify, auth, setAuth }) {
 
     if (
       trimmedName.toLocaleLowerCase() ===
-      setAuth?.user?.username.toLocaleLowerCase()
+      auth?.user?.username.toLocaleLowerCase()
     ) {
       notify("Username cannot be same as old", "ERROR");
       return;
@@ -48,7 +48,7 @@ export default function UpdateUsername({ notify, auth, setAuth }) {
 
     try {
       setIsLoading(true);
-      const res = await ApiFetch(
+      const res = await apiFetch(
         "/account/profile",
         {
           method: "PATCH",
@@ -59,9 +59,13 @@ export default function UpdateUsername({ notify, auth, setAuth }) {
         nav,
       );
 
+      if(!res){
+        return;
+      }
+
       const data = await res.json();
 
-      if (!res?.ok) {
+      if (!res.ok) {
         notify(
           data.message || "Something went wrong, please try again",
           "ERROR",
@@ -80,8 +84,6 @@ export default function UpdateUsername({ notify, auth, setAuth }) {
       setPassword("");
 
       notify("Username successfully changed", "SUCCESS");
-    } catch (err) {
-      notify("Something went wrong, please try again", "ERROR");
     } finally {
       setIsLoading(false);
     }

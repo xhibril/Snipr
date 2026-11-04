@@ -2,7 +2,7 @@ import styles from "../../../pages/dashboard/Dashboard.module.css";
 
 import logo from "../../../assets/images/logo.svg";
 import { useState } from "react";
-import ApiFetch from "../../utils/Api";
+import apiFetch from "../../utils/Api";
 
 import {
   FiFolder,
@@ -20,24 +20,25 @@ export default function Sidebar({ setActivePage, auth, notify, setAuth }) {
   const nav = useNavigate();
 
   async function logout() {
-    setIsLoading(true);
 
     try {
-      const res = await ApiFetch("/logout", { method: "POST" }, notify, nav);
+        setIsLoading(true);
+      const res = await apiFetch("/logout", { method: "POST" }, notify, nav);
 
       if (!res?.ok) {
         notify("Could not logout, please try again", "ERROR");
         return;
       }
-    } catch {
-      notify("Could not logout, please try again", "ERORR");
-    } finally {
-      setIsLoading(false);
-      setAuth({
+
+         setAuth({
         authenticated: false,
         user: null
       })
       nav("/", { replace: true }); // clear back n forward history
+
+    } finally {
+      setIsLoading(false);
+  
     }
   }
 

@@ -10,16 +10,16 @@ export default function ContextMenu({
   type,
   setSelectedItem,
   onOpen,
-  setIsEditing,
-  setEditingId,
+  editingTarget,
+  setEditingTarget,
   page,
   updatePinStatus,
-  setIsCreatingItem,
-  setIsCreatingFolder,
+  
+          setCreationType,
   pasteItem,
   copy,
   setCopy,
-  setToName
+  setPendingName
 }) {
   return (
     <div
@@ -37,15 +37,12 @@ export default function ContextMenu({
       {type !== "FILE" && (
         <>
           <button
-            onClick={(e) => {
+            onClick={() => {
               setSelectedItem({
                 data: file,
                 type: type,
               });
-              setIsCreatingFolder(false);
-              setIsCreatingItem((prev) =>
-                prev?.type === "FILE" ? false : { type: "FILE" },
-              );
+             setCreationType((prev) => prev === "FILE" ? null : "FILE");
               setContextMenu(null);
             }}
           >
@@ -53,17 +50,14 @@ export default function ContextMenu({
           </button>
 
           <button
-            onClick={(e) => {
-              setIsCreatingFolder(true);
+            onClick={() => {
 
               setSelectedItem({
                 data: file,
                 type: type,
               });
 
-              setIsCreatingItem((prev) =>
-                prev?.type === "FOLDER" ? false : { type: "FOLDER" },
-              );
+                setCreationType((prev) => prev === "FOLDER" ? null : "FOLDER");
               setContextMenu(null);
             }}
           >
@@ -90,9 +84,18 @@ export default function ContextMenu({
           {page.itemActions.includes("rename") && (
             <button
               onClick={() => {
-                setIsEditing(true);
-                setEditingId(file.id);
-                setToName(file.name)
+                setEditingTarget({
+  id: file.id,
+  type: "FILE",
+});
+
+
+                setPendingName(file.name)
+
+
+
+
+
                 setContextMenu(null);
               }}
             >
@@ -131,7 +134,7 @@ export default function ContextMenu({
         </>
       )}
 
-      {/*allow it to appear in panel n folder, not file */}
+      {/*allow copy to appear in panel n folder, not file */}
       {page.itemActions.includes("paste") &&
         (type === "FOLDER" || type === "PANEL") && <button onClick={() =>{
 

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import styles from "./Dashboard.module.css";
 
-import ApiFetch from "../../components/utils/Api.jsx";
+import apiFetch from "../../components/utils/Api.jsx";
 import FileExplorer from "../../components/dashboard/file-explorer/FileExplorer.jsx";
 import FileEditor from "../../components/dashboard/file-editor/FileEditor.jsx";
 import Sidebar from "../../components/dashboard/sidebar/Sidebar.jsx";
@@ -14,8 +14,7 @@ export default function Dashboard({ notify, auth, setAuth }) {
   const [files, setFiles] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [openFileId, setOpenFileId] = useState(false);
-  const [isCreatingItem, setIsCreatingItem] = useState(false);
-  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [creationType, setCreationType] = useState(null);
   const nav = useNavigate();
   const openFile = files.find((file) => file.id === openFileId);
 
@@ -38,9 +37,9 @@ export default function Dashboard({ notify, auth, setAuth }) {
   }, [activePage]);
 
   async function fetchFolders() {
-    const res = await ApiFetch(endpointFolders, { method: "GET" }, notify, nav);
+    const res = await apiFetch(endpointFolders, { method: "GET" }, notify, nav);
 
-    if (!res) return;
+    if (!res) {return};
 
     if (!res.ok) {
       notify("Could not fetch folders, please try again", "ERROR");
@@ -52,9 +51,9 @@ export default function Dashboard({ notify, auth, setAuth }) {
   }
 
   async function fetchFiles() {
-    const res = await ApiFetch(endpointSnippet, { method: "GET" }, notify, nav);
+    const res = await apiFetch(endpointSnippet, { method: "GET" }, notify, nav);
 
-    if (!res) return;
+    if (!res) {return};
 
     if (!res.ok) {
       notify("Could not fetch snippets, please try again", "ERROR");
@@ -83,17 +82,14 @@ export default function Dashboard({ notify, auth, setAuth }) {
           openFileId = {openFileId}
           setOpenFileId = {setOpenFileId}
           activePage={activePage}
-          isCreatingFolder={isCreatingFolder}
-          setIsCreatingFolder={setIsCreatingFolder}
-          isCreatingItem={isCreatingItem}
-          setIsCreatingItem={setIsCreatingItem}
+          creationType = {creationType}
+          setCreationType = {setCreationType}
         />
 
 
         {openFile ? 
-        <FileEditor notify={notify} file = {openFile} setFiles={setFiles}/>  :
-        <DefaultMenu setIsCreatingFolder={setIsCreatingFolder} 
-        setIsCreatingItem={setIsCreatingItem}/>}
+        <FileEditor notify={notify} file = {openFile} setFiles={setFiles} key = {openFile?.id}/>  :
+        <DefaultMenu setCreationType = {setCreationType}/>}
       </div>
     </div>
   );

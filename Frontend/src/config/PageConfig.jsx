@@ -1,5 +1,5 @@
 export const PAGE_CONFIG = {
-  REGULAR: {
+  ALL: {
     showFolders: true,
     showSearch: true,
     showExplorerToolBar: true,
@@ -15,7 +15,7 @@ export const PAGE_CONFIG = {
     deleteMode: null,
   },
 
-  STARRED: {
+  PINNED: {
     showFolders: true,
     showSearch: true,
     showExplorerToolBar: true,

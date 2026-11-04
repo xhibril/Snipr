@@ -1,7 +1,7 @@
 import styles from "../file-editor/FileEditor.module.css";
 import { RiFileAddLine, RiFolderAddLine } from "react-icons/ri";
 
-export default function DefaultMenu({setIsCreatingItem, setIsCreatingFolder}) {
+export default function DefaultMenu({setCreationType}) {
   return (
     <div className={styles.defaultMenu}>
       <h1>SNIPR.</h1>
@@ -10,10 +10,7 @@ export default function DefaultMenu({setIsCreatingItem, setIsCreatingFolder}) {
       <div
         className={styles.newFile}
         onClick={() => {
-          setIsCreatingItem((prev) =>
-            prev?.type === "FILE" ? false : { type: "FILE" },
-          );
-          setIsCreatingFolder(false);
+             setCreationType((prev) => prev === "FILE" ? null : "FILE");
         }}
       >
         <RiFileAddLine /> <a>New File</a>
@@ -22,10 +19,7 @@ export default function DefaultMenu({setIsCreatingItem, setIsCreatingFolder}) {
       <div
         className={styles.newFolder}
         onClick={() => {
-          setIsCreatingItem((prev) =>
-            prev?.type === "FOLDER" ? false : { type: "FOLDER" },
-          );
-          setIsCreatingFolder(true);
+            setCreationType((prev) => prev === "FOLDER" ? null : "FOLDER");
         }}
       >
         <RiFolderAddLine />

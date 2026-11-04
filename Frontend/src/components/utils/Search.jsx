@@ -14,11 +14,7 @@ export default function SearchFiles(files, query, tags) {
     );
   });
 
-
-  console.log(query);
-  console.log(filteredFiles)
-
-  return !query ? filteredFiles : finalizedFiles(files, query);
+  return !query ? filteredFiles : finalizedFiles(filteredFiles, query);
 }
 
 

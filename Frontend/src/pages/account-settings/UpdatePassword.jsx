@@ -1,7 +1,7 @@
 import { useState } from "react";
 import global from "../../css/Global.module.css";
 import { ValidatePassword } from "../../components/utils/Validation";
-import ApiFetch from "../../components/utils/Api";
+import apiFetch from "../../components/utils/Api";
 import {
   BrandHeader,
   PasswordField,
@@ -49,7 +49,7 @@ export default function UpdatePassword({ notify }) {
     try {
       setIsLoading(true);
 
-      const res = await ApiFetch(
+      const res = await apiFetch(
         "/account/password",
         {
           method: "PATCH",
@@ -60,8 +60,12 @@ export default function UpdatePassword({ notify }) {
         nav,
       );
 
+      if(!res){
+        return;
+      }
+
       const data = await res.json();
-      if (!res?.ok) {
+      if (!res.ok) {
         notify(
           data.message || "Something went wrong, please try again",
           "ERROR",
@@ -73,8 +77,6 @@ export default function UpdatePassword({ notify }) {
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (err) {
-      notify("Something went wrong, please try again", "ERROR");
     } finally {
       setIsLoading(false);
     }
