@@ -72,10 +72,6 @@ export default function FileExplorer({
 
     return SearchFiles(filesToSearch, searchQuery, filterTags);
 
-
-
-
-
   }, [files ,sortedFiles, isSearching, searchQuery, filterTags])
 
   const {

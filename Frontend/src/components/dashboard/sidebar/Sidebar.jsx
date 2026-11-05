@@ -4,6 +4,8 @@ import logo from "../../../assets/images/logo.svg";
 import { useState } from "react";
 import apiFetch from "../../utils/Api";
 
+import ThemeToggle from "../../ui/ThemeToggle";
+
 import {
   FiFolder,
   FiShare2,
@@ -95,6 +97,7 @@ export default function Sidebar({ setActivePage, auth, notify, setAuth }) {
 
         <div className={styles.accountRow}>
           <div className={styles.accountDetails}>
+            <ThemeToggle/>
             <p className={styles.accountName}>{auth?.user?.username}</p>
             <p className={styles.accountEmail}>{auth?.user?.email}</p>
 

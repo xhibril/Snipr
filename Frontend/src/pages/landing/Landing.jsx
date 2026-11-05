@@ -9,6 +9,7 @@ import pin from "../../assets/images/pin.svg"
 import { FiArrowDown, FiArrowUp } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
+import ThemeToggle from "../../components/ui/ThemeToggle"
 
 export default function Landing() {
 
@@ -29,6 +30,7 @@ export default function Landing() {
            <Link to="/">Home</Link>
           <a href="#features">Features</a>
            <Link to="/support">Support</Link>
+           <ThemeToggle/>
 
         </nav>
 
