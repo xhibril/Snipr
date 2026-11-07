@@ -1,180 +1,306 @@
-import styles from "./Landing.module.css"
-import logo from "../../assets/images/logo.png"
-import folder from "../../assets/images/folderIcon.svg"
-import cloud from "../../assets/images/cloudIcon.svg"
-import search from "../../assets/images/searchIcon.svg"
-import copy from "../../assets/images/copyIcon.svg"
-import pin from "../../assets/images/pin.svg"
+import styles from "./Landing.module.css";
+import { Folder, File } from "lucide-react";
+import { SiPython, SiJavascript } from "react-icons/si";
+import { FaJava } from "react-icons/fa";
 
-import { FiArrowDown, FiArrowUp } from "react-icons/fi";
-import { Link, useNavigate } from "react-router-dom"
-import { useState } from "react"
-import ThemeToggle from "../../components/ui/ThemeToggle"
+
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import ThemeToggle from "../../components/ui/ThemeToggle";
+import { FaJ } from "react-icons/fa6";
 
 export default function Landing() {
-
   const nav = useNavigate();
 
+  const effectSnippet = `const [value, setValue] = useState(0);
+                         useEffect(() => {
+                         console.log(value);
+                         }, [value]);`;
 
-  return <>
+  const mergerSnippet = `defaults = {"theme": "dark", "lang": "en"}
+                         user = {"lang": "fr"}
+                         merged = {**defaults, **user}`;
 
-    <div className={styles.mainContainer}>
-      <div className={styles.topRow}>
+  const apiSnippet = `export async function getSnippets() {
+                      const response = await fetch("/api/snippets");
 
-        <div className={styles.brand}>
-          <img src={logo} className={styles.brandLogo} />
-          <h1 className={styles.brandTitle}> SNIPR</h1>
-        </div>
+                      if (!response.ok) {
+                        throw new Error("Could not load snippets");
+                      }
 
-        <nav className={styles.navBar}>
-           <Link to="/">Home</Link>
-          <a href="#features">Features</a>
-           <Link to="/support">Support</Link>
-           <ThemeToggle/>
-
-        </nav>
-
-
-        <div className={styles.authRow}>
-          <button className={styles.signupBtn}
-          onClick={() => nav("/signup")}>Sign up</button>
-          <button className={styles.loginBtn}
-          onClick={() => nav("/login")}>Login</button>
-        </div>
-
-      </div>
+                      return response.json();
+                    }`;
 
 
-      <div className={styles.heroSection}>
-        <h1 className={styles.heroText}>
-          Manage your code snippets with ease
-        </h1>
+  const javaSnippet = `public class App {
+  public static void main(String[] args) {
+    System.out.println("Hello, Snipr!");
+  }
+}`
 
-        <p className={styles.miniDesc}>Stay organized, save snippets quickly, and access them anytime you need.</p>
+  const [code, setCode] = useState(effectSnippet);
+  const [title, setTitle] = useState("useEffect.js");
 
-        <button className={styles.heroSectionBtn}
-        onClick={() => nav("/dashboard")}>Try now</button>
-      </div>
-
-
-
-      <div className={styles.features} id="features">
-        <h1 className={styles.featuresText}>FEATURES</h1>
-
-        <div className={styles.topRowFeatures}>
-
-          <div className={styles.feature}>
-            <img src={folder} className={styles.featureIcon} />
-            <h2>Stay organized</h2>
-            <p>Save, group, and access your code in a way that actually makes sense when you come back later.</p>
-
-          </div>
-
-          <div className={styles.feature}>
-            <img src={cloud} className={styles.featureIcon} />
-            <h2>Access anywhere</h2>
-            <p>Your snippets are securely stored and available wherever you log in.</p>
-          </div>
-
-        </div>
-
-
-        <div className={styles.bottomRowFeatures}>
-
-          <div className={styles.feature}>
-            <img src={search} className={styles.featureIcon} />
-            <h2>Access anywhere</h2>
-            <p>Instantly find any snippet with keywords, tags, or filters.</p>
-
-
-          </div>
-
-          <div className={styles.feature}>
-            <img src={copy} className={styles.featureIcon} />
-            <h2>Copy in one click</h2>
-            <p>Copy any snippet instantly without wasting time.</p>
-
-          </div>
-
-
-          <div className={styles.feature}>
-            <img src={pin} className={styles.featureIcon} />
-            <h2>Favorites</h2>
-            <p>Keep your most-used snippets at the top for quick access.</p>
-          </div>
-
-        </div>
-      </div>
-
-      <FAQ />
-
-      <div className={styles.footerContainer}>
-
-        <footer> © 2026 Xhibril </footer>
-        <a href="https://github.com/xhibril" target="_blank">GitHub</a>
-        <a href="https://www.linkedin.com/in/xhibril-lleshi/" target="_blank">LinkedIn </a>
-        <a href="mailto:xhibril.dev@gmail.com" target="_blank">Email</a>
-      </div>
-    </div>
-  </>
-}
-
-
-function FAQ() {
-
-  const [activeIndex, setActiveIndex] = useState(null);
-
-  const faqs = [
-    {
-      question: "Do I need an account?",
-      answer: "Yes. It lets you save and access your snippets from anywhere."
+  const sections = {
+    organize: {
+      label: "Organize",
+      features: [
+        {
+          title: "Folders & nesting",
+          desc: "Folders inside folders, like your file tree.",
+        },
+        { title: "Tags", desc: "Label snippets and filter by them." },
+        { title: "Favorites", desc: "Star the ones you use all the time." },
+        {
+          title: "Pin to top",
+          desc: "Keep a few snippets above the rest of a folder.",
+        },
+        { title: "Drag & drop", desc: "Move snippets between folders." },
+      ],
     },
 
-    {
-      question: "Is it free?",
-      answer: "Yes, core features are free to use."
+    search: {
+      label: "Search",
+      features: [
+        {
+          title: "Instant search",
+          desc: "Find by title, code or tag as you type.",
+        },
+        {
+          title: "Filter by language",
+          desc: "Show only Python, only React, and so on.",
+        },
+        {
+          title: "Recent snippets",
+          desc: "The last ones you opened or copied.",
+        },
+      ],
     },
 
-    {
-      question: "Can I access my snippets on multiple devices?",
-      answer: "Yes, just log in and everything is there."
+    storage: {
+      label: "Storage & account",
+      features: [
+        {
+          title: "Saved to your account",
+          desc: "Snippets are stored on the server, not in your browser, so clearing your cache won't delete them.",
+        },
+        {
+          title: "Login from anywhere",
+          desc: "Log in on any device and your whole library is there.",
+        },
+        {
+          title: "Email verification",
+          desc: "Confirm your address when you sign up.",
+        },
+        {
+          title: "Password reset",
+          desc: "Get back in with a code sent to your email.",
+        },
+        {
+          title: "Export your data",
+          desc: "Download everything as JSON whenever you want.",
+        },
+      ],
     },
+  };
 
-    {
-      question: "Is my code private?",
-      answer: "Yes, your snippets are only visible to you."
-    }
-  ]
+  const [activeKey, setActiveKey] = useState("organize");
+  const active = sections[activeKey];
 
+  return (
+    <>
+      <header className={styles.siteHeader}>
+        <div className={styles.headerContainer}>
+          <div className={styles.headerTop}>
+            <h1>HIGZO</h1>
 
-  return <>
-    <div className={styles.faqs}>
-      <h1 className={styles.faqsText}>FAQS</h1>
-      <div className={styles.faqWrapper}>
-        {faqs.map((faqs, index) =>
+            <div className={styles.headerNav}>
+              <nav className={styles.nav}>
+                <a href="#about">About</a>
+                <a href="#features">Features</a>
+                <a href="#support">Support</a>
+              </nav>
+            </div>
 
-          <div className={styles.question}>
-
-            <h2 onClick={() => setActiveIndex(activeIndex === index ? null : index)}> {faqs.question}
-              {activeIndex === index ? (
-                <FiArrowUp className={styles.arrowUp} />
-              ) :
-                <FiArrowDown className={styles.arrowDown}
-                />}
-            </h2>
-
-
-            {activeIndex === index && (
-              <p className={`${styles.answer} ${styles.show}`}>{faqs.answer}</p>
-            )
-            }
-
+            <div className={styles.headerActions}>
+              <a class={`${styles.button} ${styles.primary}`}>Signup</a>
+              <a class={`${styles.button} ${styles.secondary}`}>Login</a>
+            </div>
           </div>
-        )}
+        </div>
+      </header>
 
-      </div>
-    </div>
+      <main>
+        <section className={styles.hero}>
+          <div className={styles.heroContainer}>
+            <div className={styles.heroContent}>
+              <h1>Stop digging through old projects for that one snippet.</h1>
+              <p>
+                Save your snippets, group them in folders, copy them when you
+                need them.
+              </p>
 
-  </>
+              <div className={styles.heroActions}>
+                <a class={`${styles.button} ${styles.primary}`}>Get started</a>
+                <a class={`${styles.button} ${styles.secondary}`}>
+                  Explore features
+                </a>
+              </div>
+            </div>
 
+            <div className={styles.preview}>
+              <aside className={styles.previewFiles}>
+                <ul className={styles.fileList}>
+                  <li className={styles.fileItem}>
+                    <Folder className={styles.folderIcon} />
+                    <span>Javascript</span>
+                  </li>
+
+                  <li className={styles.fileItem}>
+                    <Folder className={styles.folderIcon} />
+                    <span>React</span>
+                  </li>
+
+                  <li
+                    className={styles.fileItem}
+                    onClick={() => {
+                      setTitle("useEffect.js");
+                      setCode(effectSnippet);
+                    }}
+                  >
+                    <SiJavascript className={styles.fileIcon} />
+                    <span>useEffect.js</span>
+                  </li>
+
+                  <li
+                    className={styles.fileItem}
+                    onClick={() => {
+                      setTitle("Merger.py");
+                      setCode(mergerSnippet);
+                    }}
+                  >
+                    <SiPython className={styles.fileIcon} />
+                    <span>Merger.py</span>
+                  </li>
+
+
+                  <li
+                    className={styles.fileItem}
+                    onClick={() => {
+                      setTitle("api.js");
+                      setCode(apiSnippet);
+                    }}
+                  >
+                    <SiJavascript className={styles.fileIcon} />
+                    <span>api.js</span>
+                  </li>
+
+                     <li
+                    className={styles.fileItem}
+                    onClick={() => {
+                      setTitle("App.java");
+                      setCode(javaSnippet);
+                    }}
+                  >
+                    <FaJava className={styles.fileIcon} />
+                    <span>App.java</span>
+                  </li>
+                </ul>
+              </aside>
+              <div className={styles.previewCode}>
+                <h4 className={styles.previewCodeTitle}>{title}</h4>
+
+                <p
+                  style={{ whiteSpace: "pre-wrap" }}
+                  className={styles.previewCodeBody}
+                >
+                  {code}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.about}>
+          <div className={styles.aboutContainer}>
+            <h2 className={styles.sectionTitle}>ABOUT</h2>
+
+            <div className={styles.grid}>
+              <article>
+                <h2>Why Higzo?</h2>
+                <p>
+                  {`
+                  Higzo was made to make life a little easier for developers.
+                  Save snippets, find them when you need them, and reuse them
+                  without having to dig through old projects or files.`}
+                </p>
+              </article>
+
+              <article>
+                <h2>The idea</h2>
+                <p>
+                  {`
+                  Keep the interface simple, avoid unnecessary clutter, and
+                  focus on getting things done. And you don't have to be a
+                  developer to use it. Higzo works just as well for keeping
+                  notes and other useful information.`}
+                </p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.features}>
+          <div className={styles.featuresContainer}>
+            <h2 className={styles.sectionTitle}> FEATURES</h2>
+
+            <div className={styles.featuresLayout}>
+              <aside className={styles.featuresSideBar}>
+                <ul className={styles.featuresList}>
+                  {Object.entries(sections).map(([key, section]) => (
+                    <li
+                      key={key}
+                      onClick={() => setActiveKey(key)}
+                      className={styles.featuresItem}
+                    >
+                      <span>{section.label}</span>
+                      <span>{section.features.length}</span>
+                    </li>
+                  ))}
+                </ul>
+              </aside>
+
+              <div className={styles.featureDetails}>
+                <h3>{active.label}</h3>
+                {active.features.map((f) => (
+                  <div key={f.title} className={styles.featureDetailItem}>
+                    <h4>{f.title}</h4>
+                    <p>{f.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className={styles.footer}>
+        <div className={styles.footerContainer}>
+          <div className={styles.footerTop}>
+            <h2>HIGZO</h2>
+
+            <div className={styles.footerLinks}>
+              <a>Github</a>
+              <a>Email</a>
+            </div>
+          </div>
+
+          <div className={styles.footerBottom}>
+            <p>© 2026 Higzo. All rights reserved.</p>
+            <p>Personal project</p>
+          </div>
+        </div>
+      </footer>
+    </>
+  );
 }

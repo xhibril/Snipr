@@ -1,7 +1,4 @@
 @import "./css/tokens.css";
-
-
-
 html,
 body,
 #root {
@@ -15,4 +12,9 @@ body {
   background: var(--page);
   color: var(--text);
   font-size: clamp(16px, 1.1vw, 18px);
+}
+
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
