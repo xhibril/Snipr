@@ -1,115 +1,126 @@
 import styles from "./Landing.module.css";
-import { Folder, File } from "lucide-react";
+import { Folder } from "lucide-react";
 import { SiPython, SiJavascript } from "react-icons/si";
 import { FaJava } from "react-icons/fa";
-
-
-import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import ThemeToggle from "../../components/ui/ThemeToggle";
-import { FaJ } from "react-icons/fa6";
+
+const effectSnippet = `const [value, setValue] = useState(0);
+const [isSaving, setIsSaving] = useState(false);
+
+useEffect(() => {
+  const timer = setTimeout(() => {
+    console.log(value);
+    setIsSaving(false);
+  }, 500);
+  return () => clearTimeout(timer);
+}, [value]);`
+
+const mergerSnippet = `defaults = {"theme": "dark", "lang": "en"}
+user = {"lang": "fr", "font_size": 16}
+
+merged = defaults.copy()
+merged.update(user)
+merged["updated_at"] = "today"
+
+print(f"Theme: {merged['theme']}")
+print(f"Language: {merged['lang']}")
+print(merged)`;
+
+const apiSnippet = `export async function getSnippets() {
+  const response = await fetch("/api/snippets");
+
+  if (!response.ok) {
+    throw new Error("Could not load snippets");
+  }
+
+  const snippets = await response.json();
+  return snippets;
+}`;
+
+const javaSnippet = `public class App {
+  public static void main(String[] args) {
+    String name = "Snipr";
+    int snippetCount = 4;
+    
+    String message = "Welcome to " + name;
+    System.out.println(message);
+    System.out.println("Saved snippets: " + snippetCount);
+    System.out.println("Your library is ready");
+  }
+}`;
+
+const sections = {
+  organize: {
+    label: "Organize",
+    features: [
+      {
+        title: "Folders & nesting",
+        desc: "Folders inside folders, like your file tree.",
+      },
+      { title: "Tags", desc: "Label snippets and filter by them." },
+      { title: "Favorites", desc: "Star the ones you use all the time." },
+      {
+        title: "Pin to top",
+        desc: "Keep a few snippets above the rest of a folder.",
+      },
+      { title: "Drag & drop", desc: "Move snippets between folders." },
+    ],
+  },
+
+  search: {
+    label: "Search",
+    features: [
+      {
+        title: "Instant search",
+        desc: "Find by title, code or tag as you type.",
+      },
+      {
+        title: "Filter by language",
+        desc: "Show only Python, only React, and so on.",
+      },
+      {
+        title: "Recent snippets",
+        desc: "The last ones you opened or copied.",
+      },
+    ],
+  },
+
+  storage: {
+    label: "Storage & account",
+    features: [
+      {
+        title: "Saved to your account",
+        desc: "Snippets are stored on the server, not in your browser, so clearing your cache won't delete them.",
+      },
+      {
+        title: "Login from anywhere",
+        desc: "Log in on any device and your whole library is there.",
+      },
+      {
+        title: "Email verification",
+        desc: "Confirm your address when you sign up.",
+      },
+      {
+        title: "Password reset",
+        desc: "Get back in with a code sent to your email.",
+      },
+      {
+        title: "Export your data",
+        desc: "Download everything as JSON whenever you want.",
+      },
+    ],
+  },
+};
 
 export default function Landing() {
-  const nav = useNavigate();
-
-  const effectSnippet = `const [value, setValue] = useState(0);
-                         useEffect(() => {
-                         console.log(value);
-                         }, [value]);`;
-
-  const mergerSnippet = `defaults = {"theme": "dark", "lang": "en"}
-                         user = {"lang": "fr"}
-                         merged = {**defaults, **user}`;
-
-  const apiSnippet = `export async function getSnippets() {
-                      const response = await fetch("/api/snippets");
-
-                      if (!response.ok) {
-                        throw new Error("Could not load snippets");
-                      }
-
-                      return response.json();
-                    }`;
-
-
-  const javaSnippet = `public class App {
-  public static void main(String[] args) {
-    System.out.println("Hello, Snipr!");
-  }
-}`
-
   const [code, setCode] = useState(effectSnippet);
   const [title, setTitle] = useState("useEffect.js");
-
-  const sections = {
-    organize: {
-      label: "Organize",
-      features: [
-        {
-          title: "Folders & nesting",
-          desc: "Folders inside folders, like your file tree.",
-        },
-        { title: "Tags", desc: "Label snippets and filter by them." },
-        { title: "Favorites", desc: "Star the ones you use all the time." },
-        {
-          title: "Pin to top",
-          desc: "Keep a few snippets above the rest of a folder.",
-        },
-        { title: "Drag & drop", desc: "Move snippets between folders." },
-      ],
-    },
-
-    search: {
-      label: "Search",
-      features: [
-        {
-          title: "Instant search",
-          desc: "Find by title, code or tag as you type.",
-        },
-        {
-          title: "Filter by language",
-          desc: "Show only Python, only React, and so on.",
-        },
-        {
-          title: "Recent snippets",
-          desc: "The last ones you opened or copied.",
-        },
-      ],
-    },
-
-    storage: {
-      label: "Storage & account",
-      features: [
-        {
-          title: "Saved to your account",
-          desc: "Snippets are stored on the server, not in your browser, so clearing your cache won't delete them.",
-        },
-        {
-          title: "Login from anywhere",
-          desc: "Log in on any device and your whole library is there.",
-        },
-        {
-          title: "Email verification",
-          desc: "Confirm your address when you sign up.",
-        },
-        {
-          title: "Password reset",
-          desc: "Get back in with a code sent to your email.",
-        },
-        {
-          title: "Export your data",
-          desc: "Download everything as JSON whenever you want.",
-        },
-      ],
-    },
-  };
-
   const [activeKey, setActiveKey] = useState("organize");
   const active = sections[activeKey];
 
   return (
     <>
-      <header className={styles.siteHeader}>
+      <header>
         <div className={styles.headerContainer}>
           <div className={styles.headerTop}>
             <h1>HIGZO</h1>
@@ -123,15 +134,15 @@ export default function Landing() {
             </div>
 
             <div className={styles.headerActions}>
-              <a class={`${styles.button} ${styles.primary}`}>Signup</a>
-              <a class={`${styles.button} ${styles.secondary}`}>Login</a>
+              <a className={`${styles.button} ${styles.primary}`}>Signup</a>
+              <a className={`${styles.button} ${styles.secondary}`}>Login</a>
             </div>
           </div>
         </div>
       </header>
 
       <main>
-        <section className={styles.hero}>
+        <section>
           <div className={styles.heroContainer}>
             <div className={styles.heroContent}>
               <h1>Stop digging through old projects for that one snippet.</h1>
@@ -141,8 +152,10 @@ export default function Landing() {
               </p>
 
               <div className={styles.heroActions}>
-                <a class={`${styles.button} ${styles.primary}`}>Get started</a>
-                <a class={`${styles.button} ${styles.secondary}`}>
+                <a className={`${styles.button} ${styles.primary}`}>
+                  Get started
+                </a>
+                <a className={`${styles.button} ${styles.secondary}`}>
                   Explore features
                 </a>
               </div>
@@ -183,7 +196,6 @@ export default function Landing() {
                     <span>Merger.py</span>
                   </li>
 
-
                   <li
                     className={styles.fileItem}
                     onClick={() => {
@@ -195,7 +207,7 @@ export default function Landing() {
                     <span>api.js</span>
                   </li>
 
-                     <li
+                  <li
                     className={styles.fileItem}
                     onClick={() => {
                       setTitle("App.java");
@@ -207,30 +219,24 @@ export default function Landing() {
                   </li>
                 </ul>
               </aside>
+
               <div className={styles.previewCode}>
                 <h4 className={styles.previewCodeTitle}>{title}</h4>
-
-                <p
-                  style={{ whiteSpace: "pre-wrap" }}
-                  className={styles.previewCodeBody}
-                >
-                  {code}
-                </p>
+                <p className={styles.previewCodeBody}>{code}</p>
               </div>
             </div>
           </div>
         </section>
 
-        <section className={styles.about}>
+        <section>
           <div className={styles.aboutContainer}>
             <h2 className={styles.sectionTitle}>ABOUT</h2>
 
-            <div className={styles.grid}>
+            <div className={styles.aboutGrid}>
               <article>
                 <h2>Why Higzo?</h2>
                 <p>
-                  {`
-                  Higzo was made to make life a little easier for developers.
+                  {`Higzo was made to make life a little easier for developers.
                   Save snippets, find them when you need them, and reuse them
                   without having to dig through old projects or files.`}
                 </p>
@@ -239,8 +245,7 @@ export default function Landing() {
               <article>
                 <h2>The idea</h2>
                 <p>
-                  {`
-                  Keep the interface simple, avoid unnecessary clutter, and
+                  {`Keep the interface simple, avoid unnecessary clutter, and
                   focus on getting things done. And you don't have to be a
                   developer to use it. Higzo works just as well for keeping
                   notes and other useful information.`}
@@ -250,9 +255,9 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className={styles.features}>
+        <section>
           <div className={styles.featuresContainer}>
-            <h2 className={styles.sectionTitle}> FEATURES</h2>
+            <h2 className={styles.sectionTitle}>FEATURES</h2>
 
             <div className={styles.featuresLayout}>
               <aside className={styles.featuresSideBar}>
@@ -270,10 +275,10 @@ export default function Landing() {
                 </ul>
               </aside>
 
-              <div className={styles.featureDetails}>
+              <div className={styles.featuresDetails}>
                 <h3>{active.label}</h3>
                 {active.features.map((f) => (
-                  <div key={f.title} className={styles.featureDetailItem}>
+                  <div key={f.title} className={styles.featuresDetailItem}>
                     <h4>{f.title}</h4>
                     <p>{f.desc}</p>
                   </div>
