@@ -1,14 +1,32 @@
+section {
+scroll-margin-top: 5rem;
+}
+
 
 .headerContainer {
   padding: 0 2rem;
-  margin:0 auto;
+  margin:0 auto 2rem;
+  background-color: var(--color-bg-secondary);
+
+  height: 5rem;
+  border-bottom: 1px solid var(--color-border);
+
+  
+}
+
+.container {
+  margin:0 auto 8rem;
+max-width: 75rem;  /* 1200px*/
 }
 
 .headerTop {
-  align-items: center;
   gap: 2rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  justify-content: center;
+    height:5rem;
+
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
 }
 
 .headerTop h1,
@@ -21,24 +39,48 @@
 .headerNav {
   display: flex;
   justify-content: center;
-  align-self: flex-start;
+  align-self: center;
   padding: 1rem 0;
 }
 
 .nav {
   display: flex;
-  gap: 2rem;
+  gap: 3rem;
 }
 
 .nav a {
-  padding: 1rem 1rem 0.5rem 0;
   text-decoration: none;
   color: var(--color-text);
   opacity: 0.8;
   font-size: medium;
   align-self: flex-start;
+  font-weight: bold;
   font-family: "Outfit", sans-serif;
+  position: relative;
+  cursor: pointer;
+  text-decoration: none;
 }
+
+
+.nav a::after{
+  content: "";
+  position: absolute;
+  left:0;
+  bottom: -3px;
+
+  width:100%;
+  height: 2px;
+  background-color: var(--color-text);
+  opacity: 0;
+  transform: scaleX(0);
+  transition: all 0.2s ease;
+}
+
+.nav a:hover::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
 
 .headerActions {
   display: flex;
@@ -73,14 +115,6 @@
   background-color: var(--color-button-secondary-hover);
 }
 
-
-.heroContainer {
-  padding: 0 1rem;
-  margin: 0 auto 8rem;
-  min-height: 60vh;
-
-}
-
 .heroContent {
   display: flex;
   flex-direction: column;
@@ -99,15 +133,13 @@
   margin-top: 3rem;
 }
 
-
 .preview {
   height: 20rem;
   margin-top: 3rem;
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-rows: minmax(0, 1fr);
-  gap: 1rem;
-  
+  gap: 1rem;  
 }
 
 .previewFiles {
@@ -115,6 +147,8 @@
   padding: 1rem;
   border-radius: 0.2rem;
   overflow: auto;
+      scrollbar-width: none; 
+
 }
 
 .fileList {
@@ -161,6 +195,8 @@
   overflow: auto;
  display: flex;
  flex-direction: column;
+ max-width: 30rem;
+     scrollbar-width: none; 
 }
 
 .previewCodeTitle {
@@ -172,13 +208,11 @@
   padding: 2rem;
   opacity: 0.8;
   white-space: pre-wrap;
-
 }
 
 
 .aboutContainer {
   margin: 0 auto 8rem;
-  min-height: 30vh;
 }
 
 .sectionTitle {
@@ -204,8 +238,6 @@
 
 .featuresContainer {
   margin: 0 auto;
-  min-height: 80vh;
-
 }
 
 .featuresLayout {
@@ -234,8 +266,18 @@
   border-bottom: 1px solid var(--color-border-secondary);
   font-family: "Outfit", sans-serif;
   font-size: medium;
+  font-weight: bold;
 }
 
+.featuresDetailsList {
+
+  max-height: 25rem;
+  overflow-y:auto;
+  display: flex;
+  flex-direction: column;
+    scrollbar-width: none; 
+
+}
 
 .featuresDetails {
   display: flex;
@@ -247,6 +289,12 @@
   padding-bottom: 1rem;
   font-size: 2.5rem;
   border-bottom: 1px solid var(--color-border-secondary);
+}
+
+
+.featuresDetailItemContainer {
+  margin-bottom: 3rem;
+  scroll-margin-top: 5rem;
 }
 
 .featuresDetailItem {
@@ -269,13 +317,13 @@
 
 
 .footer {
+  max-height: 10rem;
   padding:1rem 0;
   background-color: var(--color-bg-footer);
   color: var(--color-text-secondary);
 }
 
 .footerContainer {
-  max-width: 95%;
   margin: 0 auto;
 }
 
@@ -301,13 +349,12 @@
   padding-top: 1rem;
 }
 
-@media (min-width: 1024px) {
-  .heroContainer {
-    max-width: 70%;
-  }
+.heroActions a, .footerLinks a{
+  text-decoration: none;
+  color:inherit;
+}
 
-  .aboutContainer,
-  .featuresContainer {
-    max-width: 80%;
-  }
+
+@media (min-width: 1024px) {
+
 }

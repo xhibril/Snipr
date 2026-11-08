@@ -2,7 +2,8 @@ import styles from "./Landing.module.css";
 import { Folder } from "lucide-react";
 import { SiPython, SiJavascript } from "react-icons/si";
 import { FaJava } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 const effectSnippet = `const [value, setValue] = useState(0);
 const [isSaving, setIsSaving] = useState(false);
@@ -13,7 +14,7 @@ useEffect(() => {
     setIsSaving(false);
   }, 500);
   return () => clearTimeout(timer);
-}, [value]);`
+}, [value]);`;
 
 const mergerSnippet = `defaults = {"theme": "dark", "lang": "en"}
 user = {"lang": "fr", "font_size": 16}
@@ -97,14 +98,6 @@ const sections = {
         desc: "Log in on any device and your whole library is there.",
       },
       {
-        title: "Email verification",
-        desc: "Confirm your address when you sign up.",
-      },
-      {
-        title: "Password reset",
-        desc: "Get back in with a code sent to your email.",
-      },
-      {
         title: "Export your data",
         desc: "Download everything as JSON whenever you want.",
       },
@@ -114,9 +107,9 @@ const sections = {
 
 export default function Landing() {
   const [code, setCode] = useState(effectSnippet);
+  const detailsRef = useRef(null);
   const [title, setTitle] = useState("useEffect.js");
-  const [activeKey, setActiveKey] = useState("organize");
-  const active = sections[activeKey];
+  const nav = useNavigate();
 
   return (
     <>
@@ -129,13 +122,23 @@ export default function Landing() {
               <nav className={styles.nav}>
                 <a href="#about">About</a>
                 <a href="#features">Features</a>
-                <a href="#support">Support</a>
+                <a onClick={() => nav("/support")}>Support</a>
               </nav>
             </div>
 
             <div className={styles.headerActions}>
-              <a className={`${styles.button} ${styles.primary}`}>Signup</a>
-              <a className={`${styles.button} ${styles.secondary}`}>Login</a>
+              <a
+                className={`${styles.button} ${styles.primary}`}
+                onClick={() => nav("/signup")}
+              >
+                Signup
+              </a>
+              <a
+                className={`${styles.button} ${styles.secondary}`}
+                onClick={() => nav("/login")}
+              >
+                Login
+              </a>
             </div>
           </div>
         </div>
@@ -143,7 +146,7 @@ export default function Landing() {
 
       <main>
         <section>
-          <div className={styles.heroContainer}>
+          <div className={styles.container}>
             <div className={styles.heroContent}>
               <h1>Stop digging through old projects for that one snippet.</h1>
               <p>
@@ -152,10 +155,16 @@ export default function Landing() {
               </p>
 
               <div className={styles.heroActions}>
-                <a className={`${styles.button} ${styles.primary}`}>
+                <a
+                  className={`${styles.button} ${styles.primary}`}
+                  onClick={() => nav("/dashboard")}
+                >
                   Get started
                 </a>
-                <a className={`${styles.button} ${styles.secondary}`}>
+                <a
+                  className={`${styles.button} ${styles.secondary}`}
+                  href="#features"
+                >
                   Explore features
                 </a>
               </div>
@@ -228,8 +237,8 @@ export default function Landing() {
           </div>
         </section>
 
-        <section>
-          <div className={styles.aboutContainer}>
+        <section id="about">
+          <div className={styles.container}>
             <h2 className={styles.sectionTitle}>ABOUT</h2>
 
             <div className={styles.aboutGrid}>
@@ -255,8 +264,8 @@ export default function Landing() {
           </div>
         </section>
 
-        <section>
-          <div className={styles.featuresContainer}>
+        <section id="features">
+          <div className={styles.container}>
             <h2 className={styles.sectionTitle}>FEATURES</h2>
 
             <div className={styles.featuresLayout}>
@@ -265,7 +274,17 @@ export default function Landing() {
                   {Object.entries(sections).map(([key, section]) => (
                     <li
                       key={key}
-                      onClick={() => setActiveKey(key)}
+                      onClick={(e) => {
+                        const container = detailsRef.current;
+                        const target = document.getElementById(
+                          `feature-${key}`,
+                        );
+
+                        container.scrollTo({
+                          top: target.offsetTop - container.offsetTop,
+                          behavior: "smooth",
+                        });
+                      }}
                       className={styles.featuresItem}
                     >
                       <span>{section.label}</span>
@@ -275,14 +294,28 @@ export default function Landing() {
                 </ul>
               </aside>
 
-              <div className={styles.featuresDetails}>
-                <h3>{active.label}</h3>
-                {active.features.map((f) => (
-                  <div key={f.title} className={styles.featuresDetailItem}>
-                    <h4>{f.title}</h4>
-                    <p>{f.desc}</p>
-                  </div>
-                ))}
+              <div className={styles.featuresDetailsList} ref={detailsRef}>
+                <div className={styles.featuresDetails}>
+                  {Object.entries(sections).map(([key, section]) => (
+                    <div
+                      className={styles.featuresDetailItemContainer}
+                      key={key}
+                      id={`feature-${key}`}
+                    >
+                      <h3>{section.label}</h3>
+
+                      {section.features.map((f) => (
+                        <div
+                          key={f.title}
+                          className={styles.featuresDetailItem}
+                        >
+                          <h4>{f.title}</h4>
+                          <p>{f.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -290,13 +323,21 @@ export default function Landing() {
       </main>
 
       <footer className={styles.footer}>
-        <div className={styles.footerContainer}>
+        <div className={styles.container}>
           <div className={styles.footerTop}>
             <h2>HIGZO</h2>
 
             <div className={styles.footerLinks}>
-              <a>Github</a>
-              <a>Email</a>
+              <a
+                href="https://github.com/xhibril"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Github
+              </a>
+              <a href="mailto:contact@xhibril.dev" target="_blank">
+                Email
+              </a>
             </div>
           </div>
 
