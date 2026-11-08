@@ -70,3 +70,10 @@ cursor: pointer;
 .continueButton {
   flex: 1;
 }
+
+
+.themeBtns {
+  align-self: center;
+  cursor: pointer;
+  opacity: .8;
+}

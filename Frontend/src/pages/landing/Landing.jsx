@@ -4,6 +4,7 @@ import { SiPython, SiJavascript } from "react-icons/si";
 import { FaJava } from "react-icons/fa";
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import ThemeToggle from "../../components/ui/ThemeToggle";
 
 const effectSnippet = `const [value, setValue] = useState(0);
 const [isSaving, setIsSaving] = useState(false);
@@ -127,6 +128,7 @@ export default function Landing() {
             </div>
 
             <div className={styles.headerActions}>
+              <ThemeToggle />
               <a
                 className={`${styles.button} ${styles.primary}`}
                 onClick={() => nav("/signup")}
@@ -302,7 +304,7 @@ export default function Landing() {
                       key={key}
                       id={`feature-${key}`}
                     >
-                      <h3>{section.label}</h3>
+                      <h3 className = {styles.featureSectionTitle}>{section.label}</h3>
 
                       {section.features.map((f) => (
                         <div

@@ -1,28 +1,28 @@
 import { useState, useEffect } from "react";
+import { Sun, Moon } from "lucide-react";
+import global from "../../css/Global.module.css"
 
-
-export default function ThemeToggle({}){
-
-      const [theme, setTheme] = useState(
-    () => localStorage.getItem("theme") ?? "light"
+export default function ThemeToggle({}) {
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("theme") ?? "light",
   );
 
-
-  useEffect(() =>{
-
+  useEffect(() => {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem("theme", theme);
-
   }, [theme]);
 
+  function toggleTheme() {
+    setTheme(theme === "light" ? "dark" : "light");
+  }
 
   return (
-    <button
-      type="button"
-      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-    >
-      Use {theme === "light" ? "dark" : "light"} mode
-    </button>
-  )
-
+    <>
+      {theme === "light" ? (
+        <Moon onClick={toggleTheme} className = {global.themeBtns}/>
+      ) : (
+        <Sun onClick={toggleTheme} className = {global.themeBtns}/>
+      )}
+    </>
+  );
 }

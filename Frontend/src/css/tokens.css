@@ -47,9 +47,10 @@
 
   --color-border: #303640;
 
-  --color-accent: #FFCB56;
-  --color-accent-hover: #FFD777;  
+--color-accent: #D69E2E;
+--color-accent-hover: #EAB308;
   --color-on-accent: #161B22;
 
+     --color-button-secondary: #1E252E;
   --color-button-secondary-hover: #303640;
 }
