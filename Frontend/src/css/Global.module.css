@@ -77,3 +77,39 @@ cursor: pointer;
   cursor: pointer;
   opacity: .8;
 }
+
+
+.container {
+  margin: 0 auto 8rem;
+  max-width: 75rem; /* 1200px*/
+  padding: 0 2rem;
+
+}
+
+.landingBtn {
+  padding: 0.7rem 1.7rem;
+  cursor: pointer;
+  color: var(--color-text);
+  transition: background-color 0.2s ease;
+  font-weight: 500;
+  font-size: medium;
+  border-radius: 0.2em;
+  width: fit-content;
+  border:none;
+}
+
+.landingPrimary {
+  background-color: var(--color-accent);
+}
+
+.landingSecondary {
+  background-color: var(--color-button-secondary);
+}
+
+.landingPrimary:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.landingSecondary:hover {
+  background-color: var(--color-button-secondary-hover);
+}

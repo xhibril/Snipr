@@ -1,10 +1,12 @@
 import styles from "./Landing.module.css";
+import global from "../../css/Global.module.css";
 import { Folder } from "lucide-react";
 import { SiPython, SiJavascript } from "react-icons/si";
 import { FaJava } from "react-icons/fa";
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import ThemeToggle from "../../components/ui/ThemeToggle";
+import Header from "../../components/landing/LandingHeader.jsx";
+import Footer from "../../components/landing/LandingFooter.jsx";
 
 const effectSnippet = `const [value, setValue] = useState(0);
 const [isSaving, setIsSaving] = useState(false);
@@ -114,41 +116,11 @@ export default function Landing() {
 
   return (
     <>
-      <header>
-        <div className={styles.headerContainer}>
-          <div className={styles.headerTop}>
-            <h1>HIGZO</h1>
 
-            <div className={styles.headerNav}>
-              <nav className={styles.nav}>
-                <a href="#about">About</a>
-                <a href="#features">Features</a>
-                <a onClick={() => nav("/support")}>Support</a>
-              </nav>
-            </div>
-
-            <div className={styles.headerActions}>
-              <ThemeToggle />
-              <a
-                className={`${styles.button} ${styles.primary}`}
-                onClick={() => nav("/signup")}
-              >
-                Signup
-              </a>
-              <a
-                className={`${styles.button} ${styles.secondary}`}
-                onClick={() => nav("/login")}
-              >
-                Login
-              </a>
-            </div>
-          </div>
-        </div>
-      </header>
-
+<Header/>
       <main>
         <section>
-          <div className={styles.container}>
+          <div className={global.container}>
             <div className={styles.heroContent}>
               <h1>Stop digging through old projects for that one snippet.</h1>
               <p>
@@ -158,13 +130,13 @@ export default function Landing() {
 
               <div className={styles.heroActions}>
                 <a
-                  className={`${styles.button} ${styles.primary}`}
+                  className={`${global.landingBtn} ${global.landingPrimary}`}
                   onClick={() => nav("/dashboard")}
                 >
                   Get started
                 </a>
                 <a
-                  className={`${styles.button} ${styles.secondary}`}
+                  className={`${global.landingBtn} ${global.landingSecondary}`}
                   href="#features"
                 >
                   Explore features
@@ -240,7 +212,7 @@ export default function Landing() {
         </section>
 
         <section id="about">
-          <div className={styles.container}>
+          <div className={global.container}>
             <h2 className={styles.sectionTitle}>ABOUT</h2>
 
             <div className={styles.aboutGrid}>
@@ -267,7 +239,7 @@ export default function Landing() {
         </section>
 
         <section id="features">
-          <div className={styles.container}>
+          <div className={global.container}>
             <h2 className={styles.sectionTitle}>FEATURES</h2>
 
             <div className={styles.featuresLayout}>
@@ -324,31 +296,8 @@ export default function Landing() {
         </section>
       </main>
 
-      <footer className={styles.footer}>
-        <div className={styles.container}>
-          <div className={styles.footerTop}>
-            <h2>HIGZO</h2>
+      <Footer/>
 
-            <div className={styles.footerLinks}>
-              <a
-                href="https://github.com/xhibril"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Github
-              </a>
-              <a href="mailto:contact@xhibril.dev" target="_blank">
-                Email
-              </a>
-            </div>
-          </div>
-
-          <div className={styles.footerBottom}>
-            <p>© 2026 Higzo. All rights reserved.</p>
-            <p>Personal project</p>
-          </div>
-        </div>
-      </footer>
     </>
   );
 }

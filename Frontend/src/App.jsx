@@ -15,6 +15,7 @@ import UpdateUsername from "./pages/account-settings/UpdateUsername.jsx";
 import UpdatePassword from "./pages/account-settings/UpdatePassword.jsx";
 import UpdateEmail from "./pages/account-settings/UpdateEmail.jsx";
 import DeleteAccount from "./pages/account-settings/DeleteAccount.jsx";
+import Support from "./pages/support/Support.jsx";
 
 function App() {
   useEffect(() => {
@@ -85,6 +86,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />}></Route>
+            <Route path = "/support" element = {<Support/>}></Route>
 
           <Route element={<Default />}>
             <Route element={<AuthGate isAuth={auth.authenticated} />}>
@@ -125,6 +127,9 @@ function App() {
           <Route path = "/account/delete"
           element ={<DeleteAccount notify={notify} setAuth={setAuth}/>}/>
         </Routes>
+
+
+    
       </BrowserRouter>
     </>
   );

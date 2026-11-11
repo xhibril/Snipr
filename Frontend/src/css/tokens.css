@@ -41,8 +41,9 @@
   --color-bg-input: #0D1118;     
   --color-bg-hover: #1E252E;     
 
-  --color-text: #FFFFFF;
-  --color-text-secondary: #AAB4C0;
+  --color-text: #E5E7EB;
+
+  --color-text-secondary: #9CA3AF;
 
 
   --color-border: #303640;
@@ -53,4 +54,6 @@
 
      --color-button-secondary: #1E252E;
   --color-button-secondary-hover: #303640;
+
+    --color-border-secondary: #E5E7EB;
 }

@@ -1,4 +1,4 @@
-@import "./css/tokens.css";
+@import "./css/Tokens.css";
 html,
 body,
 #root {
@@ -11,8 +11,8 @@ body,
 
 body {
   font-family: "Open Sans", sans-serif;
-  background: var(--page);
-  color: var(--text);
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
 
