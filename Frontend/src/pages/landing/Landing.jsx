@@ -130,13 +130,13 @@ export default function Landing() {
 
               <div className={styles.heroActions}>
                 <a
-                  className={`${global.landingBtn} ${global.landingPrimary}`}
+                  className={`${global.btn} ${global.btnPrimary}`}
                   onClick={() => nav("/dashboard")}
                 >
                   Get started
                 </a>
                 <a
-                  className={`${global.landingBtn} ${global.landingSecondary}`}
+                  className={`${global.btn} ${global.btnSecondary}`}
                   href="#features"
                 >
                   Explore features

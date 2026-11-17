@@ -59,3 +59,15 @@
 .forgot:hover {
     text-decoration: none;
 }
+
+
+
+@media(max-width: 480px){
+
+
+.redirect {
+    flex-direction: column;
+    justify-content: center;
+align-items: center;
+}
+}

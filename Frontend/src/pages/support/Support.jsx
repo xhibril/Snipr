@@ -131,7 +131,7 @@ export default function Support() {
 
                   <button
                     type="submit"
-                    className={`${global.landingBtn} ${global.landingPrimary}`}
+                    className={`${global.btn} ${global.btnPrimary}`}
                   >
                     Send message
                   </button>

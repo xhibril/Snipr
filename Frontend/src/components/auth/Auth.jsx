@@ -63,8 +63,6 @@ export default function Auth({ mode, notify, setAuth }) {
       return;
     }
 
-
-
     try {
       const credentials = {
         email,
@@ -122,8 +120,9 @@ export default function Auth({ mode, notify, setAuth }) {
   return (
     <>
       <div className={global.mainContainer}>
+  
         <form
-          className={`${global.inputContainer} ${global.glassyBackground}`}
+          className={`${global.formCard} ${global.glassyBackground}`}
           onSubmit={(e) => {
             e.preventDefault();
             submitCredentials(isLogin ? "/login" : "/signup");
@@ -155,7 +154,7 @@ export default function Auth({ mode, notify, setAuth }) {
             <p>Remember me</p>
           </div>
 
-          <button className={global.submit} type="submit" disabled={isLoading}>
+          <button className={`${global.btn} ${global.btnPrimary} ${global.fullWidthBtn}`} type="submit" disabled={isLoading}>
             {isLoading ? "Loading..." : isLogin ? "Login" : "Sign up"}
           </button>
 
@@ -177,7 +176,8 @@ export default function Auth({ mode, notify, setAuth }) {
             </div>
           )}
         </form>
-      </div>
+        </div>
+
     </>
   );
 }

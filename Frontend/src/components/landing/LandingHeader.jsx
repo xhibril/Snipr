@@ -36,13 +36,13 @@ export default function Header() {
           <div className={styles.headerActions}>
             <ThemeToggle />
             <a
-              className={`${global.landingBtn} ${global.landingPrimary}`}
+              className={`${global.btn} ${global.btnPrimary}`}
               onClick={() => nav("/signup")}
             >
               Signup
             </a>
             <a
-              className={`${global.landingBtn} ${global.landingSecondary}`}
+              className={`${global.btn} ${global.btnSecondary}`}
               onClick={() => nav("/login")}
             >
               Login

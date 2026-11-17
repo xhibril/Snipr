@@ -1,59 +1,51 @@
 :root {
   color-scheme: light;
 
-  --color-bg: #FFFFFF;            /* editor / main background */
-  --color-bg-sidebar: #F5F5F5;    /* sidebar secondary panels */
-  --color-bg-input: #F5F5F5;      /* input fields */
-  --color-bg-hover: #F5F5F5;      /* hover backgrounds */
+  --color-bg: #ffffff; /* editor / main background */
+  --color-bg-sidebar: #f5f5f5; /* sidebar secondary panels */
+  --color-bg-input: #f5f5f5; /* input fields */
+  --color-bg-hover: #f5f5f5; /* hover backgrounds */
 
-  --color-bg-secondary: #F8F9FA;
+  --color-bg-secondary: #f8f9fa;
 
-  --color-text: #161B22;          /* primary text */
-  --color-text-secondary: #FFFFFF;/* descriptions placeholders metadata */
+  --color-text: #161b22; /* primary text */
+  --color-text-secondary: #ffffff; /* descriptions placeholders metadata */
 
+  --color-border: #e5e7eb;
+  --color-border-secondary: #161b22;
 
+  --color-accent-secondary: #3b82f6;
 
-  --color-border: #E5E7EB;
-  --color-border-secondary: #161B22;
+  --color-accent: #ffcb56;
+  --color-accent-hover: #f5b93a;
+  --color-on-accent: #161b22; /*  text/icons on yellow */
 
-  --color-accent-secondary: #3B82F6;
+  --color-button-secondary: #f5f5f5;
+  --color-button-secondary-hover: #e2e4e8;
 
-  --color-accent: #FFCB56; 
-  --color-accent-hover: #F5B93A;  
-  --color-on-accent: #161B22;     /*  text/icons on yellow */
-
-   --color-button-secondary: #F5F5F5;
-   --color-button-secondary-hover: #E2E4E8;
-
-
-   --color-bg-footer: #161B22;
-   
-
-
+  --color-bg-footer: #161b22;
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
 
+  --color-bg: #161b22;
+  --color-bg-sidebar: #0d1118;
+  --color-bg-input: #0d1118;
+  --color-bg-hover: #1e252e;
 
-  --color-bg: #161B22;
-  --color-bg-sidebar: #0D1118;
-  --color-bg-input: #0D1118;     
-  --color-bg-hover: #1E252E;     
+  --color-text: #e5e7eb;
 
-  --color-text: #E5E7EB;
-
-  --color-text-secondary: #9CA3AF;
-
+  --color-text-secondary: #9ca3af;
 
   --color-border: #303640;
 
---color-accent: #D69E2E;
---color-accent-hover: #EAB308;
-  --color-on-accent: #161B22;
+  --color-accent: #d69e2e;
+  --color-accent-hover: #eab308;
+  --color-on-accent: #161b22;
 
-     --color-button-secondary: #1E252E;
+  --color-button-secondary: #1e252e;
   --color-button-secondary-hover: #303640;
 
-    --color-border-secondary: #E5E7EB;
+  --color-border-secondary: #e5e7eb;
 }
