@@ -4,6 +4,9 @@ import styles from "./Support.module.css";
 import global from "../../css/Global.module.css";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { ValidateEmail } from "../../components/utils/Validation.jsx";
+import apiFetch from "../../components/utils/Api.jsx";
+import { useNavigate } from "react-router-dom";
 
 const faqs = [
   {
@@ -49,8 +52,66 @@ const faqs = [
   },
 ];
 
-export default function Support() {
+export default function Support({ notify }) {
   const [activeIndex, setActiveIndex] = useState(null);
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const nav = useNavigate();
+
+  async function sumbitTicket() {
+    const validateEmail = ValidateEmail(email);
+
+    if (validateEmail !== "VALID") {
+      notify(validateEmail, "ERROR");
+      return;
+    }
+
+    if (message.length < 10) {
+      notify("Message must be at least 10 characters", "ERROR");
+      return;
+    }
+
+    if (message.length > 2000) {
+      notify("Message cannot exceed 2000 characters", "ERROR");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const res = await apiFetch("/support", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, subject, email, message }),
+      }, notify, nav);
+
+      if (!res) {
+        return;
+      }
+
+      if (!res.ok) {
+        const data = await res.json();
+        notify(
+          data.message || "Could not send message, please try again.",
+          "ERROR",
+        );
+        return;
+      }
+
+      notify("Message successfully sent", "SUCCESS");
+
+      setName("");
+      setEmail("");
+      setSubject("");
+      setMessage("");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <>
@@ -105,35 +166,53 @@ export default function Support() {
                   className={styles.contactForm}
                   onSubmit={(e) => {
                     e.preventDefault();
+                    sumbitTicket();
                   }}
                 >
                   <div className={styles.formGroupContainer}>
                     <div className={styles.formGroup}>
                       <label>Name</label>
-                      <input type="text" />
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
                     </div>
 
                     <div className={styles.formGroup}>
                       <label>Email</label>
-                      <input type="email" />
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
                     </div>
                   </div>
 
                   <div className={styles.formGroup}>
                     <label>Subject</label>
-                    <input type="text" />
+                    <input
+                      type="text"
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                    />
                   </div>
 
                   <div className={styles.formGroup}>
                     <label>Message</label>
-                    <input type="text" />
+                    <input
+                      type="text"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                    />
                   </div>
 
                   <button
                     type="submit"
-                    className={`${global.btn} ${global.btnPrimary}`}
+                    className={`${global.btn} ${global.btnPrimary} ${styles.btn}`}
+                    disabled={isLoading}
                   >
-                    Send message
+                    {isLoading ? "Sending..." : "Send message"}
                   </button>
                 </form>
               </div>

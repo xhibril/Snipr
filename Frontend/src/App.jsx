@@ -86,7 +86,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />}></Route>
-            <Route path = "/support" element = {<Support/>}></Route>
+            <Route path = "/support" element = {<Support notify={notify}/>}></Route>
 
           <Route element={<Default />}>
             <Route element={<AuthGate isAuth={auth.authenticated} />}>

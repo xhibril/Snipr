@@ -2,8 +2,6 @@ main {
   min-height: 100dvh;
 }
 
-
-
 .supportLayout {
   grid-template-columns: 1fr 1fr;
   display: grid;
@@ -35,7 +33,7 @@ main {
   display: flex;
 
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: space-between;
 
   align-items: center;
   gap: 1rem;
@@ -79,21 +77,16 @@ main {
 .contact {
   display: flex;
 
-
   flex-direction: column;
 
-
   gap: 2rem;
-    max-width: 35rem;
-
+  max-width: 35rem;
 }
-
 
 .contactForm {
   display: flex;
   flex-direction: column;
   gap: 2rem;
- 
 }
 
 .formGroup {
@@ -123,52 +116,50 @@ main {
   width: 100%;
 }
 
+@media (max-width: 1024px) {
+  .supportLayout {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 0;
+    margin: 0;
+  }
 
-@media(max-width: 1024px){
-.supportLayout{
-  grid-template-columns: 1fr;
-gap:0;
-padding:0;
-margin:0;
- 
-}
+  .faqs,
+  .contact {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-.faqs, .contact {
-padding:0;
-margin:0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-
-  min-width: 100%;
-}
-
-.contactHeader{
-  text-align: center;
-}
-
-  .formGroupContainer{
-    gap:4rem;
+   
+    min-width: 100%;
   }
 
 
 
+  .btn {
+    align-self: center;
+  }
+
+
+  .contactHeader {
+    text-align: center;
+  }
+
+  .formGroupContainer {
+    gap: 4rem;
+  }
 }
 
-
-
 @media (max-width: 768px) {
-
-  .formGroupContainer{
-    gap:3rem;
+  .formGroupContainer {
+    gap: 3rem;
   }
 }
 
 @media (max-width: 480px) {
-
-    .formGroupContainer{
-    gap:1.5rem;
+  .formGroupContainer {
+    gap: 1.5rem;
   }
-
 }
