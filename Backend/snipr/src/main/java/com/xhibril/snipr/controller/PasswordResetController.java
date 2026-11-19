@@ -6,6 +6,7 @@ import com.xhibril.snipr.service.AuthService;
 import com.xhibril.snipr.service.PasswordResetService;
 import jakarta.annotation.security.RunAs;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,17 +27,17 @@ public class PasswordResetController {
     }
 
     @PostMapping("/password/reset/init")
-    public ResponseEntity<PasswordResetResponse> initResetRequest(@RequestBody PasswordResetRequest request){
+    public ResponseEntity<PasswordResetResponse> initResetRequest(@Valid @RequestBody PasswordResetRequest request){
         return passwordResetService.initPasswordReset(request.getEmail());
     }
 
     @PostMapping("/password/reset/verify")
-    public ResponseEntity<PasswordResetResponse> verifyResetRequest(@RequestBody PasswordResetRequest request){
+    public ResponseEntity<PasswordResetResponse> verifyResetRequest(@Valid @RequestBody PasswordResetRequest request){
         return passwordResetService.verifyRequest(request.getEmail(), request.getCode());
     }
 
     @PostMapping("/password/reset/complete")
-    public ResponseEntity<PasswordResetResponse> resetPassword(@RequestBody PasswordResetRequest request){
+    public ResponseEntity<PasswordResetResponse> resetPassword(@Valid @RequestBody PasswordResetRequest request){
         return passwordResetService.resetPassword(request.getEmail(), request.getNewPassword(), request.getConfirmPassword(), request.getResetToken());
     }
 

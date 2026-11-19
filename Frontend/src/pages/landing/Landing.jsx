@@ -217,9 +217,9 @@ export default function Landing() {
 
             <div className={styles.aboutGrid}>
               <article>
-                <h2>Why Higzo?</h2>
+                <h2>Why Offcut?</h2>
                 <p>
-                  {`Higzo was made to make life a little easier for developers.
+                  {`Offcut was made to make life a little easier for developers.
                   Save snippets, find them when you need them, and reuse them
                   without having to dig through old projects or files.`}
                 </p>
@@ -230,7 +230,7 @@ export default function Landing() {
                 <p>
                   {`Keep the interface simple, avoid unnecessary clutter, and
                   focus on getting things done. And you don't have to be a
-                  developer to use it. Higzo works just as well for keeping
+                  developer to use it. Offcut works just as well for keeping
                   notes and other useful information.`}
                 </p>
               </article>

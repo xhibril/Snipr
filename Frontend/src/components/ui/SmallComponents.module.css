@@ -8,6 +8,20 @@
   flex-direction: column;
 
   align-items: flex-start;
+
+}
+
+.brandTop{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap:.25rem;
+}
+
+.logo {
+    width: 1.5rem;
+    height: 1.5rem;
+  
 }
 
 .brandText {
@@ -30,12 +44,12 @@
   background-color: var(--color-bg-input);
   text-align: start;
 border:1px solid var(--color-border);
-  padding-left: 0.8rem;
+  padding-left: 0.75rem;
   width: 100%;
   box-sizing: border-box;
-  height: 2.2rem;
-  border-radius: 0.3rem;
-  padding-right: 3rem;
+  height: 2.5rem;
+  border-radius: 0.25rem;
+  padding-right: .25rem;
 }
 
 .togglePassword {
@@ -45,4 +59,29 @@ border:1px solid var(--color-border);
   right: 0.8rem;
   cursor: pointer;
   width: 2em;
+}
+
+
+
+.back {
+  border: transparent;
+  background-color: transparent;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+  gap:.25rem;
+  cursor: pointer;
+  color: #427ab5;
+
+
+}
+
+.backArrow {
+  width: 1rem;
+}
+
+.back p {
+  align-self: center;
+  font-weight: bold;
 }

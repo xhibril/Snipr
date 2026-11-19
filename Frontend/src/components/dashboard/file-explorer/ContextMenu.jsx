@@ -14,12 +14,12 @@ export default function ContextMenu({
   setEditingTarget,
   page,
   updatePinStatus,
-  
-          setCreationType,
+
+  setCreationType,
   pasteItem,
   copy,
   setCopy,
-  setPendingName
+  setPendingName,
 }) {
   return (
     <div
@@ -28,11 +28,8 @@ export default function ContextMenu({
         position: "fixed",
         left: x,
         top: y,
-      }
-    }
-
-
-    onClick={(e) => e.stopPropagation()}
+      }}
+      onClick={(e) => e.stopPropagation()}
     >
       {type !== "FILE" && (
         <>
@@ -42,7 +39,7 @@ export default function ContextMenu({
                 data: file,
                 type: type,
               });
-             setCreationType((prev) => prev === "FILE" ? null : "FILE");
+              setCreationType((prev) => (prev === "FILE" ? null : "FILE"));
               setContextMenu(null);
             }}
           >
@@ -51,13 +48,12 @@ export default function ContextMenu({
 
           <button
             onClick={() => {
-
               setSelectedItem({
                 data: file,
                 type: type,
               });
 
-                setCreationType((prev) => prev === "FOLDER" ? null : "FOLDER");
+              setCreationType((prev) => (prev === "FOLDER" ? null : "FOLDER"));
               setContextMenu(null);
             }}
           >
@@ -85,16 +81,11 @@ export default function ContextMenu({
             <button
               onClick={() => {
                 setEditingTarget({
-  id: file.id,
-  type: "FILE",
-});
+                  id: file.id,
+                  type: "FILE",
+                });
 
-
-                setPendingName(file.name)
-
-
-
-
+                setPendingName(file.name);
 
                 setContextMenu(null);
               }}
@@ -126,31 +117,41 @@ export default function ContextMenu({
           )}
 
           {page.itemActions.includes("copy") && (
-            <button onClick={() => setCopy({
-              data: file,
-              type: type
-            })}>Copy</button>
+            <button
+              onClick={() =>
+                setCopy({
+                  data: file,
+                  type: type,
+                })
+              }
+            >
+              Copy
+            </button>
           )}
         </>
       )}
 
       {/*allow copy to appear in panel n folder, not file */}
       {page.itemActions.includes("paste") &&
-        (type === "FOLDER" || type === "PANEL") && <button onClick={() =>{
+        (type === "FOLDER" || type === "PANEL") && (
+          <button
+            onClick={() => {
+              if (copy?.type === "FOLDER") {
+                pasteItem(copy?.data, "FOLDER");
+              }
 
-          if(copy?.type === "FOLDER"){
-            pasteItem(copy?.data, "FOLDER")
-          } 
+              if (copy?.type === "FILE" && type === "PANEL") {
+                pasteItem(copy?.data, "FILE");
+              }
 
-          if(copy?.type === "FILE" && type === "PANEL"){
-            pasteItem(copy?.data, "FILE");
-          }
-
-          if(copy?.type === "FILE" && type === "FOLDER"){
-            pasteItem(copy?.data, "FILE", file?.id)
-          }
-        }
-        }>Paste</button>}
+              if (copy?.type === "FILE" && type === "FOLDER") {
+                pasteItem(copy?.data, "FILE", file?.id);
+              }
+            }}
+          >
+            Paste
+          </button>
+        )}
     </div>
   );
 }

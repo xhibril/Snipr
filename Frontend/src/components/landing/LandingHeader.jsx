@@ -1,34 +1,40 @@
 import styles from "./LandingHeader.module.css";
-import ThemeToggle from "../ui/ThemeToggle.jsx"
+import ThemeToggle from "../ui/ThemeToggle.jsx";
 import global from "../../css/Global.module.css";
+import OffcutLogo from "../../components/ui/OffcutLogo.jsx"
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 
 export default function Header() {
+  const nav = useNavigate();
 
-    const nav = useNavigate();
+  const { hash, key } = useLocation();
 
-    const {hash, key} = useLocation();
+  useEffect(() => {
+    if (!hash) return;
 
-
-    useEffect(() => {
-      if(!hash) return
-
-      document.getElementById(hash.slice(1))?.scrollIntoView({behavior : "smooth"});
-    }, [hash, key])
-
-
+    document
+      .getElementById(hash.slice(1))
+      ?.scrollIntoView({ behavior: "smooth" });
+  }, [hash, key]);
 
   return (
     <header>
       <div className={styles.headerContainer}>
         <div className={styles.headerTop}>
-          <h1 onClick={() => nav("/")}>HIGZO</h1>
+
+          <div className = {styles.headerBrand}>
+
+          <OffcutLogo className = {styles.logo}/>
+          <h1 onClick={() => nav("/")}>OFFCUT</h1>
+
+          </div>
+
 
           <div className={styles.headerNav}>
             <nav className={styles.nav}>
-<Link to="/#about">About</Link>
-  <Link to="/#features">Features</Link>
+              <Link to="/#about">About</Link>
+              <Link to="/#features">Features</Link>
               <a onClick={() => nav("/support")}>Support</a>
             </nav>
           </div>
@@ -50,6 +56,7 @@ export default function Header() {
           </div>
         </div>
       </div>
+
     </header>
   );
 }

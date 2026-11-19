@@ -1,5 +1,6 @@
 package com.xhibril.snipr.dto.auth;
 
+import com.xhibril.snipr.validation.ValidationGroups;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -7,24 +8,24 @@ import jakarta.validation.constraints.Size;
 
 public class PasswordResetRequest {
 
-    @NotBlank(message = "Enter your email address")
-    @Email(message = "Enter a valid email address")
+    @NotBlank(message = "Enter your email address", groups = ValidationGroups.Step1.class)
+    @Email(message = "Enter a valid email address", groups = ValidationGroups.Step1.class)
     private String email;
 
-    @NotBlank(message = "Enter a password")
-    @Size(min = 8, max = 32, message = "Password must be 8–32 characters long")
+    @NotBlank(message = "Enter a password", groups = ValidationGroups.Step3.class)
+    @Size(min = 8, max = 32, message = "Password must be 8–32 characters long", groups = ValidationGroups.Step3.class)
     @Pattern(
             regexp = "^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*.])[A-Za-z0-9!.@#$%^&* ]+$",
             message = "Password must include an uppercase" +
-                    " letter, a number, and a special character."
+                    " letter, a number, and a special character.", groups = ValidationGroups.Step3.class
     )
     private String newPassword;
 
     private String confirmPassword;
 
-    @NotBlank(message = "Enter a verification code")
-    @Size(min = 6, max = 6, message = "Verification code must be 6 digits")
-    @Pattern(regexp = "\\d+", message = "Verification code can only contain numbers")
+    @NotBlank(message = "Enter a verification code", groups = ValidationGroups.Step2.class)
+    @Size(min = 6, max = 6, message = "Verification code must be 6 digits", groups = ValidationGroups.Step2.class)
+    @Pattern(regexp = "\\d+", message = "Verification code can only contain numbers", groups = ValidationGroups.Step2.class)
     private String code;
 
     private String resetToken;

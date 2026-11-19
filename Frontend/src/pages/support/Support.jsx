@@ -21,7 +21,7 @@ const faqs = [
 
   {
     question: "Why isn't my snippet saving?",
-    answer: `Higzo automatically saves your changes as you edit. 
+    answer: `Offcut automatically saves your changes as you edit. 
         If your changes aren't being saved, check your internet connection and try refreshing the page. 
         Make sure you give the save operation time to complete before leaving the editor.
         `,
@@ -30,7 +30,7 @@ const faqs = [
   {
     question: "Can I access my snippets on another device?",
     answer:
-      "Yes, you can log in your Higzo account from another device and access your snippets",
+      "Yes, you can log in your Offcut account from another device and access your snippets",
   },
 
   {
@@ -46,9 +46,9 @@ const faqs = [
   },
 
   {
-    question: "Can Higzo be used on mobile?",
-    answer: `Higzo can be used on mobile, but is not recommended. 
-    Higzo is best used on larger screens such desktops or tablets.`,
+    question: "Can Offcut be used on mobile?",
+    answer: `Offcut can be used on mobile, but is not recommended. 
+    Offcut is best used on larger screens such desktops or tablets.`,
   },
 ];
 

@@ -3,6 +3,8 @@ import styles from "./SmallComponents.module.css";
 import { useNavigate } from "react-router-dom";
 import { FiEye } from "react-icons/fi";
 import { useState } from "react";
+import { ArrowLeft } from "lucide-react";
+import OffcutLogo from "./OffcutLogo.jsx";
 
 export const DEFAULT_FAILURE_MESSAGE = "Something went wrong, please try again";
 
@@ -79,9 +81,32 @@ export function BrandHeader({ title }) {
 
   return (
     <div className={styles.brandContainer} onClick={() => nav("/")}>
-       
-        <p className={styles.brandText}>Higzo</p>
+      <div className={styles.brandTop}>
+        <OffcutLogo className = {styles.logo}/>
+        <p className={styles.brandText}>Offcut</p>
+      </div>
+
       <h1>{title}</h1>
     </div>
   );
+}
+
+export function BackButton({ onClick }) {
+  return (
+    <button className={styles.back} type="button" onClick={onClick}>
+      <ArrowLeft className={styles.backArrow} />
+      <p>Back</p>
+    </button>
+  );
+}
+
+export function HandleBack(steps, currentStep, setStep, nav, destination) {
+  const currentIndex = steps.indexOf(currentStep);
+
+  if (currentIndex <= 0) {
+    nav(destination);
+    return;
+  }
+
+  setStep(steps[currentIndex - 1]);
 }
