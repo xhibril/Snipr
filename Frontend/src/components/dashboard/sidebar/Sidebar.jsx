@@ -1,124 +1,66 @@
-import styles from "../../../pages/dashboard/Dashboard.module.css";
+import styles from "./Sidebar.module.css";
 
 import logo from "../../../assets/images/logo.svg";
 import { useState } from "react";
 import apiFetch from "../../utils/Api";
 
-import ThemeToggle from "../../ui/ThemeToggle";
+import AccountSettings from "./AccountSettings.jsx";
 
 import {
   FiFolder,
   FiShare2,
   FiStar,
   FiTrash,
-  FiChevronUp,
-  FiChevronDown,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import OffcutLogo from "../../ui/OffcutLogo.jsx";
 
 export default function Sidebar({ setActivePage, auth, notify, setAuth }) {
-  const [toggleSettings, setToggleSettings] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const nav = useNavigate();
-
-  async function logout() {
-
-    try {
-        setIsLoading(true);
-      const res = await apiFetch("/logout", { method: "POST" }, notify, nav);
-
-      if (!res?.ok) {
-        notify("Could not logout, please try again", "ERROR");
-        return;
-      }
-
-         setAuth({
-        authenticated: false,
-        user: null
-      })
-      nav("/", { replace: true }); // clear back n forward history
-
-    } finally {
-      setIsLoading(false);
-  
-    }
-  }
 
   return (
     <div className={styles.sideBar}>
       <div className={styles.brandHeader}>
-        <img src={logo} alt="SNIPR logo" />
-        <h1>SNIPR</h1>
+        <OffcutLogo className = {styles.logo}/>
+        <h1>OFFCUT</h1>
       </div>
 
-      <div className={styles.options}>
+      <div className={styles.navigation}>
         <button
-          className={styles.optionRow}
+          className={styles.navItem}
           onClick={() => setActivePage("ALL")}
         >
-          <FiFolder className={styles.optionIcon} />
-          <p className={styles.optionText}>My Files</p>
+          <FiFolder className={styles.navIcon} />
+          <p className={styles.navLabel}>My Files</p>
         </button>
 
         <button
-          className={styles.optionRow}
+          className={styles.navItem}
           onClick={() => setActivePage("SHARED")}
         >
-          <FiShare2 className={styles.optionIcon} />
-          <p className={styles.optionText}>Shared Files</p>
+          <FiShare2 className={styles.navIcon} />
+          <p className={styles.navLabel}>Shared Files</p>
         </button>
 
         <button
-          className={styles.optionRow}
+          className={styles.navItem}
           onClick={() => setActivePage("PINNED")}
         >
-          <FiStar className={styles.optionIcon} />
-          <p className={styles.optionText}>Starred</p>
+          <FiStar className={styles.navIcon} />
+          <p className={styles.navLabel}>Starred</p>
         </button>
 
         <button
-          className={styles.optionRow}
+          className={styles.navItem}
           onClick={() => setActivePage("DELETED")}
         >
-          <FiTrash className={styles.optionIcon} />
-          <p className={styles.optionText}>Trash</p>
+          <FiTrash className={styles.navIcon} />
+          <p className={styles.navLabel}>Trash</p>
         </button>
       </div>
 
-      <div className={styles.accountContainer}>
-        <div
-          className={`${styles.accountSettings} ${toggleSettings ? styles.show : ""}`}
-        >
-          <button onClick={() => nav("/account/password")}>Change Password</button>
-                    <button onClick={() => nav("/account/profile")}>Change Username</button>
-          <button onClick={() => nav("/account/email")}>Change Email</button>
-          <button onClick={() => nav("/account/delete")}>Delete Account</button>
-        </div>
 
-        <div className={styles.accountRow}>
-          <div className={styles.accountDetails}>
-            <ThemeToggle/>
-            <p className={styles.accountName}>{auth?.user?.username}</p>
-            <p className={styles.accountEmail}>{auth?.user?.email}</p>
-
-            <button
-              className={styles.logoutBtn}
-              onClick={(e) => logout()}
-              disabled={isLoading}
-            >
-              {isLoading ? "Loggin out..." : "Logout"}
-            </button>
-          </div>
-
-          <div
-            className={styles.accountArrowIcons}
-            onClick={() => setToggleSettings(!toggleSettings)}
-          >
-            <FiChevronUp />
-            <FiChevronDown />
-          </div>
-        </div>
-      </div>
+<AccountSettings auth = {auth} setAuth = {setAuth} notify = {notify}/>
+      
     </div>
   );
 }

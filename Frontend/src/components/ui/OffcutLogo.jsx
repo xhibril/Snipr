@@ -14,7 +14,7 @@ export default function OffcutLogo({className}) {
 
       <svg
  
-   className={className}
+ className={`offcut-logo ${className || ""}`}
   viewBox="0 0 120 150"
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
