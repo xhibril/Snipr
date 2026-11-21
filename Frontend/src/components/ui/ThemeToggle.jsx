@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Sun, Moon } from "lucide-react";
 import global from "../../css/Global.module.css"
 
-export default function ThemeToggle({}) {
+export default function ThemeToggle({className, onToggle}) {
   const [theme, setTheme] = useState(
     () => localStorage.getItem("theme") ?? "light",
   );
@@ -19,9 +19,9 @@ export default function ThemeToggle({}) {
   return (
     <>
       {theme === "light" ? (
-        <Moon onClick={toggleTheme} className = {global.themeBtns}/>
+        <Moon onClick={toggleTheme} className = {`${global.themeBtns} ${className || ""}`} />
       ) : (
-        <Sun onClick={toggleTheme} className = {global.themeBtns}/>
+        <Sun onClick={toggleTheme} className = {`${global.themeBtns} ${className || ""}`}/>
       )}
     </>
   );

@@ -66,7 +66,7 @@ export default function Dashboard({ notify, auth, setAuth }) {
 
   return (
     <div className={styles.mainContainer}>
-      <div className={styles.mainContent}>
+     
         <Sidebar setActivePage={setActivePage} auth = {auth} notify = {notify}
         setAuth={setAuth} />
 
@@ -91,6 +91,6 @@ export default function Dashboard({ notify, auth, setAuth }) {
         <FileEditor notify={notify} file = {openFile} setFiles={setFiles} key = {openFile?.id}/>  :
         <DefaultMenu setCreationType = {setCreationType}/>}
       </div>
-    </div>
+    
   );
 }

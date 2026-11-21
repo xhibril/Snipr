@@ -7,6 +7,7 @@ import {
 } from "../../components/ui/SmallComponents";
 import apiFetch from "../../components/utils/Api";
 import global from "../../css/Global.module.css";
+import { HandleBack, BackButton } from "../../components/ui/SmallComponents";
 
 import { DEFAULT_FAILURE_MESSAGE } from "../../components/ui/SmallComponents";
 import { useNavigate } from "react-router-dom";
@@ -21,16 +22,15 @@ export default function UpdateEmail({ notify, setAuth }) {
   const [code, setCode] = useState("");
   const nav = useNavigate();
 
+  const steps = ["INIT", "VERIFY", "CHANGE"];
+
   async function updateEmail() {
-
-
     const validateEmail = ValidateEmail(pendingEmail);
 
-    if(validateEmail !== "VALID"){
+    if (validateEmail !== "VALID") {
       notify(validateEmail, "ERROR");
       return;
     }
-
 
     if (step === "INIT") {
       try {
@@ -47,7 +47,7 @@ export default function UpdateEmail({ notify, setAuth }) {
           nav,
         );
 
-        if(!res){
+        if (!res) {
           return;
         }
 
@@ -80,7 +80,7 @@ export default function UpdateEmail({ notify, setAuth }) {
           nav,
         );
 
-        if(!verifyRes){
+        if (!verifyRes) {
           return;
         }
         const verifyData = await verifyRes.json();
@@ -103,7 +103,7 @@ export default function UpdateEmail({ notify, setAuth }) {
           nav,
         );
 
-        if(!changeRes){
+        if (!changeRes) {
           return;
         }
 
@@ -117,15 +117,15 @@ export default function UpdateEmail({ notify, setAuth }) {
         setCode("");
         setPendingEmail("");
         setPassword("");
-        setStep("COMPLETED");
+        setStep("CHANGE");
 
         setAuth((prev) => ({
-            ...prev,
-            user : {
-                ...prev.user,
-                email: pendingEmail
-            }
-        }))
+          ...prev,
+          user: {
+            ...prev.user,
+            email: pendingEmail,
+          },
+        }));
 
         notify(changeData.message || "Email successfully changed", "SUCCESS");
       } finally {
@@ -141,7 +141,7 @@ export default function UpdateEmail({ notify, setAuth }) {
           updateEmail();
           e.preventDefault();
         }}
-        className={`${global.inputContainer} ${global.glassyBackground}`}
+        className={`${global.formCard} ${global.glassyBackground}`}
       >
         <BrandHeader title="Update email" />
 
@@ -164,12 +164,12 @@ export default function UpdateEmail({ notify, setAuth }) {
           <CodeField title="6-digit code" code={code} setCode={setCode} />
         )}
 
-        {step === "COMPLETED" ? (
+        {step === "CHANGE" ? (
           <>
             <p>Your email address has been updated.</p>
 
             <button
-              className={global.submit}
+             className={`${global.btn} ${global.btnPrimary} ${global.fullWidthBtn}`}
               type="button"
               onClick={() => nav("/dashboard", { replace: true })}
             >
@@ -177,13 +177,21 @@ export default function UpdateEmail({ notify, setAuth }) {
             </button>
           </>
         ) : (
-          <button
-            className={`${global.submit} ${global.continueButton}`}
-            type="submit"
-            disabled={isLoading}
-          >
-            {isLoading ? "Please wait..." : "Continue"}
-          </button>
+          <>
+            <button
+              className={`${global.btn} ${global.btnPrimary} ${global.fullWidthBtn}`}
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? "Please wait..." : "Continue"}
+            </button>
+
+            <BackButton
+              onClick={() =>
+                HandleBack(steps, step, setStep, nav, "/dashboard")
+              }
+            />
+          </>
         )}
       </form>
     </div>

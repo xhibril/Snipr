@@ -4,6 +4,16 @@ import ThemeToggle from "../../ui/ThemeToggle";
 import { useNavigate } from "react-router-dom";
 import { Settings } from "lucide-react";
 import { FiChevronUp, FiChevronDown } from "react-icons/fi";
+import apiFetch from "../../utils/Api";
+import {
+  FiLock,
+  FiUser,
+  FiMail,
+  FiMoon,
+  FiTrash2,
+  FiLogOut,
+} from "react-icons/fi";
+
 export default function AccountSettings({ notify, auth, setAuth }) {
   const [toggleSettings, setToggleSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,74 +41,75 @@ export default function AccountSettings({ notify, auth, setAuth }) {
   }
 
   return (
-    <div className={styles.accountContainer}>
+    <div className={styles.container}>
       <div
-        className={`${styles.accountSettings} ${toggleSettings ? styles.show : ""}`}
+        className={`${styles.settings} ${toggleSettings ? styles.show : ""}`}
       >
-        <h2>Account settings</h2>
+        <div className={styles.settingsGroups}>
+          <h3> ACCOUNT SETTINGS</h3>
 
-        <div className={styles.settingsGroup}>
-          <h3 className={styles.groupLabel}> SETTINGS</h3>
-
-          <button onClick={() => nav("/account/password")}>
-            Change Password
-          </button>
-          <button onClick={() => nav("/account/profile")}>
-            Change Username
-          </button>
-
-          <button onClick={() => nav("/account/email")}>Change Email</button>
-        </div>
-
-        <div className={styles.settingsGroup}>
-          <h3 className={styles.groupLabel}> PREFERENCES</h3>
-
-          <div className={styles.settingsGroupContainer}>
-            <ThemeToggle />
-            <div className={styles.appearance}>
-              <p>Appearance</p>
-              <p>{isThemeDark ? "Dark theme" : "Light theme"}</p>
-            </div>
-
-            <span className={styles.themeBadge}>On</span>
-          </div>
-        </div>
-
-        <div className={styles.settingsGroup}>
-          <div className={styles.deleteAccount}>
+          <div className={styles.accountSettings}>
             <button
-              className={styles.deleteAccountBtn}
-              onClick={() => nav("/account/delete")}
+              className={styles.groupItem}
+              onClick={() => nav("/account/profile")}
             >
-              Delete account
+              <FiUser className = {styles.itemIcon}/>
+              <span>Change username</span>
+            </button>
+
+            <button
+              className={styles.groupItem}
+              onClick={() => nav("/account/password")}
+            >
+              <FiLock className = {styles.itemIcon}/>
+              <span>Change password</span>
+            </button>
+
+            <button
+              className={styles.groupItem}
+              onClick={() => nav("/account/email")}
+            >
+              <FiMail className = {styles.itemIcon}/>
+              <span>Change email</span>
+            </button>
+
+            <button className={styles.groupItem} onClick={() => }>
+              <ThemeToggle className = {styles.itemIcon} />
+              <span>Appearance</span>
             </button>
           </div>
 
-          <button
-            className={styles.logoutBtn}
-            onClick={(e) => logout()}
-            disabled={isLoading}
-          >
-            {isLoading ? "Loggin out..." : "Logout"}
-          </button>
+          <div className={styles.accountActions}>
+            <button
+              className={`${styles.groupItem} ${styles.deleteAccount}`}
+              onClick={() => nav("/account/delete")}
+            >
+              <FiTrash2 className = {styles.itemIcon}/>
+              <span>Delete account </span>
+            </button>
+
+            <button
+              className={styles.groupItem}
+              onClick={() => logout()}
+              disabled={isLoading}
+            >
+              <FiLogOut className = {styles.itemIcon}/>
+              <span>Sign out</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className={styles.profile}>
+      <div
+        className={styles.profile}
+        onClick={() => setToggleSettings(!toggleSettings)}
+      >
+        <span className={styles.profileIcon}> {auth?.user?.username[0]}</span>
 
-<div className = {styles.profileIconContainer}>
-        <span className = {styles.profileIcon}> {auth?.user?.username[0]}</span>
-</div>
         <div className={styles.accountDetails}>
           <p className={styles.accountName}>{auth?.user?.username}</p>
           <p className={styles.accountEmail}>{auth?.user?.email}</p>
         </div>
-
-
-<div className = {styles.toggleSettingsContainer}>
-        <Settings onClick={() => setToggleSettings(!toggleSettings)}
-            className = {styles.toggleSettings}/>
-            </div>
       </div>
     </div>
   );

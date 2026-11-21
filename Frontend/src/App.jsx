@@ -16,8 +16,12 @@ import UpdatePassword from "./pages/account-settings/UpdatePassword.jsx";
 import UpdateEmail from "./pages/account-settings/UpdateEmail.jsx";
 import DeleteAccount from "./pages/account-settings/DeleteAccount.jsx";
 import Support from "./pages/support/Support.jsx";
+import ThemeToggle from "./components/ui/ThemeToggle.jsx";
 
 function App() {
+
+
+
   useEffect(() => {
     const handler = (e) => {
       if (e.ctrlKey && e.key.toLowerCase() === "s") {

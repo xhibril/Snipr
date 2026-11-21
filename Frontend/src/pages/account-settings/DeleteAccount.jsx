@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 import global from "../../css/Global.module.css";
 import { useState } from "react";
+import { HandleBack, BackButton } from "../../components/ui/SmallComponents";
 
 export default function DeleteAccount({ notify, setAuth }) {
   const [confirmDeletion, setConfirmDeletion] = useState(false);
@@ -64,7 +65,7 @@ export default function DeleteAccount({ notify, setAuth }) {
           deleteAccount();
           e.preventDefault();
         }}
-        className={`${global.inputContainer} ${global.glassyBackground}`}
+        className={`${global.formCard} ${global.glassyBackground}`}
       >
         <BrandHeader title="Delete account" />
 
@@ -74,33 +75,26 @@ export default function DeleteAccount({ notify, setAuth }) {
           setPassword={setPassword}
         />
 
-        <div>
-          <input
+   <div style={{ display: "flex", flexDirection: "row", gap:".25rem" }}>
+          <input 
             type="checkbox"
             checked={confirmDeletion}
             onChange={(e) => setConfirmDeletion(e.target.checked)}
           />
 
-          <p> Confirm deletion</p>
+          <span> Confirm deletion</span>
         </div>
 
-        <div className={global.actionButtons}>
+      
           <button
-            className={`${global.submit} ${global.backButton}`}
-            type="button"
-            onClick={() => nav("/dashboard", { replace: true })}
-          >
-            Back
-          </button>
-
-          <button
-            className={`${global.submit} ${global.continueButton}`}
+             className={`${global.btn} ${global.btnPrimary} ${global.fullWidthBtn}`}
             type="submit"
             disabled={isLoading}
           >
             {isLoading ? "Deleting..." : "Delete account"}
           </button>
-        </div>
+        
+        <BackButton onClick={() => nav("/dashboard")}/>
       </form>
     </div>
   );

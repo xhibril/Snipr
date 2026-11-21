@@ -9,11 +9,13 @@ import {
 } from "../../components/ui/SmallComponents";
 import { useNavigate } from "react-router-dom";
 import { ValidateInput } from "../../components/utils/Validation";
+import { HandleBack, BackButton } from "../../components/ui/SmallComponents";
 
 export default function UpdateUsername({ notify, auth, setAuth }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  
   const nav = useNavigate();
 
   async function updateUsername() {
@@ -96,7 +98,7 @@ export default function UpdateUsername({ notify, auth, setAuth }) {
           updateUsername();
           e.preventDefault();
         }}
-        className={`${global.inputContainer} ${global.glassyBackground}`}
+        className={`${global.formCard} ${global.glassyBackground}`}
       >
         <BrandHeader title="Update username" />
 
@@ -112,23 +114,17 @@ export default function UpdateUsername({ notify, auth, setAuth }) {
           setPassword={setPassword}
         />
 
-        <div className={global.actionButtons}>
-          <button
-            className={`${global.submit} ${global.backButton}`}
-            type="button"
-            onClick={() => nav("/dashboard", { replace: true })}
-          >
-            Back
-          </button>
 
           <button
-            className={`${global.submit} ${global.continueButton}`}
+            className={`${global.btn} ${global.btnPrimary} ${global.fullWidthBtn}`}
             type="submit"
             disabled={isLoading}
           >
             {isLoading ? "Changing..." : "Continue"}
           </button>
-        </div>
+
+
+          <BackButton onClick={() => nav("/dashboard")}/>
       </form>
     </div>
   );

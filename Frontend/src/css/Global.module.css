@@ -29,22 +29,6 @@ border:1px solid var(--color-border);
 
 }
 
-.submit {
-  border: transparent;
-  height: 2.2rem;
-  border-radius: 0.5rem;
-  width: 100%;
-
-  background-color: #427ab5;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.submit:hover {
-  background-color: rgba(25, 127, 147, 0.85);
-}
 
 .actionButtons {
   display: flex;
@@ -81,11 +65,11 @@ border:1px solid var(--color-border);
   cursor: pointer;
   color: var(--color-text);
   transition: background-color 0.2s ease;
-  font-weight: 500;
   font-size: medium;
   border-radius: 0.2em;
+
   width: fit-content;
-  border: none;
+  border:none;
 }
 
 .btnPrimary {

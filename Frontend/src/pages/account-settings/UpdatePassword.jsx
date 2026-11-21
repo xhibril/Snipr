@@ -7,6 +7,7 @@ import {
   PasswordField,
 } from "../../components/ui/SmallComponents";
 import { useNavigate } from "react-router-dom";
+import { HandleBack, BackButton } from "../../components/ui/SmallComponents";
 
 export default function UpdatePassword({ notify }) {
   const [newPassword, setNewPassword] = useState("");
@@ -89,7 +90,7 @@ export default function UpdatePassword({ notify }) {
           updatePassword();
           e.preventDefault();
         }}
-        className={`${global.inputContainer} ${global.glassyBackground}`}
+        className={`${global.formCard} ${global.glassyBackground}`}
       >
         <BrandHeader title="Update Password" />
 
@@ -109,23 +110,19 @@ export default function UpdatePassword({ notify }) {
           title="Confirm Password"
         />
 
-        <div className={global.actionButtons}>
+      
+      
           <button
-            className={`${global.submit} ${global.backButton}`}
-            type="button"
-            onClick={() => nav("/dashboard", { replace: true })}
-          >
-            Back
-          </button>
-
-          <button
-            className={`${global.submit} ${global.continueButton}`}
+            className={`${global.btn} ${global.btnPrimary} ${global.fullWidthBtn}`}
             type="submit"
             disabled={isLoading}
           >
             {isLoading ? "Changing..." : "Continue"}
           </button>
-        </div>
+
+
+          <BackButton onClick={() => nav("/dashboard")}/>
+ 
       </form>
     </div>
   );
