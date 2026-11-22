@@ -9,7 +9,7 @@ import FileEditor from "../../components/dashboard/file-editor/FileEditor.jsx";
 import Sidebar from "../../components/dashboard/sidebar/Sidebar.jsx";
 import DefaultMenu from "../../components/dashboard/default-menu/DefaultMenu.jsx";
 
-export default function Dashboard({ notify, auth, setAuth }) {
+export default function Dashboard({ notify, auth, setAuth, theme, setTheme }) {
   const [folders, setFolders] = useState([]);
   const [files, setFiles] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -67,7 +67,7 @@ export default function Dashboard({ notify, auth, setAuth }) {
   return (
     <div className={styles.mainContainer}>
      
-        <Sidebar setActivePage={setActivePage} auth = {auth} notify = {notify}
+        <Sidebar setActivePage={setActivePage} auth = {auth} notify = {notify} theme = {theme} setTheme = {setTheme}
         setAuth={setAuth} />
 
         <FileExplorer

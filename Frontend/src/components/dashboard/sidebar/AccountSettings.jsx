@@ -1,24 +1,26 @@
 import styles from "./AccountSettings.module.css";
 import { useState } from "react";
-import ThemeToggle from "../../ui/ThemeToggle";
 import { useNavigate } from "react-router-dom";
-import { Settings } from "lucide-react";
-import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 import apiFetch from "../../utils/Api";
-import {
-  FiLock,
-  FiUser,
-  FiMail,
-  FiMoon,
-  FiTrash2,
-  FiLogOut,
-} from "react-icons/fi";
+import { ThemeIcon } from "../../ui/SmallComponents";
 
-export default function AccountSettings({ notify, auth, setAuth }) {
+import { FiLock, FiUser, FiMail, FiTrash2, FiLogOut } from "react-icons/fi";
+
+export default function AccountSettings({
+  notify,
+  auth,
+  setAuth,
+  theme,
+  setTheme,
+  toggleSideBar,
+}) {
   const [toggleSettings, setToggleSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const isThemeDark = localStorage.getItem("theme") === "dark";
   const nav = useNavigate();
+
+
+
+console.log("AccountSettings rendered");
 
   async function logout() {
     try {
@@ -53,7 +55,7 @@ export default function AccountSettings({ notify, auth, setAuth }) {
               className={styles.groupItem}
               onClick={() => nav("/account/profile")}
             >
-              <FiUser className = {styles.itemIcon}/>
+              <FiUser className={styles.itemIcon} />
               <span>Change username</span>
             </button>
 
@@ -61,7 +63,7 @@ export default function AccountSettings({ notify, auth, setAuth }) {
               className={styles.groupItem}
               onClick={() => nav("/account/password")}
             >
-              <FiLock className = {styles.itemIcon}/>
+              <FiLock className={styles.itemIcon} />
               <span>Change password</span>
             </button>
 
@@ -69,12 +71,16 @@ export default function AccountSettings({ notify, auth, setAuth }) {
               className={styles.groupItem}
               onClick={() => nav("/account/email")}
             >
-              <FiMail className = {styles.itemIcon}/>
+              <FiMail className={styles.itemIcon} />
               <span>Change email</span>
             </button>
 
-            <button className={styles.groupItem} onClick={() => }>
-              <ThemeToggle className = {styles.itemIcon} />
+            <button
+              className={styles.groupItem}
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            >
+              <ThemeIcon theme={theme} className={styles.itemIcon} />
+
               <span>Appearance</span>
             </button>
           </div>
@@ -84,7 +90,7 @@ export default function AccountSettings({ notify, auth, setAuth }) {
               className={`${styles.groupItem} ${styles.deleteAccount}`}
               onClick={() => nav("/account/delete")}
             >
-              <FiTrash2 className = {styles.itemIcon}/>
+              <FiTrash2 className={styles.itemIcon} />
               <span>Delete account </span>
             </button>
 
@@ -93,7 +99,7 @@ export default function AccountSettings({ notify, auth, setAuth }) {
               onClick={() => logout()}
               disabled={isLoading}
             >
-              <FiLogOut className = {styles.itemIcon}/>
+              <FiLogOut className={styles.itemIcon} />
               <span>Sign out</span>
             </button>
           </div>
@@ -106,10 +112,12 @@ export default function AccountSettings({ notify, auth, setAuth }) {
       >
         <span className={styles.profileIcon}> {auth?.user?.username[0]}</span>
 
-        <div className={styles.accountDetails}>
-          <p className={styles.accountName}>{auth?.user?.username}</p>
-          <p className={styles.accountEmail}>{auth?.user?.email}</p>
-        </div>
+        {toggleSideBar && (
+          <div className={styles.accountDetails}>
+            <p className={styles.accountName}>{auth?.user?.username}</p>
+            <p className={styles.accountEmail}>{auth?.user?.email}</p>
+          </div>
+        )}
       </div>
     </div>
   );

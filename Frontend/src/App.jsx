@@ -16,9 +16,22 @@ import UpdatePassword from "./pages/account-settings/UpdatePassword.jsx";
 import UpdateEmail from "./pages/account-settings/UpdateEmail.jsx";
 import DeleteAccount from "./pages/account-settings/DeleteAccount.jsx";
 import Support from "./pages/support/Support.jsx";
-import ThemeToggle from "./components/ui/ThemeToggle.jsx";
 
 function App() {
+
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("theme") ?? "light",
+  );
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+
+
+
+
 
 
 
@@ -89,7 +102,7 @@ function App() {
 
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Landing />}></Route>
+          <Route path="/" element={<Landing theme = {theme} setTheme = {setTheme}/>}></Route>
             <Route path = "/support" element = {<Support notify={notify}/>}></Route>
 
           <Route element={<Default />}>
@@ -112,7 +125,7 @@ function App() {
               ></Route>
               <Route
                 path="/dashboard"
-                element={<Dashboard notify={notify} setAuth = {setAuth} auth = {auth}/>}
+                element={<Dashboard notify={notify} setAuth = {setAuth} auth = {auth} theme = {theme} setTheme = {setTheme}/>}
               ></Route>
 
 

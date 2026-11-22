@@ -1,10 +1,12 @@
 import logo from "../../assets/images/logo.svg";
 import styles from "./SmallComponents.module.css";
+import global from "../../css/Global.module.css"
 import { useNavigate } from "react-router-dom";
 import { FiEye } from "react-icons/fi";
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import OffcutLogo from "./OffcutLogo.jsx";
+import { Moon, Sun } from "lucide-react";
 
 export const DEFAULT_FAILURE_MESSAGE = "Something went wrong, please try again";
 
@@ -109,4 +111,19 @@ export function HandleBack(steps, currentStep, setStep, nav, destination) {
   }
 
   setStep(steps[currentIndex - 1]);
+}
+
+
+
+export function ThemeIcon({theme, className}){
+ return (
+    <>
+      {theme === "light" ? (
+        <Moon className = {`${global.themeBtns} ${className || ""}`} />
+      ) : (
+        <Sun className = {`${global.themeBtns} ${className || ""}`}/>
+      )}
+    </>
+  );
+
 }

@@ -69,11 +69,21 @@
 
 .settings {
   overflow: hidden;
+
   max-height: 0;
   opacity: 0 !important;
   transition: all 0.25s ease;
   display: flex;
   flex-direction: column;
+  position: fixed;
+   bottom: 4rem;
+  left: .5rem;
+  z-index: 9999;
+  background-color: var(--color-profile);
+  padding:.5rem;
+  border-radius: .25rem;
+  width: 12rem;
+
 }
 
 .settings.show {
@@ -142,4 +152,23 @@ width: 100%;
 
 .deleteAccount {
   color: var(--color-warning)
+}
+
+
+@media (max-width: 768px){ 
+
+
+  .profile {
+
+    justify-content: center;
+  }
+
+
+  .settings {
+
+  }
+
+
+
+
 }

@@ -7,8 +7,8 @@ export default function FileItem({
   selectItem,
   updateItemPinStatus,
   handleContextMenu,
- editingTarget,
- setEditingTarget,
+  editingTarget,
+  setEditingTarget,
   renameItem,
   pendingName,
   setPendingName,
@@ -42,7 +42,7 @@ export default function FileItem({
             onClick={(e) => {
               e.stopPropagation();
 
-              updateItemPinStatus(file, "FILE")
+              updateItemPinStatus(file, "FILE");
             }}
           />
         )}

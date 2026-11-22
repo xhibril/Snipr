@@ -11,6 +11,17 @@
   grid-template-rows: auto 1fr auto;
 }
 
+
+.sideBar.collapsed{
+max-width: 5rem;
+ 
+}
+
+.toggleSiderBarBtn {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .logo {
   width: 1.5rem;
 }
@@ -19,7 +30,6 @@
   justify-content: center;
   margin-top: .5rem;
   gap: 0.5rem;
-  align-items: center;
 }
 
 .brandHeader h1 {
@@ -44,6 +54,7 @@
   gap: 1rem;
   width: 80%;
 
+
   border: transparent;
   background-color: transparent;
   align-items: center;
@@ -51,7 +62,6 @@
   transition: all 0.25s ease;
   padding: 1rem;
   border-radius: 0.2rem;
-
   opacity: 1;
 }
 
@@ -71,3 +81,21 @@
 .navLabel {
   font-size: 0.8rem;
 }
+
+
+
+
+@media (max-width: 768px){
+.toggleSiderBarBtn {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+
+.navItem {
+  justify-content: center;
+}
+
+}
+
+

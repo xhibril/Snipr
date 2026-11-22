@@ -1,10 +1,6 @@
 import styles from "./FileExplorer.module.css";
-
 import { FiTrash, FiStar, FiShare2 } from "react-icons/fi";
-
 import { RiFolderAddLine, RiFileAddLine } from "react-icons/ri";
-
-import { useEffect } from "react";
 
 export default function ExplorerToolBar({
   creationType,
@@ -17,24 +13,24 @@ export default function ExplorerToolBar({
   page,
   emptyRecycleBin,
 }) {
-
-
   return (
     <>
-      <div className={styles.snippetControls}>
+      <div className={styles.snippetActions}>
         {page.itemActions.includes("create") && (
           <>
             <RiFolderAddLine
               className={styles.snippetAction}
               onClick={() => {
-                setCreationType((prev) => prev === "FILE" ? null : "FILE");
+                setCreationType((prev) => (prev === "FILE" ? null : "FILE"));
               }}
             />
 
             <RiFileAddLine
               className={styles.snippetAction}
               onClick={() => {
-             setCreationType((prev) => prev === "FOLDER" ? null : "FOLDER");
+                setCreationType((prev) =>
+                  prev === "FOLDER" ? null : "FOLDER",
+                );
               }}
             />
           </>

@@ -108,7 +108,7 @@ const sections = {
   },
 };
 
-export default function Landing() {
+export default function Landing({theme, setTheme}) {
   const [code, setCode] = useState(effectSnippet);
   const detailsRef = useRef(null);
   const [title, setTitle] = useState("useEffect.js");
@@ -117,7 +117,7 @@ export default function Landing() {
   return (
     <>
 
-<Header/>
+<Header theme = {theme} setTheme = {setTheme} />
       <main>
         <section>
           <div className={global.container}>

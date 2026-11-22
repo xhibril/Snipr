@@ -1,11 +1,11 @@
 import styles from "./LandingHeader.module.css";
-import ThemeToggle from "../ui/ThemeToggle.jsx";
 import global from "../../css/Global.module.css";
 import OffcutLogo from "../../components/ui/OffcutLogo.jsx"
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import {ThemeIcon} from "../../components/ui/SmallComponents.jsx"
 
-export default function Header() {
+export default function Header({theme, setTheme}) {
   const nav = useNavigate();
 
   const { hash, key } = useLocation();
@@ -40,7 +40,11 @@ export default function Header() {
           </div>
 
           <div className={styles.headerActions}>
-            <ThemeToggle />
+
+          <button onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+            <ThemeIcon theme = {theme}/>
+          </button>
+          
             <a
               className={`${global.btn} ${global.btnPrimary}`}
               onClick={() => nav("/signup")}

@@ -24,7 +24,7 @@ export default function FileExplorer({
   openFile,
   creationType,
   setCreationType,
-  setOpenFileId
+  setOpenFileId,
 }) {
   const [toggleSearchFilter, setToggleSearchFilter] = useState(false);
   const [filterTags, setFilterTags] = useState([]);
@@ -36,7 +36,6 @@ export default function FileExplorer({
   const [pendingName, setPendingName] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const inputRef = useRef(null);
-
 
   const nav = useNavigate();
   const page = PAGE_CONFIG[activePage] ?? PAGE_CONFIG.ALL;
@@ -63,16 +62,14 @@ export default function FileExplorer({
   const isSearching = searchQuery.trim() !== "" || filterTags.length > 0;
 
   const displayedFiles = useMemo(() => {
-
-    if(!isSearching){
+    if (!isSearching) {
       return sortedFiles;
     }
 
     const filesToSearch = files.filter((file) => file.isDeleted === false);
 
     return SearchFiles(filesToSearch, searchQuery, filterTags);
-
-  }, [files ,sortedFiles, isSearching, searchQuery, filterTags])
+  }, [files, sortedFiles, isSearching, searchQuery, filterTags]);
 
   const {
     updateItemPinStatus,
@@ -97,13 +94,13 @@ export default function FileExplorer({
     setPendingName,
     setEditingTarget,
     creationType,
-    openFile
+    openFile,
   });
 
   useEffect(() => {
     setSelectedItem(null);
     setOpenFolders([]);
-    setOpenFileId(null)
+    setOpenFileId(null);
   }, [activePage]);
 
   // close context menu
@@ -134,17 +131,15 @@ export default function FileExplorer({
     });
   }
 
-
-
   function selectItem(item, type) {
-    setSelectedItem({type: type, data: item})
-    if(type === "FILE"){
-      setOpenFileId(item.id)
+    setSelectedItem({ type: type, data: item });
+    if (type === "FILE") {
+      setOpenFileId(item.id);
     }
   }
 
   function onOpen(item, type) {
-    selectItem(item, type)
+    selectItem(item, type);
 
     if (type === "FOLDER") {
       const index = sortedFolders.findIndex((folder) => folder.id === item.id);
@@ -165,8 +160,8 @@ export default function FileExplorer({
       <div className={styles.fileExplorer}>
         {page.showExplorerToolBar && (
           <ExplorerToolBar
-          creationType = {creationType}
-          setCreationType = {setCreationType}
+            creationType={creationType}
+            setCreationType={setCreationType}
             inputRef={inputRef}
             createItem={createItem}
             selectedItem={selectedItem}
@@ -205,11 +200,14 @@ export default function FileExplorer({
           onDrop={(e) => {
             const file = JSON.parse(e.dataTransfer.getData("file"));
 
-            moveSnippet({
-              ...file,
-              folderId: null,
-            }, file?.folderId, null);
-            
+            moveSnippet(
+              {
+                ...file,
+                folderId: null,
+              },
+              file?.folderId,
+              null,
+            );
           }}
         >
           {!isSearching &&
@@ -229,14 +227,13 @@ export default function FileExplorer({
                   updateItemPinStatus={updateItemPinStatus}
                   moveSnippet={moveSnippet}
                   handleContextMenu={handleContextMenu}
-                 
-                  editingTarget = {editingTarget}
-                  setEditingTarget = {setEditingTarget}
+                  editingTarget={editingTarget}
+                  setEditingTarget={setEditingTarget}
                   renameItem={renameItem}
                   pendingName={pendingName}
                   setPendingName={setPendingName}
-                            creationType = {creationType}
-          setCreationType = {setCreationType}
+                  creationType={creationType}
+                  setCreationType={setCreationType}
                   inputRef={inputRef}
                   createItem={createItem}
                   page={page}
@@ -280,19 +277,19 @@ export default function FileExplorer({
             setContextMenu={setContextMenu}
             editingTarget={editingTarget}
             setEditingTarget={setEditingTarget}
-          setCreationType = {setCreationType}
+            setCreationType={setCreationType}
             copy={copy}
             setCopy={setCopy}
             pasteItem={pasteItem}
             page={page}
-            setPendingName = {setPendingName}
+            setPendingName={setPendingName}
           />
         )}
 
         {creationType && selectedItem?.type !== "FOLDER" && (
           <NewItem
-                                    creationType = {creationType}
-          setCreationType = {setCreationType}
+            creationType={creationType}
+            setCreationType={setCreationType}
             inputRef={inputRef}
             createItem={createItem}
             page={page}

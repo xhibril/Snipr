@@ -3,7 +3,7 @@ import styles from "./Notification.module.css"
 import global from "../../css/Global.module.css"
 import { FiCheckCircle, FiInfo } from "react-icons/fi";
 
-export default function Notification({ message, type, key }) {
+export default function Notification({ message, type }) {
     
     const [visible, setVisible] = useState(false);
 
