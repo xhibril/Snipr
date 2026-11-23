@@ -74,6 +74,7 @@ export default function FolderItem({
 
         {folder.isPinned && (
           <RiPushpinFill
+      className = {styles.pinIcon}
             onClick={(e) => {
               e.stopPropagation();
 
@@ -112,15 +113,15 @@ export default function FolderItem({
         )}
 
         {page.showExpiration && (
-          <p>
-            {folder?.daysRemaining}
-            days
-          </p>
+          <span className={styles.daysRemaining}>
+  <span>{folder?.daysRemaining}</span>
+  <span>days</span>
+</span>
         )}
       </div>
 
-      {page.itemActions.includes("openFolders") && (
-        <div className={`${styles.folderFiles} ${isOpen ? styles.show : ""}`}>
+      {page.itemActions.includes("openFolders") && isOpen && (
+        <div className={styles.folderFiles}>
           {folderFiles.map((file) => (
             <FileItem
               key={file.id}

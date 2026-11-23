@@ -6,6 +6,7 @@
   height: 100vh;
   margin: 0;
   padding: 0;
+  
 }
 
 p {
@@ -19,8 +20,6 @@ p {
   grid-column: 2;
   display: flex;
 }
-
-
 
 
 .fileContents {
@@ -65,140 +64,3 @@ p {
   cursor: pointer;
 }
 
-.fileBody {
-  display: flex;
-  color: white;
-  flex-direction: column;
-  width: 100%;
-}
-
-.fileInfo {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.fileInfo h1 {
-  margin-left: 2rem;
-}
-
-.tagsWrapper {
-  margin-top: 0.5rem;
-}
-
-.tagsWrapper h4 {
-  font-size: 0.9rem;
-  margin: 0;
-  padding: 0;
-}
-
-.tagsAction {
-  display: flex;
-  flex-direction: row;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.addTag {
-  cursor: pointer;
-}
-
-.tags {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  width: 6rem;
-  margin-top: 0.5rem;
-}
-.tags p {
-  font-size: 0.8rem;
-  opacity: 0.8;
-  border: 1px solid #f69d39;
-  padding: 0.3rem;
-  border-radius: 0.3rem;
-}
-
-.addTagFieldWrapper {
-  display: flex;
-  flex-direction: row;
-}
-
-.tagsActionWrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: 1rem;
-}
-
-.addTagField {
-  padding: 0;
-}
-
-.fileContent {
-  margin-left: 2rem;
-
-  max-height: 75vh;
-
-  overflow-y: scroll;
-  min-height: 0;
-}
-
-pre:focus {
-  outline: none;
-}
-
-h1:focus {
-  outline: none;
-}
-
-.fileContent {
-  height: 100%;
-  margin-top: 1rem;
-  background: none;
-  border: none;
-  color: white;
-  resize: none;
-  padding-right: 2rem;
-}
-
-.fileContent::-webkit-scrollbar {
-  width: 10px;
-}
-
-.fileContent::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.fileContent::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 999px;
-}
-
-.fileContent::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.fileContent:focus {
-  outline: none;
-}
-
-.fileTitle {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 2rem;
-  margin-left: 2rem;
-  padding-right: 2rem;
-
-  flex: 1;
-}
-
-.fileTitle:focus {
-  outline: none;
-}
-
-.saveContainer {
-  display: flex;
-  justify-content: flex-end;
-}
-    

@@ -39,6 +39,7 @@ export default function FileItem({
 
         {file.isPinned && (
           <RiPushpinFill
+               className = {styles.pinIcon}
             onClick={(e) => {
               e.stopPropagation();
 
@@ -67,10 +68,10 @@ export default function FileItem({
         )}
 
         {page.showExpiration && (
-          <p>
-            {file?.daysRemaining}
-            days
-          </p>
+       <span className={styles.daysRemaining}>
+  <span>{file?.daysRemaining}</span>
+  <span>days</span>
+</span>
         )}
       </div>
     </div>

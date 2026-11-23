@@ -1,0 +1,88 @@
+.fileBody {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.fileInfo {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.fileInfo h1 {
+  margin-left: 2rem;
+}
+
+
+
+
+
+
+.fileContent {
+  margin-left: 2rem;
+
+  max-height: 75vh;
+
+  overflow-y: scroll;
+  min-height: 0;
+}
+
+pre:focus {
+  outline: none;
+}
+
+h1:focus {
+  outline: none;
+}
+
+.fileContent {
+  height: 100%;
+  margin-top: 1rem;
+  background: none;
+  border: none;
+  color: white;
+  resize: none;
+  padding-right: 2rem;
+}
+
+.fileContent::-webkit-scrollbar {
+  width: 10px;
+}
+
+.fileContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.fileContent::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+
+.fileContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.fileContent:focus {
+  outline: none;
+}
+
+.fileTitle {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  margin-left: 2rem;
+  padding-right: 2rem;
+
+  flex: 1;
+}
+
+.fileTitle:focus {
+  outline: none;
+}
+
+.saveContainer {
+  display: flex;
+  justify-content: flex-end;
+}

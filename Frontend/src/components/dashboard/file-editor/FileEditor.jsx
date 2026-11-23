@@ -1,16 +1,11 @@
-import styles from "../../../pages/dashboard/Dashboard.module.css";
+import styles from "./FileEditor.module.css";
 import { FiPlus, FiX } from "react-icons/fi";
 import { useState, useEffect, useRef } from "react";
 import apiFetch from "../../utils/Api";
 import { ValidateInput } from "../../utils/Validation";
 import { useNavigate } from "react-router-dom";
 
-export default function FileEditor({
-  setFiles,
-  file,
-  notify,
-}) {
-
+export default function FileEditor({ setFiles, file, notify }) {
   const [newTag, setNewTag] = useState("");
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,11 +32,12 @@ export default function FileEditor({
   useEffect(
     () => () => {
       if (latest.current.dirty) {
-      updateSnippet({
-        ...latest.current.file,
-        ...latest.current.draft
-      });
-      }},
+        updateSnippet({
+          ...latest.current.file,
+          ...latest.current.draft,
+        });
+      }
+    },
     [],
   );
 
@@ -102,17 +98,22 @@ export default function FileEditor({
     try {
       setIsLoading(true);
 
-      const res = await apiFetch("/snippets", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: snippet.id,
-          body: snippet.body,
-          title: snippet.title,
-          tags: snippet.tags,
-          folderId: snippet.folderId,
-        }),
-      }, notify, nav);
+      const res = await apiFetch(
+        "/snippets",
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: snippet.id,
+            body: snippet.body,
+            title: snippet.title,
+            tags: snippet.tags,
+            folderId: snippet.folderId,
+          }),
+        },
+        notify,
+        nav,
+      );
 
       if (!res) {
         rollbackSave(previousSnippet, previousOriginal);
@@ -155,87 +156,88 @@ export default function FileEditor({
               updateSnippet(snippet);
             }
           }
-        }}>
+        }}
+      >
+        <div className={styles.fileInfo}>
+          <input
+            type="text"
+            className={styles.fileTitle}
+            value={draft.title}
+            onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+          />
 
-            <div className={styles.fileInfo}>
-              <input
-                type="text"
-                className={styles.fileTitle}
-                value={draft.title}
-                onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-              />
-
-              <div className={styles.tagsWrapper}>
-                <div className={styles.tagCounter}>
-                  <p>{draft.tags?.length ?? 0}</p>
-                  <p>/5</p>
-                </div>
-
-                <div className={styles.tagsActionWrapper}>
-                  <div className={styles.tagsAction}>
-                    <h4>Tags</h4>
-                    <FiPlus
-                      className={styles.addTag}
-                      onClick={() => setIsAddingTag(!isAddingTag)}
-                    />
-                  </div>
-
-                  {isAddingTag && (
-                    <form
-                      className={styles.addTagFieldWrapper}
-                      onSubmit={(e) => {
-                        e.preventDefault();
-
-                        setDraft({
-                          ...draft,
-                          tags: [...(draft.tags ?? []), newTag],
-                        });
-
-                        setNewTag("");
-                      }}
-                    >
-                      <input
-                        type="text"
-                        className={styles.addTagField}
-                        placeholder="Add tag"
-                        onChange={(e) => setNewTag(e.target.value)}
-                        value={newTag}
-                      />
-                      <FiPlus className={styles.finalizeAddingTag} />
-                    </form>
-                  )}
-                </div>
-
-                <div className={styles.tags}>
-                  {draft.tags.map((tag, index) => (
-                    <>
-                      <p key={index}>{tag}</p>
-                      <FiX
-                        // remove tag
-                        onClick={() => {
-                          const newTags = draft.tags.filter(
-                            (_, i) => i !== index,
-                          );
-
-                          setDraft({
-                            ...draft,
-                            tags: newTags ?? [],
-                          });
-                        }}
-                      />
-                    </>
-                  ))}
-                </div>
-              </div>
+          <div className={styles.tagCounter}>
+            <div className={styles.tags}>
+              <p>{draft.tags?.length ?? 0}</p>
+              <p>/5</p>
             </div>
 
-            <textarea
-              className={styles.fileContent}
-              value={draft.body}
-              onChange={(e) => setDraft({ ...draft, body: e.target.value })}>
-              {draft.body}
-            </textarea>
+            <div className={styles.tagsContainer}>
 
+
+
+              <div className={styles.tagCounter}>
+                <h4>Tags</h4>
+                <FiPlus
+                  className={styles.toggleAddTag}
+                  onClick={() => setIsAddingTag(!isAddingTag)}
+                />
+              </div>
+
+              {isAddingTag && (
+                <form
+                  className={styles.tagForm}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+
+                    setDraft({
+                      ...draft,
+                      tags: [...(draft.tags ?? []), newTag],
+                    });
+
+                    setNewTag("");
+                  }}
+                >
+                  <input
+                    type="text"
+                    className={styles.tagField}
+                    placeholder="Add tag"
+                    onChange={(e) => setNewTag(e.target.value)}
+                    value={newTag}
+                  />
+                  <FiPlus className={styles.addTag} />
+                </form>
+              )}
+            </div>
+
+            <div className={styles.tags}>
+              {draft.tags.map((tag, index) => (
+                <>
+                  <p key={index}>{tag}</p>
+                  <FiX
+                    // remove tag
+                    onClick={() => {
+                      const newTags = draft.tags.filter((_, i) => i !== index);
+
+                      setDraft({
+                        ...draft,
+                        tags: newTags ?? [],
+                      });
+                    }}
+                  />
+                </>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <textarea
+          className={styles.fileContent}
+          value={draft.body}
+          onChange={(e) => setDraft({ ...draft, body: e.target.value })}
+        >
+          {draft.body}
+        </textarea>
 
         {dirty && (
           <div className={styles.saveContainer}>

@@ -4,14 +4,26 @@
   width: 15rem;
   background-color: var(--color-bg-explorer);
   color: var(--color-text);
-  gap:1rem;
+  gap: 1rem;
+  overflow: scroll;
+  padding: 0.75rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.fileExplorer::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.fileExplorer::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
 }
 
 /* explorer tool bar */
 .snippetActions {
   display: flex;
   justify-content: center;
-  padding-top: 0.25rem;
   align-items: center;
   gap: 0.5rem;
 }
@@ -21,46 +33,140 @@
   cursor: pointer;
 }
 
-
 /* search bar*/
 .search {
-    display: flex;
-    flex-direction: column;
-    gap:.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.querySearch, .filterSearch {
-    justify-content: center;
-    align-self: center;
-    display: flex;
-    gap:.25rem;
-    padding: 0 .35rem;
-    width: 100%; 
+.querySearch,
+.filterSearch {
+  justify-content: center;
+  align-self: center;
+  display: flex;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.inputWrapper {
+  min-width: 0;
+  flex: 1;
+
+  border-radius: 0.15rem;
+  justify-content: space-between;
+  padding: 0 0.35rem;
+  align-self: center;
+  display: flex;
+
+  background-color: var(--color-bg-input);
+  border: 1px solid var(--color-border);
+}
+
+.queryField,
+.tagField {
+  border: none;
+  padding: 0.35rem;
+  background-color: transparent;
+}
+
+.toggleTagFilter,
+.addTag {
+  width: 1rem;
+  height: auto;
+  cursor: pointer;
 }
 
 
-.queryField, .filterField{
-    min-width: 0;
-    flex:1;
-    border: none;
-    border-radius: .15rem;
-    padding:.35rem;  
-    background-color: var(--color-bg-input);  
-    border:1px solid var(--color-border);
+.selectedTags {
+  height: auto;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 1rem;
+  overflow-x: hidden;
 }
 
-.toggleFilter, .addTag {
-    width: 1rem;
-    height: auto;
-    cursor: pointer;
+.tagItem {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
 
+.selectedTagsActions {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.selectedTagsAmount {
+  font-size: small;
+  opacity: 0.8;
+}
+
+.clearTags {
+  text-decoration: underline;
+  text-underline-offset: 2.5px;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
 }
 
 
+/* files n folder */
+.folderItem {
+  display: flex;
+  flex-direction: column;
+}
 
+.folderIcon,
+.fileIcon,
+.pinIcon {
+  min-width: 1.15rem;
+  height: auto;
+}
 
+.pinIcon {
+  min-width: 1rem;
+}
 
+.folderIcon {
+  color: orange;
+}
 
+.fileIcon {
+  color: rgb(11, 129, 214);
+}
 
+.folderFiles {
+  padding: 0.25rem 0 0 0.25rem;
+}
 
+.fileItem,
+.folderItem {
+  padding: 0.5rem 0;
+}
+
+.fileHeader,
+.folderHeader {
+  cursor: pointer;
+  gap: 0.5rem;
+  display: flex;
+  flex-direction: row;
+}
+
+.fileName,
+.folderName {
+  width: 85%;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.daysRemaining {
+  font-size: 0.85rem;
+  display: inline-flex;
+  gap: 4px;
+}
 
