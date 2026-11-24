@@ -18,10 +18,6 @@ export default function AccountSettings({
   const [isLoading, setIsLoading] = useState(false);
   const nav = useNavigate();
 
-
-
-console.log("AccountSettings rendered");
-
   async function logout() {
     try {
       setIsLoading(true);

@@ -3,8 +3,8 @@ import { FiPlus } from "react-icons/fi";
 import { useEffect, useRef } from "react";
 
 export default function NewItem({
-          creationType,
-          setCreationType,
+  creationType,
+  setCreationType,
   createItem,
   page,
   inputRef,
@@ -39,32 +39,36 @@ export default function NewItem({
   }
 
   return (
-    <form
-      ref={formRef}
-      className={styles.addFile}
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
+    <div>
+   <div className={styles.fieldWrapper} style={{ marginTop: "0.5rem" }}>
+      <form
+        ref={formRef}
+        className={styles.addFile}
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
 
-        const value = inputRef.current?.value || "";
+          const value = inputRef.current?.value || "";
 
-        createItem(value);
+          createItem(value);
 
-        inputRef.current.value = "";
-        
-        setCreationType(null);
-      }}
-      onClick={(e) => e.stopPropagation()}
-    >
-      <input
-        className={styles.addFileField}
-        ref={inputRef}
-        placeholder={creationType === "FOLDER" ? "Folder name" : "File name"}
-      />
+          inputRef.current.value = "";
 
-      <button type="submit">
-        <FiPlus className={styles.addBtn} />
-      </button>
-    </form>
+          setCreationType(null);
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <input
+          className={styles.field}
+          ref={inputRef}
+          placeholder={creationType === "FOLDER" ? "Folder name" : "File name"}
+        />
+      </form>
+
+              <button className={styles.btn} type="submit">
+          <FiPlus className={styles.btnIcon} />
+        </button>
+    </div>
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 import styles from "./FileEditor.module.css";
-import { FiPlus, FiX } from "react-icons/fi";
+import { FiPlus, FiX, FiMinus } from "react-icons/fi";
 import { useState, useEffect, useRef } from "react";
 import apiFetch from "../../utils/Api";
 import { ValidateInput } from "../../utils/Validation";
@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 
 export default function FileEditor({ setFiles, file, notify }) {
   const [newTag, setNewTag] = useState("");
-  const [isAddingTag, setIsAddingTag] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const nav = useNavigate();
 
@@ -143,7 +142,7 @@ export default function FileEditor({ setFiles, file, notify }) {
   return (
     <>
       <div
-        className={styles.fileBody}
+        className={styles.file}
         onKeyDown={(e) => {
           if (e.ctrlKey && e.key === "s") {
             e.preventDefault();
@@ -166,56 +165,44 @@ export default function FileEditor({ setFiles, file, notify }) {
             onChange={(e) => setDraft({ ...draft, title: e.target.value })}
           />
 
-          <div className={styles.tagCounter}>
-            <div className={styles.tags}>
-              <p>{draft.tags?.length ?? 0}</p>
-              <p>/5</p>
-            </div>
+          <div className={styles.fileTags}>
+            <p className = {styles.tagCounter}>{draft?.tags?.length ?? 0} / 5</p>
 
-            <div className={styles.tagsContainer}>
+            <form
+              className={styles.tagForm}
+              onSubmit={(e) => {
+                e.preventDefault();
 
+                setDraft({
+                  ...draft,
+                  tags: [...(draft.tags ?? []), newTag],
+                });
 
-
-              <div className={styles.tagCounter}>
-                <h4>Tags</h4>
-                <FiPlus
-                  className={styles.toggleAddTag}
-                  onClick={() => setIsAddingTag(!isAddingTag)}
+                setNewTag("");
+              }}
+            >
+              <div className={styles.fieldWrapper}>
+                <input
+                  type="text"
+                  className={styles.tagField}
+                  placeholder="Add tag"
+                  onChange={(e) => setNewTag(e.target.value)}
+                  value={newTag}
                 />
+
+                <button className = {styles.btn} type = "submit">
+                     <FiPlus className={styles.btnIcon} />
+                </button>
+             
               </div>
-
-              {isAddingTag && (
-                <form
-                  className={styles.tagForm}
-                  onSubmit={(e) => {
-                    e.preventDefault();
-
-                    setDraft({
-                      ...draft,
-                      tags: [...(draft.tags ?? []), newTag],
-                    });
-
-                    setNewTag("");
-                  }}
-                >
-                  <input
-                    type="text"
-                    className={styles.tagField}
-                    placeholder="Add tag"
-                    onChange={(e) => setNewTag(e.target.value)}
-                    value={newTag}
-                  />
-                  <FiPlus className={styles.addTag} />
-                </form>
-              )}
-            </div>
+            </form>
 
             <div className={styles.tags}>
-              {draft.tags.map((tag, index) => (
-                <>
+              {draft?.tags.map((tag, index) => (
+                <div className={styles.tagItem}>
                   <p key={index}>{tag}</p>
-                  <FiX
-                    // remove tag
+
+                  <FiX className = {styles.removeTag}
                     onClick={() => {
                       const newTags = draft.tags.filter((_, i) => i !== index);
 
@@ -225,7 +212,7 @@ export default function FileEditor({ setFiles, file, notify }) {
                       });
                     }}
                   />
-                </>
+                </div>
               ))}
             </div>
           </div>

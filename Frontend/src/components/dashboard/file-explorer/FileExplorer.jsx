@@ -259,6 +259,22 @@ export default function FileExplorer({
               />
             );
           })}
+
+
+
+                       {creationType && selectedItem?.type !== "FOLDER" && (
+          <NewItem
+            creationType={creationType}
+            setCreationType={setCreationType}
+            inputRef={inputRef}
+            createItem={createItem}
+            page={page}
+          />
+        )}
+
+
+
+
         </div>
 
         {contextMenu && (
@@ -286,15 +302,10 @@ export default function FileExplorer({
           />
         )}
 
-        {creationType && selectedItem?.type !== "FOLDER" && (
-          <NewItem
-            creationType={creationType}
-            setCreationType={setCreationType}
-            inputRef={inputRef}
-            createItem={createItem}
-            page={page}
-          />
-        )}
+   
+
+
+
       </div>
     </>
   );

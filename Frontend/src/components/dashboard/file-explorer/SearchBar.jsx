@@ -13,28 +13,21 @@ export default function SearchBar({
 }) {
   const [tagInput, setTagInput] = useState(null);
 
-  function addTag() {
-    setFilterTags([...filterTags, tagInput]);
-    setTagInput("");
-  }
-
   return (
     <div className={styles.search}>
-      <div className={styles.querySearch}>
-        <div className={styles.inputWrapper}>
-          <input
-            type="text"
-            className={styles.queryField}
-            placeholder="Search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+      <div className={styles.fieldWrapper}>
+        <input
+          type="text"
+          className={styles.field}
+          placeholder="Search"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
 
-          <FiSliders
-            className={styles.toggleTagFilter}
-            onClick={() => setToggleSearchFilter(!toggleSearchFilter)}
-          />
-        </div>
+        <FiSliders
+          className={styles.btn}
+          onClick={() => setToggleSearchFilter(!toggleSearchFilter)}
+        />
       </div>
 
       {toggleSearchFilter && (
@@ -42,19 +35,26 @@ export default function SearchBar({
           className={styles.tagInputForm}
           onSubmit={(e) => {
             e.preventDefault();
-            addTag();
+
+            const tag = tagInput.trim();
+            if (!tag) return;
+
+            setFilterTags([...filterTags, tag]);
+            setTagInput("");
           }}
         >
-          <div className={styles.inputWrapper}>
+          <div className={styles.fieldWrapper}>
             <input
               type="text"
-              className={styles.tagField}
-              placeholder="Add tags"
+              className={styles.field}
+              placeholder="Add tag"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
             />
 
-            <FiPlus className={styles.addTag} onClick={addTag} />
+            <button className={styles.btn} type="submit">
+              <FiPlus className={styles.btnIcon} />
+            </button>
           </div>
         </form>
       )}

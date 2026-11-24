@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import styles from "./FileExplorer.module.css";
 
 export default function ContextMenu({
   x,
@@ -23,7 +24,7 @@ export default function ContextMenu({
 }) {
   return (
     <div
-      className="context-menu"
+      className={styles.contextMenu}
       style={{
         position: "fixed",
         left: x,
