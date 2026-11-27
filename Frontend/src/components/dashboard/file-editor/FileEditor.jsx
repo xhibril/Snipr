@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import apiFetch from "../../utils/Api";
 import { ValidateInput } from "../../utils/Validation";
 import { useNavigate } from "react-router-dom";
+import TagInput from "../../ui/TagInput";
 
 export default function FileEditor({ setFiles, file, notify }) {
   const [newTag, setNewTag] = useState("");
@@ -168,53 +169,12 @@ export default function FileEditor({ setFiles, file, notify }) {
           <div className={styles.fileTags}>
             <p className = {styles.tagCounter}>{draft?.tags?.length ?? 0} / 5</p>
 
-            <form
-              className={styles.tagForm}
-              onSubmit={(e) => {
-                e.preventDefault();
 
-                setDraft({
-                  ...draft,
-                  tags: [...(draft.tags ?? []), newTag],
-                });
+            <TagInput tags = {draft?.tags} onChange={setDraft} maxTags = {5}/>
+        
+          
 
-                setNewTag("");
-              }}
-            >
-              <div className={styles.fieldWrapper}>
-                <input
-                  type="text"
-                  className={styles.tagField}
-                  placeholder="Add tag"
-                  onChange={(e) => setNewTag(e.target.value)}
-                  value={newTag}
-                />
-
-                <button className = {styles.btn} type = "submit">
-                     <FiPlus className={styles.btnIcon} />
-                </button>
-             
-              </div>
-            </form>
-
-            <div className={styles.tags}>
-              {draft?.tags.map((tag, index) => (
-                <div className={styles.tagItem}>
-                  <p key={index}>{tag}</p>
-
-                  <FiX className = {styles.removeTag}
-                    onClick={() => {
-                      const newTags = draft.tags.filter((_, i) => i !== index);
-
-                      setDraft({
-                        ...draft,
-                        tags: newTags ?? [],
-                      });
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
+  
           </div>
         </div>
 

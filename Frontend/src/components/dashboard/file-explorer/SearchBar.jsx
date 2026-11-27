@@ -1,7 +1,7 @@
-import { useState } from "react";
 import styles from "./FileExplorer.module.css";
+import TagInput from "../../ui/TagInput";
 
-import { FiX, FiSliders, FiPlus } from "react-icons/fi";
+import {FiSliders} from "react-icons/fi";
 
 export default function SearchBar({
   searchQuery,
@@ -11,8 +11,6 @@ export default function SearchBar({
   filterTags,
   setFilterTags,
 }) {
-  const [tagInput, setTagInput] = useState(null);
-
   return (
     <div className={styles.search}>
       <div className={styles.fieldWrapper}>
@@ -31,32 +29,7 @@ export default function SearchBar({
       </div>
 
       {toggleSearchFilter && (
-        <form
-          className={styles.tagInputForm}
-          onSubmit={(e) => {
-            e.preventDefault();
-
-            const tag = tagInput.trim();
-            if (!tag) return;
-
-            setFilterTags([...filterTags, tag]);
-            setTagInput("");
-          }}
-        >
-          <div className={styles.fieldWrapper}>
-            <input
-              type="text"
-              className={styles.field}
-              placeholder="Add tag"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-            />
-
-            <button className={styles.btn} type="submit">
-              <FiPlus className={styles.btnIcon} />
-            </button>
-          </div>
-        </form>
+        <TagInput onChange={setFilterTags} tags = {filterTags}/>
       )}
 
       {filterTags.length > 0 && (
@@ -69,25 +42,10 @@ export default function SearchBar({
               className={styles.clearTags}
               onClick={() => {
                 setFilterTags([]);
-                setTagInput("");
-              }}
-            >
+              }}>
               Clear all
             </button>
           </div>
-
-          {filterTags.map((tag, index) => (
-            <div key={index} className={styles.tagItem}>
-              <p>{tag}</p>
-
-              <FiX
-                className={styles.removeTag}
-                onClick={() =>
-                  setFilterTags(filterTags.filter((_, i) => i !== index))
-                }
-              />
-            </div>
-          ))}
         </div>
       )}
     </div>
