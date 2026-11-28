@@ -1,6 +1,7 @@
 import styles from "../dashboard/file-explorer/FileExplorer.module.css";
 import { FiPlus } from "react-icons/fi";
 import { useEffect, useRef } from "react";
+import global from "../../css/Global.module.css";
 
 export default function NewItem({
   creationType,
@@ -40,7 +41,7 @@ export default function NewItem({
 
   return (
     <div>
-   <div className={styles.fieldWrapper} style={{ marginTop: "0.5rem" }}>
+   <div className={global.fieldWrapper} style={{ marginTop: "0.5rem" }}>
       <form
         ref={formRef}
         className={styles.addFile}
@@ -59,14 +60,14 @@ export default function NewItem({
         onClick={(e) => e.stopPropagation()}
       >
         <input
-          className={styles.field}
+          className={global.field}
           ref={inputRef}
           placeholder={creationType === "FOLDER" ? "Folder name" : "File name"}
         />
       </form>
 
-              <button className={styles.btn} type="submit">
-          <FiPlus className={styles.btnIcon} />
+              <button className={global.fieldBtn} type="submit">
+          <FiPlus className={global.fieldBtnIcon} />
         </button>
     </div>
     </div>

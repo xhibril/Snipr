@@ -37,6 +37,8 @@ export default function FileExplorer({
   const [contextMenu, setContextMenu] = useState(null);
   const inputRef = useRef(null);
 
+  const [isExpanded, setIsExpanded] = useState(true);
+
   const nav = useNavigate();
   const page = PAGE_CONFIG[activePage] ?? PAGE_CONFIG.ALL;
 
@@ -156,157 +158,150 @@ export default function FileExplorer({
   }
 
   return (
-    <>
-      <div className={styles.fileExplorer}>
-        {page.showExplorerToolBar && (
-          <ExplorerToolBar
-            creationType={creationType}
-            setCreationType={setCreationType}
-            inputRef={inputRef}
-            createItem={createItem}
-            selectedItem={selectedItem}
-            deleteItem={deleteItem}
-            updateItemPinStatus={updateItemPinStatus}
-            emptyRecycleBin={emptyRecycleBin}
-            page={page}
-          />
-        )}
+    <div className={`${styles.fileExplorer} ${ !isExpanded ? styles.collapsed : ""}`}>
+      {page.showExplorerToolBar && (
+        <ExplorerToolBar
+          creationType={creationType}
+          setCreationType={setCreationType}
+          inputRef={inputRef}
+          createItem={createItem}
+          selectedItem={selectedItem}
+          deleteItem={deleteItem}
+          updateItemPinStatus={updateItemPinStatus}
+          emptyRecycleBin={emptyRecycleBin}
+          page={page}
+          isExpanded={isExpanded}
+          setIsExpanded={setIsExpanded}
+        />
+      )}
 
-        {page.showSearch && (
-          <SearchBar
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            toggleSearchFilter={toggleSearchFilter}
-            setToggleSearchFilter={setToggleSearchFilter}
-            filterTags={filterTags}
-            setFilterTags={setFilterTags}
-            page={page}
-          />
-        )}
+      {isExpanded && (
+        <>
+          {page.showSearch && (
+            <SearchBar
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              toggleSearchFilter={toggleSearchFilter}
+              setToggleSearchFilter={setToggleSearchFilter}
+              filterTags={filterTags}
+              setFilterTags={setFilterTags}
+              page={page}
+            />
+          )}
 
-        <div
-          onContextMenu={(e) => {
-            /*if file is clicked instead of panel stop the handler */
-            if (e.target !== e.currentTarget) return;
+          <div
+            onContextMenu={(e) => {
+              /*if file is clicked instead of panel stop the handler */
+              if (e.target !== e.currentTarget) return;
 
-            setSelectedItem(null);
-            setCreationType(null);
+              setSelectedItem(null);
+              setCreationType(null);
 
-            e.preventDefault();
-            handleContextMenu(e, null, "PANEL");
-          }}
-          className={styles.snippetFiles}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => {
-            const file = JSON.parse(e.dataTransfer.getData("file"));
+              e.preventDefault();
+              handleContextMenu(e, null, "PANEL");
+            }}
+            className={styles.snippetFiles}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              const file = JSON.parse(e.dataTransfer.getData("file"));
 
-            moveSnippet(
-              {
-                ...file,
-                folderId: null,
-              },
-              file?.folderId,
-              null,
-            );
-          }}
-        >
-          {!isSearching &&
-            page.showFolders &&
-            sortedFolders.map((folder, index) => {
+              moveSnippet(
+                {
+                  ...file,
+                  folderId: null,
+                },
+                file?.folderId,
+                null,
+              );
+            }}
+          >
+            {!isSearching &&
+              page.showFolders &&
+              sortedFolders.map((folder, index) => {
+                return (
+                  <FolderItem
+                    key={folder.id}
+                    folder={folder}
+                    files={files}
+                    index={index}
+                    isOpen={openFolders.includes(index)}
+                    setOpenFolders={setOpenFolders}
+                    selectedItem={selectedItem}
+                    setSelectedItem={setSelectedItem}
+                    selectItem={selectItem}
+                    updateItemPinStatus={updateItemPinStatus}
+                    moveSnippet={moveSnippet}
+                    handleContextMenu={handleContextMenu}
+                    editingTarget={editingTarget}
+                    setEditingTarget={setEditingTarget}
+                    renameItem={renameItem}
+                    pendingName={pendingName}
+                    setPendingName={setPendingName}
+                    creationType={creationType}
+                    setCreationType={setCreationType}
+                    inputRef={inputRef}
+                    createItem={createItem}
+                    page={page}
+                  />
+                );
+              })}
+
+            {displayedFiles.map((file) => {
               return (
-                <FolderItem
-                  key={folder.id}
-                  folder={folder}
-                  files={files}
-                  index={index}
-                  isOpen={openFolders.includes(index)}
-                  setOpenFolders={setOpenFolders}
+                <FileItem
+                  key={file.id}
+                  file={file}
                   selectedItem={selectedItem}
-                  setSelectedItem={setSelectedItem}
                   selectItem={selectItem}
                   updateItemPinStatus={updateItemPinStatus}
-                  moveSnippet={moveSnippet}
                   handleContextMenu={handleContextMenu}
                   editingTarget={editingTarget}
                   setEditingTarget={setEditingTarget}
                   renameItem={renameItem}
                   pendingName={pendingName}
                   setPendingName={setPendingName}
-                  creationType={creationType}
-                  setCreationType={setCreationType}
-                  inputRef={inputRef}
-                  createItem={createItem}
                   page={page}
                 />
               );
             })}
 
-          {displayedFiles.map((file) => {
-            return (
-              <FileItem
-                key={file.id}
-                file={file}
-                selectedItem={selectedItem}
-                selectItem={selectItem}
-                updateItemPinStatus={updateItemPinStatus}
-                handleContextMenu={handleContextMenu}
-                editingTarget={editingTarget}
-                setEditingTarget={setEditingTarget}
-                renameItem={renameItem}
-                pendingName={pendingName}
-                setPendingName={setPendingName}
+            {creationType && selectedItem?.type !== "FOLDER" && (
+              <NewItem
+                creationType={creationType}
+                setCreationType={setCreationType}
+                inputRef={inputRef}
+                createItem={createItem}
                 page={page}
               />
-            );
-          })}
+            )}
+          </div>
 
-
-
-                       {creationType && selectedItem?.type !== "FOLDER" && (
-          <NewItem
-            creationType={creationType}
-            setCreationType={setCreationType}
-            inputRef={inputRef}
-            createItem={createItem}
-            page={page}
-          />
-        )}
-
-
-
-
-        </div>
-
-        {contextMenu && (
-          <ContextMenu
-            x={contextMenu.x}
-            y={contextMenu.y}
-            file={contextMenu.item}
-            type={contextMenu.type}
-            contextMenu={contextMenu}
-            onDelete={deleteItem}
-            onRecover={recoverFiles}
-            onOpen={onOpen}
-            onRename={renameItem}
-            updatePinStatus={updateItemPinStatus}
-            setSelectedItem={setSelectedItem}
-            setContextMenu={setContextMenu}
-            editingTarget={editingTarget}
-            setEditingTarget={setEditingTarget}
-            setCreationType={setCreationType}
-            copy={copy}
-            setCopy={setCopy}
-            pasteItem={pasteItem}
-            page={page}
-            setPendingName={setPendingName}
-          />
-        )}
-
-   
-
-
-
-      </div>
-    </>
+          {contextMenu && (
+            <ContextMenu
+              x={contextMenu.x}
+              y={contextMenu.y}
+              file={contextMenu.item}
+              type={contextMenu.type}
+              contextMenu={contextMenu}
+              onDelete={deleteItem}
+              onRecover={recoverFiles}
+              onOpen={onOpen}
+              onRename={renameItem}
+              updatePinStatus={updateItemPinStatus}
+              setSelectedItem={setSelectedItem}
+              setContextMenu={setContextMenu}
+              editingTarget={editingTarget}
+              setEditingTarget={setEditingTarget}
+              setCreationType={setCreationType}
+              copy={copy}
+              setCopy={setCopy}
+              pasteItem={pasteItem}
+              page={page}
+              setPendingName={setPendingName}
+            />
+          )}
+        </>
+      )}
+    </div>
   );
 }

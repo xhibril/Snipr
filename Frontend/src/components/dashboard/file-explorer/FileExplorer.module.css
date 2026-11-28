@@ -12,19 +12,37 @@
   overflow-x: hidden;
 }
 
+
+.fileExplorer.collapsed {
+  width: fit-content;
+  background-color: transparent;
+  overflow: hidden;
+}
+
 /* explorer tool bar */
-.snippetActions {
+.explorerActions {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
+
+  height: 2rem;
 }
 
-.snippetAction {
-  font-size: 1.05rem;
+.persistentActions, .conditionalActions {
+  display: flex;
+}
+
+.persistentActions {
+  gap:.25rem;
+}
+
+
+
+
+.action {
+  font-size: 1.2rem;
   cursor: pointer;
 }
-
 
 .snippetFiles {
   height: 100%;
@@ -39,20 +57,6 @@
 }
 
 
-.selectedTags {
-  height: auto;
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  gap: 1rem;
-  overflow-x: hidden;
-}
-
-.tagItem {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-}
 
 .selectedTagsActions {
   display: flex;
@@ -132,3 +136,15 @@
 }
 
 
+
+
+
+@media(max-width: 480px){
+  .explorerActions {
+   justify-content: flex-start;
+   justify-content: space-between;
+  }
+
+
+
+}

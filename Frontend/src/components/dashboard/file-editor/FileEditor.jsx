@@ -5,10 +5,12 @@ import apiFetch from "../../utils/Api";
 import { ValidateInput } from "../../utils/Validation";
 import { useNavigate } from "react-router-dom";
 import TagInput from "../../ui/TagInput";
+import { Tag } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 export default function FileEditor({ setFiles, file, notify }) {
-  const [newTag, setNewTag] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [toggleTags, setToggleTags] = useState(false);
   const nav = useNavigate();
 
   const [draft, setDraft] = useState({
@@ -167,14 +169,28 @@ export default function FileEditor({ setFiles, file, notify }) {
           />
 
           <div className={styles.fileTags}>
-            <p className = {styles.tagCounter}>{draft?.tags?.length ?? 0} / 5</p>
+            <div className={styles.toggleTags}>
+              <div className={styles.toggleTagsInfo}>
+                <Tag className = {styles.tagsIcon}/>
+                <span> Tags ({draft?.tags?.length ?? 0})</span>
+              </div>
 
+              {toggleTags ? (
+                <ChevronUp
+                  onClick={() => setToggleTags(!toggleTags)}
+                  className={styles.toggleTagsBtn}
+                />
+              ) : (
+                <ChevronDown
+                  onClick={() => setToggleTags(!toggleTags)}
+                  className={styles.toggleTagsBtn}
+                />
+              )}
+            </div>
 
-            <TagInput tags = {draft?.tags} onChange={setDraft} maxTags = {5}/>
-        
-          
-
-  
+            {toggleTags && (
+              <TagInput tags={draft?.tags} onChange={setDraft} maxTags={5} />
+            )}
           </div>
         </div>
 

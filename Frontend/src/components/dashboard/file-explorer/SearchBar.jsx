@@ -1,5 +1,6 @@
 import styles from "./FileExplorer.module.css";
 import TagInput from "../../ui/TagInput";
+import global from "../../../css/Global.module.css";
 
 import {FiSliders} from "react-icons/fi";
 
@@ -13,22 +14,24 @@ export default function SearchBar({
 }) {
   return (
     <div className={styles.search}>
-      <div className={styles.fieldWrapper}>
+      <div className={global.fieldWrapper}>
         <input
           type="text"
-          className={styles.field}
+          className={global.field}
           placeholder="Search"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
 
+
+
         <FiSliders
-          className={styles.btn}
+          className={global.fieldBtnIcon}
           onClick={() => setToggleSearchFilter(!toggleSearchFilter)}
         />
       </div>
 
-      {toggleSearchFilter && (
+      { toggleSearchFilter && (
         <TagInput onChange={setFilterTags} tags = {filterTags}/>
       )}
 
